@@ -1,0 +1,134 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!129 &1
+PlayerSettings:
+  m_ObjectHideFlags: 0
+  productName: Monopoly Tycoon
+  companyName: Tycoon Games
+  bundleVersion: 1.0.0
+  splashScreen:
+    show: 1
+    showUnityLogo: 1
+    unityLogoStyle: 0
+    drawMode: 0
+    backgroundColor:
+      r: 0.13333334
+      g: 0.13333334
+      b: 0.13333334
+      a: 1
+  defaultScreenOrientation: 5
+  targetDevice: 0
+  useOnDemandResources: 0
+  accelerometerFrequency: 60
+  cameraUsageDescription: 
+  locationUsageDescription: 
+  microphoneUsageDescription: 
+  alwaysShowTouchControls: 0
+  defaultCursor: {fileID: 0}
+  cursorHotspot: {x: 0, y: 0}
+  applicationIdentifier:
+    Android: com.TycoonGames.MonopolyTycoon
+    Standalone: com.TycoonGames.MonopolyTycoon
+  buildNumber:
+    Android: 1
+  AndroidTargetDevices: 0
+  splashIsTranslucent: 0
+  resolutionDialogBanner: {fileID: 0}
+  virtualRealitySplashScreen: {fileID: 0}
+  holographicPauseBackground: {fileID: 0}
+  vrEditorSimulation: 0
+  vrPlayMode: 0
+  runInBackground: 1
+  captureSingleScreen: 0
+  supportedAspectRatios:
+    4:3: 1
+    5:4: 1
+    16:10: 1
+    16:9: 1
+    Others: 1
+  defaultIsNativeResolution: 1
+  macRetinaSupport: 1
+  fullScreenMode: 1
+  visibleInBackground: 0
+  allowFullscreenSwitch: 1
+  forceSingleInstance: 0
+  resizableWindow: 0
+  usePlayerLog: 1
+  logObjCUncaughtExceptions: 1
+  enableCrashReportAPI: 0
+  bakeCollisionMeshes: 0
+  forceSRGBBlit: 0
+  enableInternalProfiler: 0
+  actionOnDotNetUnhandledException: 1
+  stripEngineCode: 1
+  aotOptions: 
+  stackTraceTypes: 0100000001000000010000000100000001000000
+  stripUnusedMeshComponents: 1
+  colorGamut: 0
+  activeColorSpace: 0
+  MTRendering: 1
+  graphicsJobs: 1
+  vulkanEnableSetSRGBWrite: 0
+  vulkanEnablePreTransform: 0
+  graphicsJobMode: 0
+  graphicsJobModeMetal: 0
+  gpuSkinning: 1
+  lightmapStreamingEnabled: 0
+  lightmapStreamingPriority: 0
+  metalEditorSupport: 0
+  metalAPIValidation: 1
+  metalForceHardShadows: 0
+  gcIncremental: 1
+  scriptingDefineSymbols: {}
+  platformSettings:
+  - buildTarget: Standalone
+    playerActivity:
+      m_MainOrNone: 1
+      m_BuiltinOrCustom: 0
+    scriptingBackend: 1
+    managedStrippingLevel: 1
+    allowUnsafeCode: 0
+    useDeterministicCompilation: 1
+    additionalCompilerArguments: []
+    suppressCommonWarnings: 0
+    useTinyCorlib: 0
+    scriptingRuntimeVersion: 1
+    apiCompatibilityLevel: 6
+  - buildTarget: StandaloneWindows64
+    playerActivity:
+      m_MainOrNone: 1
+      m_BuiltinOrCustom: 0
+    scriptingBackend: 1
+    managedStrippingLevel: 1
+    allowUnsafeCode: 0
+    useDeterministicCompilation: 1
+    additionalCompilerArguments: []
+    suppressCommonWarnings: 0
+    useTinyCorlib: 0
+    scriptingRuntimeVersion: 1
+    apiCompatibilityLevel: 6
+  il2cppCompilerConfiguration: 0
+  il2cppStealthOptionalMethods: {}
+  il2cppStripMethodBodies: 1
+  scriptingVersion: 0
+  blurInPause: 0
+  allowHDRDisplay: 0
+  hdrFluidColorEncoding: 0
+  vrrSupport: 0
+  cloudProjectId: 
+  frameTimingStats: 0
+  assetBundleManifest: {fileID: 0}
+  useAlphaInDashboard: 0
+  legacyClampBlendShapeWeights: 1
+  useDefaultGraphicsAPIs: 1
+  renderingPath: 1
+  stereoRenderingPath: 0
+  uIElementUpdateMode: 0
+  bakeCollisionMeshes_PS4: 0
+  videoMemoryForVertexBuffers_PS4: 512
+  customLightmapSettings:
+    m_Enabled: 0
+  m_RenderingLayerMask: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1

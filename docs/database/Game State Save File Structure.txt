@@ -1,0 +1,52 @@
+{
+  "gameStateId": "f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+  "gameVersion": "1.0.0",
+  "playerStates": [
+    {
+      "playerId": "player1_guid",
+      "money": 1500,
+      "position": 0,
+      "propertiesOwned": [],
+      "inJail": false,
+      "jailTurns": 0
+    },
+    {
+      "playerId": "player2_guid",
+      "money": 1500,
+      "position": 0,
+      "propertiesOwned": [],
+      "inJail": false,
+      "jailTurns": 0
+    }
+  ],
+  "boardState": {
+    "propertyOwnership": {
+      "mediterraneanAve": null,
+      "balticAve": null
+    },
+    "propertyDevelopment": {
+      "mediterraneanAve": {
+        "houses": 0,
+        "hotel": 0
+      },
+      "balticAve": {
+        "houses": 0,
+        "hotel": 0
+      }
+    }
+  },
+  "bankState": {
+    "housesRemaining": 32,
+    "hotelsRemaining": 12
+  },
+  "deckStates": {
+    "chanceDeckOrder": [5, 12, 1, 8, 3, 15, 6, 10, 2, 7, 13, 4, 11, 9, 14, 0],
+    "communityChestDeckOrder": [10, 2, 7, 13, 4, 11, 9, 14, 0, 5, 12, 1, 8, 3, 15, 6]
+  },
+  "gameMetadata": {
+    "currentTurn": 1,
+    "activePlayerId": "player1_guid",
+    "sessionTimestamp": "2023-10-27T14:22:01Z",
+    "diceRollResult": null
+  }
+}

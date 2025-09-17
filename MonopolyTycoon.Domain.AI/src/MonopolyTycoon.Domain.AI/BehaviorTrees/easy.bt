@@ -1,0 +1,26 @@
+# REQ-1-064: 'Easy' AI will make sub-optimal decisions.
+# This tree is simple: it focuses on basic survival and opportunistic buying without deep strategy.
+# It will prioritize not spending money unless it has a large reserve.
+
+tree "EasyAI_PreRoll"
+    
+    # Always check for a healthy cash reserve before considering any spending actions.
+    sequence
+        IsCashAboveThreshold # Uses a high threshold from ai_parameters.json
+        
+        # If cash is good, try to buy the property we're on. Don't worry about monopolies.
+        fallback
+            sequence
+                IsOnUnownedProperty
+                CanAffordCurrentProperty
+                AttemptToBuyProperty # Sets ResultAction
+            
+            # If buying fails or is not an option, this fallback ensures the sequence succeeds.
+            succeed
+            
+
+    # If the main sequence results in an action, this node will fail and the tree stops.
+    # If no action was taken, this node will succeed, and we proceed to end the pre-roll phase.
+    fallback
+        HasActionBeenDecided
+        DecideToEndPreRollPhase # Sets ResultAction to RollDice

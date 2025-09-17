@@ -1,0 +1,97 @@
+# Visual Studio generated
+*.vs/
+*.[Ss]u[Oo]
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider generated
+.idea/
+*.sln.iml
+
+# User-specific files
+*.DS_Store
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio Code files
+.vscode/
+
+# Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# MemoryCaptures can be huge
+/[Mm]emoryCaptures/
+
+# Asset meta files
+*.pidb
+*.unityproj
+*.suo
+*.userprefs
+*.sln
+*.csproj
+*.unity
+*.asset
+*.meta
+
+# Mac specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows specific
+Thumbs.db
+Desktop.ini
+
+# Builds
+Builds/
+ExportedProject/
+
+# Crash reports
+crash_reports/
+
+# NuGet packages
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+# except build/, which is used as an MSBuild target.
+!**/packages/build/
+# Uncomment if you don't want to check in private information
+#*.privatetheme
+
+# Raw Assets
+RawAssets/
+
+# Misc
+*.pem
+*.pfx
+*.key
+*.cer
+
+# Local config files
+appsettings.Development.json
+secrets.json
+
+# Tooling
+.DS_Store
+.toolstarget
+.vs

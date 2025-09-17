@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "components": [
+    "Microsoft.VisualStudio.Component.CoreEditor",
+    "Microsoft.VisualStudio.Workload.NetDesktop",
+    "Microsoft.VisualStudio.Component.ManagedDesktop.Core",
+    "Microsoft.Net.Component.8.0.SDK",
+    "Microsoft.VisualStudio.Component.Git",
+    "Microsoft.VisualStudio.Component.Unity"
+  ]
+}

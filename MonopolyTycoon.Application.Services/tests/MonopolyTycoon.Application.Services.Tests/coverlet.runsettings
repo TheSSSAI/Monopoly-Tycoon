@@ -1,0 +1,44 @@
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage" uri="datacollector://Microsoft/CodeCoverage/2.0" assemblyQualifiedName="Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <Configuration>
+          <CodeCoverage>
+            <ModulePaths>
+              <Exclude>
+                <ModulePath>.*\.Tests\.dll$</ModulePath>
+              </Exclude>
+            </ModulePaths>
+            <Functions>
+              <Exclude>
+                <!-- Exclude auto-generated record methods -->
+                <Function>.*\.get_EqualityContract\(\)$</Function>
+                <Function>.*\.get_Clone\$\(\)$</Function>
+                <Function>.*\.op_Equality\(.*\)$</Function>
+                <Function>.*\.op_Inequality\(.*\)$</Function>
+                <Function>.*\.PrintMembers\(.*\)$</Function>
+                <Function>.*\.ToString\(\)$</Function>
+                <Function>.*\.Equals\(.*\)$</Function>
+                <Function>.*\.GetHashCode\(\)$</Function>
+              </Exclude>
+            </Functions>
+            <Attributes>
+                <Exclude>
+                    <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
+                    <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+                </Exclude>
+            </Attributes>
+            <Sources>
+              <Exclude>
+                <Source>.*\\src\\.*</Source> <!-- Exclude all source files for now until projects are generated -->
+              </Exclude>
+            </Sources>
+          </CodeCoverage>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+  <RunConfiguration>
+    <ResultsDirectory>.\TestResults</ResultsDirectory>
+  </RunConfiguration>
+</RunSettings>

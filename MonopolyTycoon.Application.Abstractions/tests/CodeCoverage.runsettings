@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- REQ-1-025: Achieve a minimum of 70% code coverage for core components. -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Specify modules to include in code coverage analysis -->
+          <Include>
+            <!-- Core business logic and rules -->
+            <ModulePath>.*MonopolyTycoon\.Domain\.dll$</ModulePath>
+            <!-- Application use cases and orchestration -->
+            <ModulePath>.*MonopolyTycoon\.Application\.Services\.dll$</ModulePath>
+          </Include>
+          <!-- Specify modules/types to exclude from code coverage analysis -->
+          <Exclude>
+            <!-- Exclude test projects from coverage metrics -->
+            <ModulePath>.*\.Tests\.dll$</ModulePath>
+            <!-- Abstractions have no logic to cover -->
+            <ModulePath>.*\.Abstractions\.dll$</ModulePath>
+            <!-- Exclude auto-generated code, like compiler-generated types -->
+            <Function>.*\.ctor$</Function> <!-- Exclude constructors -->
+            <Function>.*\.get_.*</Function> <!-- Exclude property getters -->
+            <Function>.*\.set_.*</Function> <!-- Exclude property setters -->
+            <Function>.*g__.*</Function>   <!-- Exclude compiler-generated display classes -->
+            <Source>.*\\Migrations\\.*</Source> <!-- Exclude EF Core migrations -->
+          </Exclude>
+          <SkipAutoProps>true</SkipAutoProps>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

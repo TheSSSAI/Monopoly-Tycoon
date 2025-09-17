@@ -1,0 +1,27 @@
+<Project>
+  <!-- This file applies to all projects in the solution -->
+  <PropertyGroup>
+    <Product>Monopoly Tycoon</Product>
+    <Company>Monopoly Tycoon Dev Team</Company>
+    <Authors>Monopoly Tycoon Dev Team</Authors>
+    <Copyright>Copyright (c) 2024 Monopoly Tycoon Dev Team. All rights reserved.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/user/monopoly-tycoon</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/user/monopoly-tycoon</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    
+    <!-- Build Configuration -->
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Deterministic Builds for CI -->
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+</Project>

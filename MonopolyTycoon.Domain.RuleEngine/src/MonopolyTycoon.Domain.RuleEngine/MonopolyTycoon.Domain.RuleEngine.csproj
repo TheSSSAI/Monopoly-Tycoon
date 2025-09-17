@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MonopolyTycoon.Domain.RuleEngine</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 
+      This project would typically reference MonopolyTycoon.Domain as a package reference 
+      in a large-scale enterprise system. For a self-contained solution, a project 
+      reference is used. The path assumes a standard src/tests structure.
+    -->
+    <ProjectReference Include="..\..\..\MonopolyTycoon.Domain\src\MonopolyTycoon.Domain\MonopolyTycoon.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

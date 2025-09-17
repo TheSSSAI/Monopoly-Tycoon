@@ -1,0 +1,54 @@
+# This workflow builds and tests the .NET solution.
+# REQ-1-024: All source code must be managed in a Git version control repository.
+# This CI pipeline helps enforce code quality and integration standards.
+
+name: .NET CI for Domain.AI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'src/MonopolyTycoon.Domain.AI/**'
+      - 'tests/MonopolyTycoon.Domain.AI.Tests/**'
+      - '.github/workflows/dotnet.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'src/MonopolyTycoon.Domain.AI/**'
+      - 'tests/MonopolyTycoon.Domain.AI.Tests/**'
+      - '.github/workflows/dotnet.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore MonopolyTycoon.Domain.AI.sln
+
+    - name: Build solution
+      run: dotnet build MonopolyTycoon.Domain.AI.sln --configuration Release --no-restore
+
+    - name: Run tests with code coverage
+      # REQ-1-025: Unit tests with NUnit achieving minimum code coverage.
+      run: dotnet test MonopolyTycoon.Domain.AI.sln --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory "TestResults" --settings tests/coverlet.runsettings
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: ${{ github.repository }}
+        files: ./TestResults/**/coverage.cobertura.xml
+        fail_ci_if_error: true

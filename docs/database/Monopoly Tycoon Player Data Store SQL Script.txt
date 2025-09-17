@@ -1,0 +1,118 @@
+-- This script is for SQLite
+
+-- Enable foreign key support
+PRAGMA foreign_keys = ON;
+
+-- Table: PlayerProfile
+-- Represents the human player's persistent profile.
+CREATE TABLE PlayerProfile (
+    profileId TEXT NOT NULL PRIMARY KEY,
+    displayName TEXT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_PlayerProfile_DisplayName UNIQUE (displayName),
+    CONSTRAINT CHK_DisplayName_Length CHECK (LENGTH(displayName) >= 3 AND LENGTH(displayName) <= 16),
+    CONSTRAINT CHK_DisplayName_Chars CHECK (displayName GLOB '[a-zA-Z0-9_]*')
+);
+
+-- Table: PlayerStatistic
+-- Stores aggregated historical gameplay statistics for a player profile.
+CREATE TABLE PlayerStatistic (
+    playerStatisticId TEXT NOT NULL PRIMARY KEY,
+    profileId TEXT NOT NULL,
+    totalGamesPlayed INTEGER NOT NULL DEFAULT 0,
+    totalWins INTEGER NOT NULL DEFAULT 0,
+    averageGameDurationSeconds INTEGER NOT NULL DEFAULT 0,
+    mostProfitableProperty TEXT,
+    totalRentPaid NUMERIC(18, 2) NOT NULL DEFAULT 0.00,
+    totalRentCollected NUMERIC(18, 2) NOT NULL DEFAULT 0.00,
+    totalPropertiesAcquired INTEGER NOT NULL DEFAULT 0,
+    largestTradeDealValue NUMERIC(18, 2) NOT NULL DEFAULT 0.00,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_PlayerStatistic_ProfileId UNIQUE (profileId),
+    CONSTRAINT FK_PlayerStatistic_PlayerProfile FOREIGN KEY (profileId) REFERENCES PlayerProfile(profileId) ON DELETE CASCADE,
+    CONSTRAINT CHK_TotalGamesPlayed_NonNegative CHECK (totalGamesPlayed >= 0),
+    CONSTRAINT CHK_TotalWins_NonNegative CHECK (totalWins >= 0),
+    CONSTRAINT CHK_AvgGameDuration_NonNegative CHECK (averageGameDurationSeconds >= 0),
+    CONSTRAINT CHK_TotalRentPaid_NonNegative CHECK (totalRentPaid >= 0.00),
+    CONSTRAINT CHK_TotalRentCollected_NonNegative CHECK (totalRentCollected >= 0.00),
+    CONSTRAINT CHK_TotalPropsAcquired_NonNegative CHECK (totalPropertiesAcquired >= 0),
+    CONSTRAINT CHK_LargestTrade_NonNegative CHECK (largestTradeDealValue >= 0.00)
+);
+
+-- Table: GameResult
+-- Records the outcome and high-level statistics of a single completed game session.
+CREATE TABLE GameResult (
+    gameResultId TEXT NOT NULL PRIMARY KEY,
+    profileId TEXT NOT NULL,
+    didHumanWin INTEGER NOT NULL DEFAULT 0,
+    gameDurationSeconds INTEGER NOT NULL DEFAULT 0,
+    totalTurns INTEGER NOT NULL DEFAULT 0,
+    endTimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    humanFinalNetWorth NUMERIC(18, 2) NOT NULL DEFAULT 0.00,
+    CONSTRAINT FK_GameResult_PlayerProfile FOREIGN KEY (profileId) REFERENCES PlayerProfile(profileId) ON DELETE CASCADE,
+    CONSTRAINT CHK_DidHumanWin_Boolean CHECK (didHumanWin IN (0, 1)),
+    CONSTRAINT CHK_GameDuration_NonNegative CHECK (gameDurationSeconds >= 0),
+    CONSTRAINT CHK_TotalTurns_NonNegative CHECK (totalTurns >= 0)
+);
+
+-- Table: GameParticipant
+-- Represents a single player's performance in a specific completed game.
+CREATE TABLE GameParticipant (
+    gameParticipantId TEXT NOT NULL PRIMARY KEY,
+    gameResultId TEXT NOT NULL,
+    participantName TEXT NOT NULL,
+    isHuman INTEGER NOT NULL DEFAULT 0,
+    aiDifficulty INTEGER,
+    finalNetWorth NUMERIC(18, 2) NOT NULL DEFAULT 0.00,
+    propertiesOwnedCount INTEGER NOT NULL DEFAULT 0,
+    totalRentCollected NUMERIC(18, 2) NOT NULL DEFAULT 0.00,
+    isWinner INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT UC_GameParticipant_Result_Name UNIQUE (gameResultId, participantName),
+    CONSTRAINT FK_GameParticipant_GameResult FOREIGN KEY (gameResultId) REFERENCES GameResult(gameResultId) ON DELETE CASCADE,
+    CONSTRAINT CHK_IsHuman_Boolean CHECK (isHuman IN (0, 1)),
+    CONSTRAINT CHK_PropsOwned_NonNegative CHECK (propertiesOwnedCount >= 0),
+    CONSTRAINT CHK_PartRentCollected_NonNegative CHECK (totalRentCollected >= 0.00),
+    CONSTRAINT CHK_IsWinner_Boolean CHECK (isWinner IN (0, 1))
+);
+
+-- Table: SavedGame
+-- Stores metadata for a saved game state file.
+CREATE TABLE SavedGame (
+    savedGameId TEXT NOT NULL PRIMARY KEY,
+    profileId TEXT NOT NULL,
+    slotNumber INTEGER NOT NULL,
+    saveName TEXT DEFAULT 'Game Save',
+    saveTimestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    gameVersion TEXT NOT NULL,
+    fileChecksum TEXT NOT NULL,
+    CONSTRAINT UC_SavedGame_Profile_Slot UNIQUE (profileId, slotNumber),
+    CONSTRAINT FK_SavedGame_PlayerProfile FOREIGN KEY (profileId) REFERENCES PlayerProfile(profileId) ON DELETE CASCADE,
+    CONSTRAINT CHK_SlotNumber_Range CHECK (slotNumber BETWEEN 1 AND 5)
+);
+
+-- Indexes for performance optimization
+CREATE INDEX IX_PlayerProfile_CreatedAt ON PlayerProfile(createdAt);
+CREATE INDEX IX_GameResult_TopScores ON GameResult(profileId, didHumanWin, humanFinalNetWorth);
+CREATE INDEX IX_GameResult_History ON GameResult(profileId, endTimestamp);
+CREATE INDEX IX_GameParticipant_GameResultId ON GameParticipant(gameResultId);
+CREATE INDEX IX_SavedGame_Profile_Timestamp ON SavedGame(profileId, saveTimestamp);
+
+-- Triggers for automatically updating the 'updatedAt' timestamps
+CREATE TRIGGER TRG_PlayerProfile_Update
+AFTER UPDATE ON PlayerProfile
+FOR EACH ROW
+BEGIN
+    UPDATE PlayerProfile
+    SET updatedAt = CURRENT_TIMESTAMP
+    WHERE profileId = OLD.profileId;
+END;
+
+CREATE TRIGGER TRG_PlayerStatistic_Update
+AFTER UPDATE ON PlayerStatistic
+FOR EACH ROW
+BEGIN
+    UPDATE PlayerStatistic
+    SET updatedAt = CURRENT_TIMESTAMP
+    WHERE playerStatisticId = OLD.playerStatisticId;
+END;

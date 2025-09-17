@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>MonopolyTycoon.Presentation.Core</AssemblyName>
+    <RootNamespace>MonopolyTycoon.Presentation</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Assets\App\Presentation\Core\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Formatting.Json" Version="2.5.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>path\to\your\unity\installation\Editor\Data\Managed\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>path\to\your\unity\installation\Editor\Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>path\to\your\unity\installation\Editor\Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+        <HintPath>Library\PackageCache\com.unity.inputsystem@1.7.0\InputSystem\Plugins\PlayerInput\Unity.InputSystem.dll</HintPath>
+        <Private>false</Private>
+    </Reference>
+    <Reference Include="VContainer">
+        <HintPath>Library\PackageCache\jp.hadashikick.vcontainer@1.15.1\Runtime\VContainer.dll</HintPath>
+        <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- These would be project references to other layers once their csproj files are defined -->
+    <!-- <ProjectReference Include="..\..\Domain\MonopolyTycoon.Domain.csproj" /> -->
+    <!-- <ProjectReference Include="..\..\Application\MonopolyTycoon.Application.csproj" /> -->
+  </ItemGroup>
+
+</Project>

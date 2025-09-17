@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MonopolyTycoon.Application.Services</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 
+      These project references are placeholders for the actual projects that will be created at lower dependency levels.
+      The paths assume a standard Clean Architecture solution structure.
+    -->
+    <ProjectReference Include="..\..\..\Application\MonopolyTycoon.Application.Abstractions\MonopolyTycoon.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Domain\MonopolyTycoon.Domain.Core\MonopolyTycoon.Domain.Core.csproj" />
+    <ProjectReference Include="..\..\..\Domain\MonopolyTycoon.Domain.AI\MonopolyTycoon.Domain.AI.csproj" />
+    <ProjectReference Include="..\..\..\Domain\MonopolyTycoon.Domain.Rules\MonopolyTycoon.Domain.Rules.csproj" />
+  </ItemGroup>
+
+</Project>

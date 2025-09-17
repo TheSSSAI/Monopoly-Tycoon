@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>MonopolyTycoon DevTeam</Authors>
+    <Company>MonopolyTycoon Inc.</Company>
+    <Product>Monopoly Tycoon</Product>
+    <Copyright>Copyright © MonopolyTycoon Inc. 2024</Copyright>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "components": [
+    "Microsoft.Component.MSBuild",
+    "Microsoft.Net.Component.4.8.TargetingPack",
+    "Microsoft.NetCore.Component.Runtime.8.0",
+    "Microsoft.NetCore.Component.SDK",
+    "Microsoft.VisualStudio.Component.CoreEditor",
+    "Microsoft.VisualStudio.Component.DotNetModelBuilder",
+    "Microsoft.VisualStudio.Component.NuGet",
+    "Microsoft.VisualStudio.Component.Roslyn.Compiler",
+    "Microsoft.VisualStudio.Component.Roslyn.LanguageServices",
+    "Microsoft.VisualStudio.Component.SolutionExplorer",
+    "Microsoft.VisualStudio.Component.TextControl",
+    "Microsoft.VisualStudio.Component.LiveUnitTesting",
+    "Microsoft.VisualStudio.Component.TestTools.Core"
+  ]
+}

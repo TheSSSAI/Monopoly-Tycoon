@@ -1,0 +1,63 @@
+graph TD
+    subgraph Presentation Layer
+        REPO_PU_010["MonopolyTycoon.Presentation.Unity<br>(Composition Root)"]
+    end
+
+    subgraph "Application Services Layer"
+        REPO_AS_005["MonopolyTycoon.Application.Services"]
+        REPO_AA_004["MonopolyTycoon.Application.Abstractions"]
+    end
+
+    subgraph "Business Logic (Domain) Layer"
+        REPO_DA_003["MonopolyTycoon.Domain.AI"]
+        REPO_DR_002["MonopolyTycoon.Domain.RuleEngine"]
+        REPO_DM_001["MonopolyTycoon.Domain.Models"]
+    end
+
+    subgraph "Infrastructure Layer"
+        REPO_IP_SG_008["MonopolyTycoon.Infrastructure.Persistence.SaveGames"]
+        REPO_IP_ST_009["MonopolyTycoon.Infrastructure.Persistence.Statistics"]
+        REPO_IC_007["MonopolyTycoon.Infrastructure.Configuration"]
+        REPO_IL_006["MonopolyTycoon.Infrastructure.Logging"]
+    end
+
+    %% Dependencies
+    REPO_PU_010 --> REPO_AS_005
+    REPO_PU_010 --> REPO_AA_004
+    REPO_PU_010 --> REPO_DM_001
+    REPO_PU_010 --> REPO_IL_006
+
+    REPO_AS_005 --> REPO_AA_004
+    REPO_AS_005 --> REPO_DA_003
+    REPO_AS_005 --> REPO_DR_002
+    REPO_AS_005 --> REPO_DM_001
+    REPO_AS_005 --> REPO_IL_006
+
+    REPO_AA_004 --> REPO_DM_001
+
+    REPO_DA_003 --> REPO_DM_001
+    REPO_DR_002 --> REPO_DM_001
+
+    REPO_IP_SG_008 --> REPO_AA_004
+    REPO_IP_SG_008 --> REPO_DM_001
+    REPO_IP_SG_008 --> REPO_IL_006
+
+    REPO_IP_ST_009 --> REPO_AA_004
+    REPO_IP_ST_009 --> REPO_DM_001
+    REPO_IP_ST_009 --> REPO_IL_006
+
+    REPO_IC_007 --> REPO_AA_004
+    REPO_IC_007 --> REPO_IL_006
+
+    REPO_IL_006 --> REPO_AA_004
+
+    %% Styling
+    classDef presentation fill:#87CEEB,stroke:#333,stroke-width:2px;
+    classDef app fill:#90EE90,stroke:#333,stroke-width:2px;
+    classDef domain fill:#FFD700,stroke:#333,stroke-width:2px;
+    classDef infra fill:#D3D3D3,stroke:#333,stroke-width:2px;
+
+    class REPO_PU_010 presentation;
+    class REPO_AS_005,REPO_AA_004 app;
+    class REPO_DA_003,REPO_DR_002,REPO_DM_001 domain;
+    class REPO_IP_SG_008,REPO_IP_ST_009,REPO_IC_007,REPO_IL_006 infra;

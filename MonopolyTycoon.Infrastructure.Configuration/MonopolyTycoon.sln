@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Infrastructure.Configuration", "src/Infrastructure/Configuration/MonopolyTycoon.Infrastructure.Configuration.csproj", "{A8E8B1D4-9A27-4E8D-9E1D-0A7B6C5F4E3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Infrastructure.Configuration.Tests", "tests/Infrastructure/Configuration/MonopolyTycoon.Infrastructure.Configuration.Tests.csproj", "{B9F9C2E5-8A3E-4B7C-9F2A-1B8D7E6A5C4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8E8B1D4-9A27-4E8D-9E1D-0A7B6C5F4E3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E8B1D4-9A27-4E8D-9E1D-0A7B6C5F4E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E8B1D4-9A27-4E8D-9E1D-0A7B6C5F4E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E8B1D4-9A27-4E8D-9E1D-0A7B6C5F4E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9F9C2E5-8A3E-4B7C-9F2A-1B8D7E6A5C4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F9C2E5-8A3E-4B7C-9F2A-1B8D7E6A5C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F9C2E5-8A3E-4B7C-9F2A-1B8D7E6A5C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F9C2E5-8A3E-4B7C-9F2A-1B8D7E6A5C4F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C1D2E3F4-5A6B-7C8D-9E0F-1A2B3C4D5E6F}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,46 @@
+# REQ-1-024: All source code must be managed in a Git version control repository.
+# REQ-1-025, REQ-1-026: Run unit and integration tests on CI.
+name: .NET Core Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest # REQ-1-001: Windows exclusive
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' # REQ-1-009: Use .NET 8
+        
+    - name: Restore dependencies
+      run: dotnet restore MonopolyTycoon.sln
+
+    - name: Build solution
+      run: dotnet build MonopolyTycoon.sln --configuration Release --no-restore
+
+    - name: Run tests with code coverage
+      run: |
+        dotnet test MonopolyTycoon.sln `
+          --no-build `
+          --configuration Release `
+          --collect:"XPlat Code Coverage" `
+          --settings "tests/CodeCoverage.runsettings"
+
+    - name: Upload Test Results
+      if: always() # Upload on success or failure
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          tests/**/TestResults/**/*.trx
+          tests/**/TestResults/**/coverage.cobertura.xml
+        retention-days: 7

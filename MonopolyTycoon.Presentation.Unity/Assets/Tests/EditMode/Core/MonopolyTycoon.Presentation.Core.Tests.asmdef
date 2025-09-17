@@ -1,0 +1,25 @@
+{
+    "name": "MonopolyTycoon.Presentation.Core.Tests",
+    "rootNamespace": "MonopolyTycoon.Presentation.Tests",
+    "references": [
+        "MonopolyTycoon.Presentation.Core",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "VContainer"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

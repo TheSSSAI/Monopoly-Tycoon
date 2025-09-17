@@ -1,0 +1,31 @@
+name: Build and Test Logging Library
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        # Use global.json to ensure exact SDK version is used
+        global-json-file: global.json
+
+    - name: Restore dependencies
+      run: dotnet restore MonopolyTycoon.Logging.sln
+
+    - name: Build solution
+      run: dotnet build MonopolyTycoon.Logging.sln --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test MonopolyTycoon.Logging.sln --configuration Release --no-build --verbosity normal

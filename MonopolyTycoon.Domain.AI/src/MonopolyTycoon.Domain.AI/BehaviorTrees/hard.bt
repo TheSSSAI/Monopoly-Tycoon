@@ -1,0 +1,54 @@
+# REQ-1-064: 'Hard' AI will play strategically, aggressively pursuing monopolies, 
+# blocking opponents, and attempting to create housing shortages.
+# This tree is complex, using parallel execution to evaluate multiple strategies at once.
+
+tree "HardAI_PreRoll"
+
+    # The main selector chooses the most important category of actions to perform.
+    selector
+
+        # HIGHEST PRIORITY: If we can build to complete a hotel and create a housing shortage, do it.
+        sequence
+            CanCreateHousingShortageWithHotel
+            AttemptToBuildHotel # Sets ResultAction
+            
+        # NEXT PRIORITY: Build houses on existing monopolies if it's a good investment.
+        sequence
+            ShouldBuildOnMonopoly # A more complex condition that evaluates ROI.
+            AttemptToBuildHouse # Sets ResultAction
+
+        # NEXT PRIORITY: Aggressively try to complete a monopoly.
+        # This includes buying properties or proposing trades.
+        selector
+            
+            # If we land on a property that completes a monopoly, buy it immediately.
+            sequence
+                IsOnPropertyThatCompletesMonopoly
+                CanAffordCurrentProperty
+                AttemptToBuyProperty # Sets ResultAction
+
+            # Actively seek trades to complete a monopoly.
+            sequence
+                IsMonopolyCompletableByTrade
+                ProposeBestAvailableTrade # Sets ResultAction
+
+        # NEXT PRIORITY: Block an opponent from getting a monopoly.
+        sequence
+            IsOnPropertyThatBlocksOpponent
+            CanAffordCurrentProperty
+            AttemptToBuyProperty # Sets ResultAction
+            
+        # DEFAULT ACTION: If none of the above, just perform a standard property check.
+        fallback
+            sequence
+                IsOnUnownedProperty
+                CanAffordCurrentProperty
+                IsCashAboveThreshold
+                AttemptToBuyProperty # Sets ResultAction
+            succeed
+
+    # If any action was decided, this fails, ending the tree.
+    # Otherwise, it succeeds and the next node ends the phase.
+    fallback
+        HasActionBeenDecided
+        DecideToEndPreRollPhase # Sets ResultAction

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MonopolyTycoon.Infrastructure.Configuration</RootNamespace>
+    <AssemblyName>MonopolyTycoon.Infrastructure.Configuration</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- This is a placeholder for a project reference that will be created in a later step.
+       It represents the dependency on the application abstractions layer. -->
+  <!-- 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Application.Abstractions\MonopolyTycoon.Application.Abstractions.csproj" />
+  </ItemGroup>
+  -->
+
+</Project>

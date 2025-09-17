@@ -1,0 +1,12 @@
+<Project>
+  <!-- This file provides centralized, solution-wide MSBuild properties. -->
+  <!-- It ensures all projects share consistent settings like Language Version. -->
+  <PropertyGroup>
+    <!-- Ensures all projects use the latest available C# language version features (C# 12 for .NET 8). -->
+    <LangVersion>latest</LangVersion>
+    <!-- Enables the generation of XML documentation files for better IntelliSense in consuming projects. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Suppress warning for missing XML comments on public types/members if not provided. Can be overridden in specific projects. -->
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+</Project>

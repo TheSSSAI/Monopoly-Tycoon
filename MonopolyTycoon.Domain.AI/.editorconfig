@@ -1,0 +1,62 @@
+# REQ-1-024: All C# code must conform to the Microsoft C# Coding Conventions.
+# This file is the primary enforcement mechanism for that requirement.
+
+# C# files
+[*.cs]
+# Indentation and spacing
+indent_style = space
+indent_size = 4
+tab_width = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# New line preferences
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# Code style preferences
+csharp_style_var_for_built_in_types = true
+csharp_style_var_when_type_is_apparent = true
+csharp_style_var_elsewhere = true
+csharp_style_expression_bodied_methods = when_on_single_line
+csharp_style_expression_bodied_constructors = false
+csharp_style_expression_bodied_operators = false
+csharp_style_expression_bodied_properties = true
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_accessors = true
+csharp_style_prefer_conditional_expression_over_assignment = true
+csharp_style_prefer_conditional_expression_over_return = true
+csharp_prefer_simple_default_expression = true
+csharp_style_prefer_null_check_over_type_check = true
+csharp_style_prefer_switch_expression = true
+csharp_style_prefer_pattern_matching = true
+csharp_style_prefer_pattern_matching_over_as_with_null_check = true
+csharp_style_prefer_pattern_matching_over_is_with_cast_check = true
+csharp_style_prefer_not_pattern = true
+csharp_style_prefer_simplified_boolean_expressions = true
+csharp_style_prefer_inferred_tuple_names = true
+csharp_style_prefer_inferred_anonymous_type_member_names = true
+csharp_style_prefer_compound_assignment = true
+csharp_style_prefer_simplified_interpolation = true
+
+# Naming conventions
+dotnet_naming_rule.public_members_must_be_pascal_case.severity = suggestion
+dotnet_naming_rule.public_members_must_be_pascal_case.symbols = public_symbols
+dotnet_naming_rule.public_members_must_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.public_symbols.applicable_accessibilities = public, protected, internal
+dotnet_naming_symbols.public_symbols.applicable_kinds = property, method, field, event, enum, struct, class, interface, delegate
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# General project settings
+root = true
+
+[*]
+charset = utf-8

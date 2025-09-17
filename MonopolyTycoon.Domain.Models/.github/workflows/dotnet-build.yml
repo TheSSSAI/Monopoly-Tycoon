@@ -1,0 +1,32 @@
+name: .NET Core Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        global-json-file: global.json
+
+    - name: Restore dependencies
+      run: dotnet restore ./MonopolyTycoon.sln
+
+    - name: Build
+      run: dotnet build ./MonopolyTycoon.sln --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test ./MonopolyTycoon.sln --no-build --verbosity normal
+      # Note: This step will pass vacuously until a test project is added.
+      # It is included for future-proofing the CI pipeline.

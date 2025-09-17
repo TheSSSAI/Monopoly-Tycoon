@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>MonopolyTycoon.Domain.AI</RootNamespace>
+    <AssemblyName>MonopolyTycoon.Domain.AI</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PandaBT" Version="1.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <!-- REQ-1-063: Behavior tree architecture is implemented via C# and .bt scripts -->
+    <!-- These scripts are embedded as resources to be loaded by the executor -->
+    <EmbeddedResource Include="BehaviorTrees\easy.bt" />
+    <EmbeddedResource Include="BehaviorTrees\medium.bt" />
+    <EmbeddedResource Include="BehaviorTrees\hard.bt" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <!-- Dependency on the core Domain model for GameState etc. -->
+    <ProjectReference Include="..\..\MonopolyTycoon.Domain\MonopolyTycoon.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

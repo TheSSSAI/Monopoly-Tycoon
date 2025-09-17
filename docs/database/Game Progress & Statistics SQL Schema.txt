@@ -1,0 +1,93 @@
+-- =============================================
+-- Table: PlayerProfile
+-- Represents the human player's persistent profile.
+-- =============================================
+CREATE TABLE PlayerProfile (
+    profileId UUID PRIMARY KEY,
+    displayName VARCHAR(16) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_PlayerProfile_DisplayName UNIQUE (displayName),
+    CONSTRAINT CK_PlayerProfile_DisplayName_Length CHECK (LENGTH(displayName) BETWEEN 3 AND 16)
+);
+
+-- =============================================
+-- Table: PlayerStatistic
+-- Stores aggregated historical gameplay statistics for a player profile.
+-- =============================================
+CREATE TABLE PlayerStatistic (
+    playerStatisticId UUID PRIMARY KEY,
+    profileId UUID NOT NULL,
+    totalGamesPlayed INT NOT NULL DEFAULT 0,
+    totalWins INT NOT NULL DEFAULT 0,
+    averageGameDurationSeconds INT NOT NULL DEFAULT 0,
+    mostProfitableProperty VARCHAR(50),
+    totalRentPaid DECIMAL(18, 2) NOT NULL DEFAULT 0.00,
+    totalRentCollected DECIMAL(18, 2) NOT NULL DEFAULT 0.00,
+    totalPropertiesAcquired INT NOT NULL DEFAULT 0,
+    largestTradeDealValue DECIMAL(18, 2) NOT NULL DEFAULT 0.00,
+    updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_PlayerStatistic_ProfileId UNIQUE (profileId),
+    CONSTRAINT FK_PlayerStatistic_PlayerProfile FOREIGN KEY (profileId) REFERENCES PlayerProfile(profileId) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT CK_PlayerStatistic_NonNegative CHECK (totalGamesPlayed >= 0 AND totalWins >= 0 AND averageGameDurationSeconds >= 0 AND totalRentPaid >= 0 AND totalRentCollected >= 0 AND totalPropertiesAcquired >= 0 AND largestTradeDealValue >= 0)
+);
+
+-- =============================================
+-- Table: GameResult
+-- Records the outcome and high-level statistics of a single completed game session.
+-- =============================================
+CREATE TABLE GameResult (
+    gameResultId UUID PRIMARY KEY,
+    profileId UUID NOT NULL,
+    didHumanWin BOOLEAN NOT NULL DEFAULT false,
+    gameDurationSeconds INT NOT NULL DEFAULT 0,
+    totalTurns INT NOT NULL DEFAULT 0,
+    endTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    humanFinalNetWorth DECIMAL(18, 2),
+    CONSTRAINT FK_GameResult_PlayerProfile FOREIGN KEY (profileId) REFERENCES PlayerProfile(profileId) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT CK_GameResult_NonNegative CHECK (gameDurationSeconds >= 0 AND totalTurns >= 0)
+);
+
+-- =============================================
+-- Table: GameParticipant
+-- Represents a single player's (human or AI) performance in a specific completed game.
+-- =============================================
+CREATE TABLE GameParticipant (
+    gameParticipantId UUID PRIMARY KEY,
+    gameResultId UUID NOT NULL,
+    participantName VARCHAR(16) NOT NULL,
+    isHuman BOOLEAN NOT NULL DEFAULT false,
+    aiDifficulty INT,
+    finalNetWorth DECIMAL(18, 2) NOT NULL DEFAULT 0.00,
+    propertiesOwnedCount INT NOT NULL DEFAULT 0,
+    totalRentCollected DECIMAL(18, 2) NOT NULL DEFAULT 0.00,
+    isWinner BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT UC_GameParticipant_Result_Name UNIQUE (gameResultId, participantName),
+    CONSTRAINT FK_GameParticipant_GameResult FOREIGN KEY (gameResultId) REFERENCES GameResult(gameResultId) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT CK_GameParticipant_NonNegative CHECK (propertiesOwnedCount >= 0 AND totalRentCollected >= 0)
+);
+
+-- =============================================
+-- Table: SavedGame
+-- Stores metadata for a saved game state file.
+-- =============================================
+CREATE TABLE SavedGame (
+    savedGameId UUID PRIMARY KEY,
+    profileId UUID NOT NULL,
+    slotNumber INT NOT NULL,
+    saveName VARCHAR(100) DEFAULT 'Game Save',
+    saveTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    gameVersion VARCHAR(20) NOT NULL,
+    CONSTRAINT UC_SavedGame_Profile_Slot UNIQUE (profileId, slotNumber),
+    CONSTRAINT FK_SavedGame_PlayerProfile FOREIGN KEY (profileId) REFERENCES PlayerProfile(profileId) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT CK_SavedGame_SlotNumber_Range CHECK (slotNumber BETWEEN 1 AND 5)
+);
+
+-- =============================================
+-- Indexes
+-- =============================================
+CREATE INDEX IX_PlayerProfile_CreatedAt ON PlayerProfile (createdAt);
+CREATE INDEX idx_gameresult_profile_win_ts ON GameResult (profileId, didHumanWin, endTimestamp);
+CREATE INDEX IX_GameParticipant_GameResultId ON GameParticipant (gameResultId);
+CREATE INDEX idx_gameparticipant_networth_desc ON GameParticipant (finalNetWorth DESC);
+CREATE INDEX idx_savedgame_profile_ts_desc ON SavedGame (profileId, saveTimestamp DESC);

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>MonopolyTycoon.Infrastructure.Logging</AssemblyName>
+    <RootNamespace>MonopolyTycoon.Infrastructure.Logging</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      Serilog is the core logging framework as per REQ-1-018.
+      Serilog.Extensions.Hosting is used for seamless integration with .NET's DI container and IHostBuilder.
+      Serilog.Formatting.Json provides the JSON formatter for structured logging as per REQ-1-019.
+      Serilog.Sinks.Async is critical for performance NFRs, ensuring logging IO does not block game threads.
+      Serilog.Sinks.File is the sink for writing logs to disk, supporting rolling files as per REQ-1-021.
+    -->
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Formatting.Json" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    
+    <!--
+      Microsoft.Extensions packages are necessary for modern .NET library development,
+      enabling dependency injection, configuration binding (IOptions), and abstractions.
+    -->
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

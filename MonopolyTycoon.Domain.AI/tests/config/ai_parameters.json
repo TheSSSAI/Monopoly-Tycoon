@@ -1,0 +1,34 @@
+{
+  "AIProfiles": [
+    {
+      "DifficultyLevel": "Easy",
+      "PropertyAcquisitionPriority": 0.5,
+      "MonopolyCompletionPriority": 0.7,
+      "BuildingPriority": 0.4,
+      "OpponentBlockingPriority": 0.2,
+      "TradeWillingness": 0.2,
+      "RiskTolerance": 0.2,
+      "MinimumCashReserve": 500
+    },
+    {
+      "DifficultyLevel": "Medium",
+      "PropertyAcquisitionPriority": 0.7,
+      "MonopolyCompletionPriority": 1.0,
+      "BuildingPriority": 0.8,
+      "OpponentBlockingPriority": 0.6,
+      "TradeWillingness": 0.6,
+      "RiskTolerance": 0.5,
+      "MinimumCashReserve": 250
+    },
+    {
+      "DifficultyLevel": "Hard",
+      "PropertyAcquisitionPriority": 0.9,
+      "MonopolyCompletionPriority": 1.5,
+      "BuildingPriority": 1.2,
+      "OpponentBlockingPriority": 1.0,
+      "TradeWillingness": 0.8,
+      "RiskTolerance": 0.8,
+      "MinimumCashReserve": 100
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+# Microsoft C# Coding Conventions - REQ-1-024
+# https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
+
+# C# files
+[*.cs]
+
+#### Core EditorConfig Options ####
+# Indentation and spacing
+indent_style                           = space
+indent_size                            = 4
+tab_width                              = 4
+
+# Newline options
+end_of_line                            = lf
+insert_final_newline                   = true
+
+#### .NET Coding Conventions ####
+# Organize using directives
+dotnet_sort_system_directives_first    = true
+dotnet_separate_import_directive_groups = true
+csharp_using_directive_placement       = outside_namespace
+
+# Language keywords instead of framework type names for type references
+dotnet_style_predefined_type_for_locals_parameters_members = true
+dotnet_style_predefined_type_for_member_access             = true
+
+# Modifier preferences
+dotnet_style_require_accessibility_modifiers               = always
+csharp_preferred_modifier_order                            = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
+
+# Parentheses preferences
+dotnet_style_parentheses_in_arithmetic_binary_operators    = always_for_clarity
+dotnet_style_parentheses_in_relational_binary_operators    = always_for_clarity
+dotnet_style_parentheses_in_other_binary_operators         = always_for_clarity
+dotnet_style_parentheses_in_other_operators                = never_if_unnecessary
+
+# Null checking preferences
+dotnet_style_coalesce_expression                           = true
+dotnet_style_null_propagation                              = true
+
+# Code block preferences
+csharp_prefer_braces                                       = true
+
+# Expression-bodied members
+csharp_style_expression_bodied_methods                     = when_on_single_line
+csharp_style_expression_bodied_constructors                = when_on_single_line
+csharp_style_expression_bodied_operators                   = when_on_single_line
+csharp_style_expression_bodied_properties                  = true
+csharp_style_expression_bodied_indexers                    = true
+csharp_style_expression_bodied_accessors                   = true
+
+# Pattern matching preferences
+csharp_style_pattern_matching_over_as_with_null_check      = true
+csharp_style_pattern_matching_over_is_with_cast_check      = true
+csharp_style_prefer_pattern_matching                       = true
+csharp_style_prefer_not_pattern                            = true
+csharp_style_prefer_switch_expression                      = true
+
+# `var` preferences
+csharp_style_var_for_built_in_types                        = false
+csharp_style_var_when_type_is_apparent                     = true
+csharp_style_var_elsewhere                                 = false
+
+# `using` statement preferences
+csharp_prefer_simple_using_statement                       = true
+
+# `new` expression preferences
+csharp_style_prefer_simplified_new_expression              = true
+
+#### Naming Conventions ####
+# Private fields should start with _
+dotnet_naming_rule.private_fields_should_be_underscored.symbols  = private_fields
+dotnet_naming_rule.private_fields_should_be_underscored.style    = underscore_prefix
+dotnet_naming_rule.private_fields_should_be_underscored.severity = suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds            = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities  = private
+
+dotnet_naming_style.underscore_prefix.required_prefix            = _
+dotnet_naming_style.underscore_prefix.capitalization             = camel_case

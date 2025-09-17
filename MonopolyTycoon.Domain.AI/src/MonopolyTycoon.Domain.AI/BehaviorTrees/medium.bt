@@ -1,0 +1,38 @@
+# REQ-1-064: 'Medium' AI will play competently, prioritizing monopolies and making fair trades.
+# This tree is more advanced than Easy but less aggressive than Hard.
+
+tree "MediumAI_PreRoll"
+
+    # A selector allows the AI to choose the first valid action from a list of priorities.
+    selector
+
+        # PRIORITY 1: Develop existing monopolies.
+        sequence
+            IsCashAboveThreshold
+            ShouldBuildOnMonopoly
+            AttemptToBuildHouse # Sets ResultAction
+
+        # PRIORITY 2: Acquire a property that completes a monopoly.
+        sequence
+            IsOnPropertyThatCompletesMonopoly
+            CanAffordCurrentProperty
+            AttemptToBuyProperty # Sets ResultAction
+
+        # PRIORITY 3: Acquire any other unowned property if affordable and cash reserve is good.
+        sequence
+            IsOnUnownedProperty
+            IsCashAboveThreshold # Medium AI is more cautious than Hard AI.
+            CanAffordCurrentProperty
+            AttemptToBuyProperty # Sets ResultAction
+            
+        # PRIORITY 4: Consider making a trade if it's beneficial.
+        sequence
+            IsTradePossible
+            ShouldProposeTrade
+            ProposeBestAvailableTrade # Sets ResultAction
+
+    # If any of the above selectors found an action, this node will fail, stopping the tree.
+    # If no action was taken, this node will succeed, allowing the turn to end.
+    fallback
+        HasActionBeenDecided
+        DecideToEndPreRollPhase # Sets ResultAction to RollDice

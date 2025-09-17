@@ -1,0 +1,17 @@
+{
+    "name": "MonopolyTycoon.Presentation.Core",
+    "rootNamespace": "MonopolyTycoon.Presentation",
+    "references": [
+        "VContainer",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

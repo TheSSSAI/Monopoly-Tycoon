@@ -1,0 +1,17 @@
+{
+    "name": "MonopolyTycoon.Presentation.Features.GameBoard",
+    "rootNamespace": "MonopolyTycoon.Presentation.Features.GameBoard",
+    "references": [
+        "MonopolyTycoon.Presentation.Core",
+        "VContainer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

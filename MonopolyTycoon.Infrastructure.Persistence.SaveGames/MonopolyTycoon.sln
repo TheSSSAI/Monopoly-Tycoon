@@ -1,0 +1,41 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Infrastructure.Persistence.SaveGames", "src\MonopolyTycoon.Infrastructure.Persistence.SaveGames\MonopolyTycoon.Infrastructure.Persistence.SaveGames.csproj", "{8D1C3A5B-4E6F-4B9A-8F0E-9D7A6C3B1F2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Infrastructure.Persistence.SaveGames.Tests", "tests\MonopolyTycoon.Infrastructure.Persistence.SaveGames.Tests\MonopolyTycoon.Infrastructure.Persistence.SaveGames.Tests.csproj", "{A9B8C7D6-5E4F-4C1A-B3D2-1E8F7A6B9C0E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C5E4E3A0-3B1F-4F9A-9A2E-8E7D6F5B3A1C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.vsconfig = .vsconfig
+		Directory.Build.props = Directory.Build.props
+		global.json = global.json
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D1C3A5B-4E6F-4B9A-8F0E-9D7A6C3B1F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D1C3A5B-4E6F-4B9A-8F0E-9D7A6C3B1F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D1C3A5B-4E6F-4B9A-8F0E-9D7A6C3B1F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D1C3A5B-4E6F-4B9A-8F0E-9D7A6C3B1F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9B8C7D6-5E4F-4C1A-B3D2-1E8F7A6B9C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9B8C7D6-5E4F-4C1A-B3D2-1E8F7A6B9C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9B8C7D6-5E4F-4C1A-B3D2-1E8F7A6B9C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9B8C7D6-5E4F-4C1A-B3D2-1E8F7A6B9C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F4B3C2D1-A0E9-4F8B-B1A5-9C8D7E6F5A4B}
+	EndGlobalSection
+EndGlobal

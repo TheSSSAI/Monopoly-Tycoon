@@ -1,0 +1,43 @@
+name: .NET CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        global-json-file: global.json
+
+    - name: Restore dependencies
+      run: dotnet restore MonopolyTycoon.sln
+
+    - name: Build
+      run: dotnet build MonopolyTycoon.sln --no-restore --configuration Release
+
+    - name: Test
+      run: >
+        dotnet test MonopolyTycoon.sln 
+        --no-build 
+        --configuration Release 
+        --collect:"XPlat Code Coverage" 
+        --results-directory ./.test-results/
+        --settings tests/coverlet.runsettings
+
+    - name: Publish coverage report
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./.test-results/
+        fail_ci_if_error: true

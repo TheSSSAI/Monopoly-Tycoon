@@ -1,0 +1,94 @@
+# This .gitignore is tailored for .NET and Visual Studio development,
+# ensuring that build artifacts, user-specific files, and other noise
+# are not committed to the repository.
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]est[Rr]esults/
+
+# Visual Studio cache files
+.vs/
+.vscode/
+TestResult.xml
+*.DotSettings
+*.csproj. DotSettings
+
+# Roslyn files
+*.ruleset
+
+# Rider files
+.idea/
+
+# Mac files
+*.DS_Store
+
+# Tooling
+_ReSharper*/
+*.[Rr]eSharper
+*.ncrunch*
+*.teamcity*
+*.vssscc
+*.vsproj
+
+# Project files
+*.csproj.user
+
+# Secrets
+secrets.json
+
+# Environment files
+.env
+
+# Packages
+*.nupkg
+*.snupkg
+/packages/
+
+# Nuget temp folder
+.nuget/
+
+# Dotnet files
+project.lock.json
+project.assets.json
+
+# OS generated files
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# MemoryCaptures can be huge
+/[Mm]emoryCaptures/
+
+# Asset meta files
+*.pidb
+*.unityproj
+*.suo
+*.userprefs
+*.DS_Store
