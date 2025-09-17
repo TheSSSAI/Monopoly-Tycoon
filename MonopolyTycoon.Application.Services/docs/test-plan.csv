@@ -1,0 +1,121 @@
+test_id,feature_area,test_type,test_level,priority,automation_candidate,test_description,preconditions,test_steps,expected_result,test_data_needs,tools_required,estimated_effort,dependencies
+CORE-UT-001,Data Models,"Functional",Unit,Critical,High,"Verify PlayerState object serialization and deserialization integrity.","The `PlayerState.cs` class and its enums are implemented in the `MonopolyTycoon.Core` library.","1. Instantiate a new `PlayerState` object.
+2. Populate all fields with non-default values (e.g., cash=1234, is_human=true, status=InJail).
+3. Serialize the object to a JSON string using `System.Text.Json`.
+4. Deserialize the JSON string back into a new `PlayerState` object.
+5. Assert that every property of the new object is equal to the corresponding property of the original object.","The deserialized object must be a deep-equal copy of the original object, ensuring no data loss during serialization.",None,"NUnit, Visual Studio",2,"TASK-WI003-01"
+CORE-UT-002,Data Models,"Functional",Unit,Critical,High,"Verify the entire GameState object graph can be serialized and deserialized without data loss (round-trip integrity).","The `GameState.cs` class and all its child models (`PlayerState`, `BoardState`, `BankState`, `DeckState`) are fully implemented.","1. Create a complex, representative `GameState` object (e.g., 4 players, some properties owned with houses, some mortgaged, cards drawn from decks).
+2. Serialize the entire `GameState` object to a JSON string.
+3. Deserialize the JSON string back into a new `GameState` object.
+4. Perform a deep comparison of the original and deserialized objects, checking player cash, property ownership, house counts, bank inventory, and card deck order.","The deserialized `GameState` object must be identical to the original, proving the entire game state can be persisted and restored perfectly.",A pre-defined complex GameState object graph,"NUnit, Visual Studio",8,"TASK-WI003-03, TASK-WI003-04"
+LOG-IT-001,Logging & Diagnostics,"Functional",Integration,Critical,Medium,"Verify that Serilog is correctly configured to create a structured JSON log file in the specified directory.","The Serilog integration (WI-004-01) is complete.","1. Launch the application.
+2. Perform a simple action that is known to generate a log entry (e.g., start a new game).
+3. Close the application.
+4. Navigate to the user's `%APPDATA%/MonopolyTycoon/logs` directory.
+5. Open the latest log file.","A log file exists in the correct directory. The content of the file must be valid, structured JSON, not plain text.",None,"Manual Inspection, Text Editor",2,"TASK-WI004-01"
+LOG-IT-002,Logging & Diagnostics,"Functional",Integration,Medium,Low,"Verify that the rolling file policy correctly deletes old log files based on retention time and total size.","Serilog rolling file policy (WI-004-02) is implemented.","1. (Size) Programmatically generate >50MB of log data. Check the log directory.
+2. (Time) Set system clock forward 8 days. Launch the app to trigger a new log. Check the log directory.","1. The total size of the log directory should not exceed the 50MB limit, and the oldest files should be deleted.
+2. All log files older than 7 days should be deleted.",Script to generate large log files,"Manual Inspection, PowerShell/Bash script",6,"TASK-WI004-02"
+LOG-IT-003,Logging & Diagnostics,"Security",Integration,High,Medium,"Verify that no Personally Identifiable Information (PII), except the player's profile name, is written to any log file.","PII sanitization enricher (WI-005-03) is implemented.","1. Trigger various game events that involve player data.
+2. Trigger an unhandled exception.
+3. Inspect the log files generated.","Log files must not contain any user-specific data like machine name, user account name, or IP address. The user's provided profile name is permitted.",None,"Manual Inspection, Text Editor",4,"TASK-WI005-03"
+ERR-ST-001,Error Handling,"Functional",System,Critical,Medium,"Verify that an unhandled exception triggers the global error dialog and logs the error with a correlation ID.","Global exception handler (WI-005-01) and error dialog UI (WI-005-02) are implemented.","1. Launch the game.
+2. Trigger a test exception using a debug command.
+3. Observe the screen.
+4. Note the Error ID from the dialog.
+5. Close the application via the dialog's button.
+6. Inspect the latest log file.","A modal error dialog appears, displaying a user-friendly message, a unique Error ID, and the path to the log files. The log file contains an ERROR level entry with full stack trace and the same Error ID.",A debug build with a mechanism to throw an unhandled exception,"Manual Testing, Debug Build",4,"TASK-WI005-01, TASK-WI005-02"
+RULE-UT-001,Rules Engine,"Functional",Unit,Critical,High,"Unit test the rent calculation logic for all property types and development levels.","Rent calculation logic (WI-015-01) is implemented in the Rule Engine.","This is a data-driven test. For each ownable property:
+1. Create a test case where a player lands on it.
+2. Test conditions: no monopoly, with monopoly, 1-4 houses, 1 hotel.
+3. For railroads, test with owner having 1, 2, 3, and 4 total railroads.
+4. For utilities, test with owner having 1 and 2 total utilities, with various dice rolls.
+5. For all cases, test the 'mortgaged' state.","The calculated rent amount must exactly match the official Hasbro Monopoly rules for every single case.",Property data JSON file,"NUnit, Visual Studio",16,"TASK-WI015-01"
+RULE-UT-002,Rules Engine,"Functional",Unit,Critical,High,"Unit test the 'Even Building' rule validation for both buying and selling houses.","Even building rule logic (WI-014-03) is implemented.","1. (Buying) Given a 3-property monopoly, test `CanBuildOn(property)`:
+   - State [0,0,0] -> returns true for all.
+   - State [1,0,0] -> returns false for property A, true for B and C.
+   - State [1,1,0] -> returns false for A & B, true for C.
+2. (Selling) Given a 3-property monopoly, test `CanSellFrom(property)`:
+   - State [2,1,1] -> returns true for A, false for B and C.","The validation functions must return the correct boolean result according to the even building/selling rule for all possible development states.",None,"NUnit, Visual Studio",8,"TASK-WI014-03"
+RULE-UT-003,Rules Engine,"Functional",Unit,Critical,High,"Verify the Net Worth calculation for the Income Tax choice.","Net worth calculation logic (part of WI-015-06) is implemented.","1. Create a `PlayerState` object.
+2. Test with various asset combinations: only cash; cash and unmortgaged properties; cash, properties, and buildings; cash, mortgaged properties, and buildings.
+3. Call the `CalculateNetWorth()` function.","The function must return the correct total value, which is cash + sum of printed property values (mortgaged or not) + sum of building purchase costs.",Property data JSON file,"NUnit, Visual Studio",4,"TASK-WI015-06"
+GAME-ST-001,Core Gameplay,"Smoke",System,Critical,Medium,"Verify the main game loop sequence for a single turn: Pre-Roll Management, Roll, Move, Action, Post-Roll.","Turn Manager (WI-011-01), Dice Rolling (WI-012-01), and Token Movement (WI-012-02) are implemented.","1. Start a new game.
+2. Observe the UI. 'Roll Dice' button should be enabled.
+3. Click 'Roll Dice'.
+4. Observe the dice animation and token movement.
+5. The token lands, and a space action occurs (e.g., land on unowned property).
+6. The turn indicator passes to the next player.","The game progresses through a single player turn in the correct, logical sequence without crashing.",None,"Manual Testing",2,"TASK-WI011-01"
+GAME-ST-002,Core Gameplay,"Functional",System,High,High,"Verify the 'doubles' rule grants an extra turn, and the 'three consecutive doubles' rule sends the player to jail.","Doubles logic (WI-012-04) and Go to Jail logic (WI-016-01) are implemented.","1. Using a debug tool, force a doubles roll. Complete the turn.
+2. Force a second doubles roll. Complete the turn.
+3. Force a third doubles roll.
+4. Reset and force a doubles roll while in jail.","1. After the first roll, the same player gets to roll again.
+2. After the second roll, the same player gets to roll again.
+3. After the third roll, the player's token moves directly to the jail space and their turn ends.
+4. The player gets out of jail but does not get an extra turn.",Debug tool to force dice rolls,"Unity Test Framework, Debug Build",6,"TASK-WI012-04, TASK-WI016-01"
+GAME-ST-003,Core Gameplay,"Functional",System,Critical,Medium,"Verify the complete property acquisition flow: landing, choosing to buy, and transaction completion.","Property acquisition logic and UI (WI-013-02 to WI-013-04) are complete.","1. Start a new game.
+2. Roll the dice to land on an unowned property (e.g., Baltic Avenue).
+3. The Buy/Auction dialog appears. Click 'Buy'.
+4. Check the player's cash on the HUD.
+5. Check the board for the ownership indicator.","The dialog appears. After clicking 'Buy', the player's cash is reduced by the property's price, and a visual marker for that player appears on the Baltic Avenue space.",Debug tool to force dice rolls,"Manual Testing, Debug Build",4,"US-030"
+GAME-ST-004,Core Gameplay,"Functional",System,Critical,Medium,"Verify the complete property auction flow.","Auction logic and UI (WI-013-05, WI-013-06) are complete.","1. Land on an unowned property.
+2. On the Buy/Auction dialog, click 'Auction'.
+3. The auction UI appears. As the human, place a bid.
+4. Let the AI players bid.
+5. Place a final winning bid.
+6. The auction ends.","The auction UI appears. The bidding proceeds in clockwise order. After winning, the player's cash is reduced by the final bid amount, and they gain ownership of the property.",Debug tool to force dice rolls, Curated save file where player is near unowned property,"Manual Testing, Debug Build",8,"US-032"
+GAME-ST-005,Core Gameplay,"Functional",System,Critical,Medium,"Verify the bankruptcy process when a player is bankrupted by another player.","Bankruptcy logic (WI-017-01) is implemented.","1. Load a curated save file where Player A is about to land on Player B's hotel, and Player A has insufficient funds.
+2. Execute the move.
+3. Player A is prompted to liquidate assets. Sell/mortgage everything.
+4. Confirm bankruptcy.","Player A's assets are sold/mortgaged. When they still cannot pay, all their remaining cash, properties (including mortgaged ones), and cards are transferred to Player B. Player A's HUD panel is greyed out.",Curated save file for near-bankruptcy scenario (REQ-1-027),"Manual Testing, Debug Build",8,"US-047"
+GAME-ST-006,Core Gameplay,"Functional",System,Critical,Medium,"Verify the bankruptcy process when a player is bankrupted by the Bank.","Bankruptcy logic (WI-017-01) is implemented.","1. Load a curated save file where a player is about to land on Luxury Tax with insufficient funds.
+2. Execute the move and fail to raise the funds.
+3. Confirm bankruptcy.","The player's properties are returned to the bank and are then auctioned off one-by-one to the remaining players.",Curated save file for near-bankruptcy scenario (REQ-1-027),"Manual Testing, Debug Build",6,"US-047"
+CARD-IT-001,Card System,"Functional",Integration,Critical,High,"Verify that landing on a Chance/Community Chest space correctly draws a card, executes its action, and cycles the deck.","Card deck logic (WI-016-04) and action executor (WI-016-05) are implemented.","1. Using a debug tool, force the 'Advance to Go' card to be on top of the Chance deck.
+2. Force the player to land on a Chance space.
+3. The Card UI appears. Click 'Continue'.
+4. Observe player token and cash.
+5. Check the game state's deck order.","The player's token moves to the GO space, their cash increases by $200. The 'Advance to Go' card is now at the bottom of the Chance deck.",Debug tool to manipulate card decks and dice rolls,"Unity Test Framework, Debug Build",8,"US-024, US-025"
+PERSIST-ST-001,Save/Load,"Functional (Round-trip)",System,Critical,High,"Verify that a complex game state can be saved and loaded with perfect data integrity.","Save (WI-023-01) and Load (WI-024-01) logic is complete.","1. Play a game to a complex state (e.g., Turn 15, player in jail, 2 monopolies owned, some properties mortgaged, 5 houses on the board).
+2. Save the game to Slot 1.
+3. Exit to the main menu.
+4. Load the game from Slot 1.
+5. Meticulously compare the loaded game state to the state just before saving. Check all player cash, positions, statuses, property ownership, building counts, mortgaged states, and deck orders.","The loaded game state must be 100% identical to the state at the time of saving.",Curated complex save file,"Unity Test Framework, Manual Verification",16,"US-061, US-062"
+PERSIST-ST-002,Save/Load,"Negative",System,High,Medium,"Verify the system gracefully handles loading a corrupted save file.","Load game validation (WI-024-01) and UI (WI-024-02) are implemented.","1. Save a game to Slot 2.
+2. Go to the save directory (`%APPDATA%/MonopolyTycoon/saves`) and manually edit the save file (e.g., change a character) to invalidate its checksum.
+3. Launch the game and go to the 'Load Game' screen.","The entry for Slot 2 is visually marked as 'Corrupted' or 'Unusable'. The 'Load' button for this slot is disabled.",A valid save file,"Manual Testing, File Editor",4,"US-063"
+PERSIST-ST-003,Save/Load,"Negative",System,High,Medium,"Verify the system gracefully handles loading an incompatible (old version) save file.","Load game validation (WI-024-01) and UI (WI-024-02) are implemented.","1. Create a save file with a current version number (e.g., 1.0.0).
+2. Manually edit the file's version number to an older, unsupported version (e.g., 0.9.0).
+3. Launch the game (simulating it's now version 1.0.0) and go to the 'Load Game' screen.","The entry for the save slot is visually marked as 'Incompatible Version'. The 'Load' button for this slot is disabled.",A valid save file,"Manual Testing, File Editor",4,"US-063"
+AI-IT-001,Artificial Intelligence,"Functional",Integration,Critical,Medium,"Verify that AI of different difficulties makes different decisions in a controlled property acquisition scenario.","AI configuration loading (WI-019-01) and acquisition logic (WI-020-01) are implemented.","1. Start a 2-player game with an 'Easy' AI. Force the AI to land on Boardwalk.
+2. Reset and start a 2-player game with a 'Hard' AI. Force the AI to land on Boardwalk.","The 'Easy' AI might decline to purchase Boardwalk due to its high cost. The 'Hard' AI should always purchase it, recognizing its strategic value.",Debug tool to control player movement, AI configuration files,"Manual Testing, Debug Build",8,"US-010"
+AI-ST-001,Artificial Intelligence,"Functional",System,High,Low,"Qualitatively assess AI behavior over a full game.","All AI behaviors (WI-020-01 to WI-020-03) are implemented.","1. Play one full game against 3 'Easy' AI opponents.
+2. Play one full game against 3 'Hard' AI opponents.
+3. Observe their trading, building, and property management strategies.","'Easy' AI should make noticeable mistakes (e.g., breaking their own monopolies in trades, not building strategically). 'Hard' AI should be aggressive in completing sets, block player monopolies, and manage their cash effectively.",None,"Exploratory Testing",16,"US-010"
+PERF-BM-001,Performance,"Non-Functional",System,Critical,Medium,"Verify the game meets the sustained framerate requirement on recommended hardware.","The game is in a feature-complete state.","1. Configure a test machine with the 'Recommended' hardware specifications (REQ-1-013).
+2. Play a full 4-player game from start to finish.
+3. Use a performance profiler to record FPS throughout the session, paying special attention to late-game scenarios with many assets and animations.","The average framerate must be at or above 60 FPS. The framerate must not drop below 45 FPS during any typical gameplay scenario.",None,"Unity Profiler, FRAPS/MSI Afterburner",8,"REQ-1-014"
+PERF-BM-002,Performance,"Non-Functional",System,Critical,Medium,"Verify the game meets the 'New Game' and 'Load Game' time requirements.","The game is in a feature-complete state. Save/Load is implemented.","1. On a recommended spec machine with an SSD, time the duration from clicking 'Start Game' on the setup screen until the game board is interactive.
+2. Time the duration from clicking 'Load' on the load game screen until the game is interactive.
+3. Repeat each test 5 times and average the results.","The time for both 'New Game' and 'Load Game' must not exceed 10 seconds.",A complex save file for the load test,"Stopwatch, In-game timer",4,"REQ-1-015"
+UI-ST-001,UI/UX,"Functional",System,High,Low,"Verify UI and game view correctly adapt to all supported aspect ratios.","All major UI screens are implemented (Main Menu, HUD, Modals, etc.).","1. Launch the game.
+2. In the Unity editor or via display settings, switch the resolution to test 16:9 (1920x1080), 16:10 (1920x1200), and 21:9 (2560x1080).
+3. For each aspect ratio, navigate through all game screens: Main Menu, Game Setup, Gameplay HUD, Property Management, Trade dialog, Auction dialog, Game Summary.","On all supported aspect ratios, no UI elements are obscured, distorted, or non-functional. The game board remains correctly proportioned.",None,"Unity Editor Resolution Tool, Manual Testing",8,"US-004"
+INSTALL-E2E-001,Installer,"Functional",System,Critical,Low,"Verify the standard installation process and desktop shortcut creation.","The Inno Setup installer script (WI-026-01) is complete.","1. On a clean Windows 11 VM, run the installer.
+2. Accept all default options, including 'Create a desktop shortcut'.
+3. Complete the installation.
+4. Verify the desktop shortcut.
+5. Launch the game from the shortcut.","The game installs to the default Program Files directory. A desktop shortcut is created with the correct icon and target path. The game launches successfully from the shortcut.",Installer .exe file,"Clean Windows 11 Virtual Machine",2,"US-001, US-003"
+INSTALL-E2E-002,Installer,"Functional",System,Critical,Low,"Verify the uninstallation process, including the choice to keep or remove user data.","The Inno Setup uninstaller script (WI-027-01) is complete.","1. Install the game and play briefly to generate save/profile data.
+2. Go to 'Apps & features' and uninstall Monopoly Tycoon.
+3. At the prompt, choose 'No' (keep data). Complete uninstallation.
+4. Verify application files are gone but `%APPDATA%/MonopolyTycoon` remains.
+5. Re-install. Uninstall again.
+6. At the prompt, choose 'Yes' (remove data). Complete uninstallation.","The uninstaller correctly removes all application files. The choice to keep or remove user data in `%APPDATA%` is respected.",Installer .exe file,"Clean Windows 10 Virtual Machine",4,"US-006, US-007"
+TEST-IT-001,Automated Testing,"Functional",Integration,Critical,High,"Verify the NUnit test suite for the core logic library achieves the minimum required code coverage.","The game is in a feature-complete state. All unit tests are written.","1. Run the NUnit test suite for the `MonopolyTycoon.Core` project.
+2. Use a code coverage tool (e.g., Coverlet, dotCover) to generate a coverage report for the test run.","The calculated line coverage for the core components (Rule Engine, economic model, AI stubs) must be at least 70%.",None,"Visual Studio Test Runner, Coverlet/dotCover",2,"REQ-1-025"
+TEST-IT-002,Automated Testing,"Functional",Integration,High,High,"Verify the integration tests for key end-to-end workflows are implemented and passing.","The game is in a feature-complete state. Integration tests are written.","1. Run the integration test suite.
+2. Specifically check the results for tests covering:
+   - Save game -> Load game -> Verify state.
+   - Complete trade negotiation sequence.
+   - Player bankruptcy and asset transfer.","All integration tests must pass, confirming that the key workflows function correctly from end-to-end at a code level.",Curated save files for testing,"Unity Test Framework",8,"REQ-1-026"

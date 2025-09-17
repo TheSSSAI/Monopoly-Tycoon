@@ -1,0 +1,133 @@
+test_id,feature_area,test_type,test_level,priority,automation_candidate,test_description,preconditions,test_steps,expected_result,test_data_needs,tools_required,estimated_effort,dependencies
+SMK-CORE-001,Core Gameplay,Smoke,System,Critical,Yes,"Verify a full game turn can be completed for a human player (Pre-roll -> Roll -> Move -> Action -> Post-roll).","A new 2-player game (1 Human, 1 AI) is started. It is the human player's turn.","1. Verify 'Roll Dice' button is enabled.
+2. Click 'Roll Dice'.
+3. Verify token animates to the new space.
+4. Verify the action for the landing space is triggered (e.g., property purchase prompt for an unowned space).
+5. Complete the action.
+6. Verify the turn passes to the AI player.","The human player successfully completes a turn, and the game state advances to the next player without errors.",Default new game state,Unity Test Framework (for automation),Manual Inspection,M,"TASK-CORE-012, TASK-CORE-006, TASK-CORE-007"
+UT-LOG-001,Logging,Functional,Unit,Critical,Yes,"Verify Serilog configuration creates a log file in the correct directory.","Serilog is integrated into the project.","1. Instantiate the `LoggingService`.
+2. Call the `LogInfo` method with a test message.
+3. Check the file system at the expected path (`%APPDATA%/MonopolyTycoon/logs`).","A log file is created in the specified directory, and it contains the test message.",None,NUnit,S,TASK-INFRA-015
+IT-LOG-002,Logging,Functional,Integration,Critical,Yes,"Verify the rolling file policy deletes logs older than 7 days.","The logging system is configured with a 7-day rolling policy. A log file from 8 days ago exists.","1. Launch the application to initialize the logging service.
+2. The logging service performs its startup/maintenance routines.
+3. Check the contents of the log directory.","The log file from 8 days ago is deleted, while newer files remain.",Log files with manipulated 'Date Modified' timestamps,NUnit / File System access,S,TASK-INFRA-015
+IT-LOG-003,Logging,Functional,Integration,Critical,Yes,"Verify the rolling file policy deletes the oldest log file when the total size exceeds 50 MB.","The logging system is configured with a 50MB size limit. The log directory contains 51MB of log files across several files.","1. Launch the application.
+2. The logging service performs a write operation, triggering the size check.
+3. Check the total size of the log directory.","The oldest log file(s) are deleted until the total size is under 50 MB.",Multiple large log files totaling >50MB,NUnit / File System access,M,TASK-INFRA-015
+UT-LOG-004,Logging,Functional,Unit,Critical,Yes,"Verify that logs are written in structured JSON format and contain required fields (Timestamp, Level, Message).","The logging service is configured for JSON output.","1. Call the logger with a test message at INFO, DEBUG, and ERROR levels.
+2. Read the content of the generated log file.
+3. Parse the JSON content from each line.","Each log entry is a valid JSON object containing the correct timestamp, level, and message content.",None,NUnit,S,TASK-INFRA-015
+UT-DATA-001,Data Model,Functional,Unit,Critical,Yes,"Verify the `PlayerState` object can be serialized to and deserialized from JSON without data loss.","The `PlayerState` class is defined. System.Text.Json is configured.","1. Create a `PlayerState` instance with non-default values (e.g., cash=1234, position=15, owned_properties list populated).
+2. Serialize the object to a JSON string.
+3. Deserialize the string back into a new `PlayerState` object.
+4. Assert that all properties of the new object are equal to the original object.","The deserialized object is a perfect deep copy of the original object.",None,NUnit,S,TASK-CORE-002
+IT-DATA-002,Data Model,Functional,Integration,Critical,Yes,"Verify the aggregate `GameState` root object, including nested lists of `PlayerState` and `BoardState`, serializes and deserializes correctly.","The `GameState`, `PlayerState`, and `BoardState` classes are defined.","1. Create a complete `GameState` object representing a mid-game scenario (e.g., 3 players, multiple properties owned and developed).
+2. Serialize the `GameState` to JSON.
+3. Deserialize it back to a new `GameState` object.
+4. Compare the original and new objects, checking nested properties like player cash and property ownership.","The deserialized `GameState` object is a perfect deep copy of the original, validating the entire data model for the save/load system.",`GameState` object representing a mid-game state,NUnit,M,TASK-CORE-004
+UT-DICE-001,Core Gameplay,Functional,Unit,Critical,Yes,"Verify the `DiceService` roll results are always within the valid range [1, 6] for each die.","The `DiceService` is implemented.","1. Call the `DiceService.Roll()` method 1,000 times in a loop.
+2. For each result, assert that `Die1` is >= 1 and <= 6.
+3. Assert that `Die2` is >= 1 and <= 6.","All 1,000 rolls produce individual die values strictly within the 1-6 range. The test never fails.",None,NUnit,S,TASK-CORE-005
+UT-DICE-002,Core Gameplay,Non-Functional,Unit,Critical,Yes,"Verify the `DiceService` uses a cryptographically secure random number generator, resulting in a non-deterministic sequence.","The `DiceService` is implemented using `System.Security.Cryptography.RandomNumberGenerator`.","1. Instantiate two separate `DiceService` instances.
+2. Call `Roll()` on each instance 10 times and store the sequences of results.
+3. Assert that the two sequences of results are not identical.","The sequences of rolls from two different service instances are different, indicating a lack of a fixed seed and proper randomness.",None,NUnit,S,TASK-CORE-005
+UT-DICE-003,Core Gameplay,Functional,Unit,Critical,Yes,"Verify the `DiceService` correctly identifies a doubles roll.","The `DiceService` is implemented.","1. Mock the random number generator to return identical values (e.g., 4 and 4).
+2. Call `DiceService.Roll()`.
+3. Assert that the `IsDoubles` property of the returned result object is true.
+4. Mock the random number generator to return different values (e.g., 4 and 5).
+5. Call `DiceService.Roll()`.
+6. Assert that the `IsDoubles` property is false.","The `IsDoubles` flag is correctly set to true only when the two dice values are identical.",Mocked RNG,NUnit,S,TASK-CORE-005
+UT-MOVE-001,Core Gameplay,Functional,Unit,Critical,Yes,"Verify the `MovementService` correctly calculates the new board position, including wrapping past GO.","The `MovementService` is implemented. The board has 40 spaces (0-39).","1. Test a move from position 5 with a roll of 7. Expected: 12.
+2. Test a move from position 37 with a roll of 5. Expected: 2 (37 -> 38 -> 39 -> 0 -> 1 -> 2).
+3. Test a move landing exactly on GO (position 37, roll 3). Expected: 0.","The service returns the correct final position for all test cases.",None,NUnit,S,TASK-CORE-007
+UT-MOVE-002,Core Gameplay,Functional,Unit,Critical,Yes,"Verify the `MovementService` correctly detects when a player has passed GO.","The `MovementService` is implemented.","1. Test a move from position 5 with a roll of 7 (start < end). Expected: `passedGo` = false.
+2. Test a move from position 37 with a roll of 5 (start > end due to wrap). Expected: `passedGo` = true.
+3. Test a move landing on GO (position 37, roll 3). Expected: `passedGo` = true.","The service correctly returns `true` for the `passedGo` flag if and only if the move crosses the boundary between space 39 and space 0.",None,NUnit,S,TASK-CORE-007
+E2E-INST-001,Installer,Functional,System,Critical,No,"Verify a complete, default installation on Windows 11.","A clean Windows 11 VM is available. The signed installer `.exe` is available.","1. Run the installer.
+2. Accept the UAC prompt.
+3. Click 'Next' through all wizard pages, accepting default options (install path, desktop shortcut).
+4. On the final page, ensure 'Launch Game' is checked and click 'Finish'.","The game installs to `C:\Program Files\MonopolyTycoon`, a desktop shortcut is created, an entry appears in 'Apps & features', and the game launches successfully.",Clean Windows 11 VM,Inno Setup Installer, Manual Inspection,M,TASK-INFRA-001
+E2E-INST-002,Installer,Functional,System,Critical,No,"Verify a complete, default installation on Windows 10.","A clean Windows 10 VM is available. The signed installer `.exe` is available.","1. Run the installer.
+2. Accept the UAC prompt.
+3. Click 'Next' through all wizard pages, accepting default options (install path, desktop shortcut).
+4. On the final page, ensure 'Launch Game' is checked and click 'Finish'.","The game installs to `C:\Program Files\MonopolyTycoon`, a desktop shortcut is created, an entry appears in 'Apps & features', and the game launches successfully.",Clean Windows 10 VM,Inno Setup Installer, Manual Inspection,M,TASK-INFRA-001
+E2E-INST-003,Installer,Functional,System,High,No,"Verify installation to a custom directory.","A clean Windows VM with a secondary drive (e.g., D:) is available.","1. Run the installer.
+2. Proceed to the 'Choose Install Location' page.
+3. Click 'Browse' and select 'D:\Games'.
+4. Complete the installation.
+5. Check the contents of the D: drive.
+6. Launch the game from the created shortcut.","The game files are installed into 'D:\Games\MonopolyTycoon'. The desktop shortcut target path points to the executable on the D: drive. The game launches correctly.",Clean VM with multiple partitions,Inno Setup Installer, Manual Inspection,S,TASK-INFRA-004
+E2E-INST-004,Installer,Functional,System,High,No,"Verify the installer's disk space check prevents installation on a full drive.","A Windows VM with a target drive that has less than 2 GB of free space.","1. Run the installer.
+2. Attempt to select the drive with insufficient space as the installation target.","The installer displays an error message indicating insufficient disk space, and the 'Next' or 'Install' button is disabled, preventing the user from proceeding.",VM with a small partition configured to be nearly full,Inno Setup Installer, Manual Inspection,S,TASK-INFRA-003
+E2E-UNINST-001,Installer,Functional,System,Critical,No,"Verify a clean uninstallation of the application files.","The game is installed.","1. Go to Windows 'Apps & features'.
+2. Find 'Monopoly Tycoon' and select 'Uninstall'.
+3. Follow the uninstaller prompts, choosing to KEEP personal data when asked.
+4. After completion, check the file system.","The installation directory, desktop shortcut, and Start Menu entries are all deleted. The 'Apps & features' entry is removed. The `%APPDATA%/MonopolyTycoon` directory REMAINS.",Game installed on a test machine,Manual Inspection,S,TASK-INFRA-010
+E2E-UNINST-002,Installer,Functional,System,High,No,"Verify the uninstaller correctly deletes personal data when requested.","The game is installed and has been run to generate save/profile data in `%APPDATA%`.","1. Run the uninstaller.
+2. When prompted to keep or remove personal data, select 'Yes' to REMOVE it.
+3. Complete the uninstallation.
+4. Check the file system.","All application files are removed, AND the `%APPDATA%/MonopolyTycoon` directory is also deleted.",Populated `%APPDATA%/MonopolyTycoon` directory,Manual Inspection,S,TASK-INFRA-012
+E2E-UNINST-003,Installer,Functional,System,High,No,"Verify the uninstaller blocks operation if the game is currently running.","The Monopoly Tycoon game is running.","1. While the game is open, attempt to run the uninstaller.","The uninstaller displays an error message stating that the application must be closed first and pauses the uninstallation process. After closing the game, the uninstaller can proceed.",Game installed and running,Manual Inspection,S,TASK-INFRA-010
+IT-TURN-001,Core Gameplay,Functional,Integration,Critical,Yes,"Verify the Turn Manager correctly cycles through a 4-player game.","A 4-player game is initialized.","1. Start Player 1's turn.
+2. Signal the end of Player 1's turn.
+3. Assert that the active player is now Player 2.
+4. Repeat for Players 2, 3, and 4.
+5. After Player 4's turn ends, assert that the active player is Player 1 again.","The active player index correctly cycles from 0 -> 1 -> 2 -> 3 -> 0.",Mock `GameState` with 4 players,NUnit,M,TASK-CORE-012
+IT-TURN-002,Core Gameplay,Functional,Integration,Critical,Yes,"Verify the Turn Manager skips a bankrupt player in the turn order.","A 4-player game is in progress. Player 3's status is set to 'Bankrupt'. It is Player 2's turn.","1. Signal the end of Player 2's turn.
+2. Assert that the active player is now Player 4 (skipping Player 3).","The `TurnManager` correctly identifies Player 3 as bankrupt and advances the turn to the next non-bankrupt player.",Mock `GameState` with one bankrupt player,NUnit,S,TASK-CORE-012
+IT-TURN-003,Core Gameplay,Functional,Integration,Critical,Yes,"Verify a single doubles roll grants an extra turn.","A player's turn begins. The dice roll is a double.","1. The `TurnManager` processes the roll, move, and action phases.
+2. In the post-roll phase, it checks the `IsDoubles` flag.
+3. Assert that the active player remains the same.
+4. Assert that the player's `consecutive_doubles_count` is 1.","The game state transitions back to the 'Pre-Roll Management Phase' for the same player.",Mock `GameState`, Mock `DiceService` result,NUnit,S,TASK-CORE-010
+IT-TURN-004,Core Gameplay,Functional,Integration,Critical,Yes,"Verify rolling three consecutive doubles sends the player to jail.","A player has a `consecutive_doubles_count` of 2. Their next roll is also a double.","1. The `TurnManager` processes the roll.
+2. It detects the third consecutive double.
+3. Assert that the player's `status` is set to `InJail`.
+4. Assert that the player's `current_position` is the jail space index.
+5. Assert that the active player advances to the next player.","The player is sent to jail, their turn ends, and they do not move the amount rolled.",Mock `GameState`, Mock `DiceService` result,NUnit,M,TASK-CORE-011
+IT-RULE-001,Core Gameplay,Functional,Integration,Critical,Yes,"Verify passing GO correctly adds $200 to the player's cash.","A player is at position 38 and has $500. Their movement result passes GO.","1. The `MovementService` reports that the player passed GO.
+2. The `TurnManager` or `FinancialService` processes this event.
+3. Check the player's cash balance after the event.","The player's cash balance is updated to $700.",Mock `GameState`, Mock `MovementService` result,NUnit,S,TASK-CORE-009
+IT-RULE-002,Core Gameplay,Functional,Integration,High,Yes,"Verify a 'Go to Jail' move does NOT award the GO salary.","A player is at position 38 and moves to the 'Go to Jail' space at position 30.","1. The player's token is moved directly to the Jail space (position 10).
+2. The `MovementService` logic for passing GO should be bypassed.
+3. Check the player's cash balance.","The player is in jail, and their cash balance is unchanged.",Mock `GameState`, Mock `DiceService` result,NUnit,S,TASK-CORE-009
+UT-RULE-RENT-001,Core Gameplay,Functional,Unit,Critical,Yes,"Unit test the `RentCalculator` for all property types and states.","The `RentCalculator` service is available.","1. Test rent for an unmortgaged, undeveloped single property.
+2. Test rent for an unmortgaged, undeveloped property that is part of a monopoly (should be double).
+3. Test rent for a property with 1, 2, 3, 4 houses and a hotel.
+4. Test rent for owning 1, 2, 3, and 4 Railroads.
+5. Test rent for owning 1 Utility (4x dice roll) and 2 Utilities (10x dice roll).
+6. Test rent for any mortgaged property (should be 0).","The calculator returns the exact, correct rent amount for every single test case according to the official rulebook.",Property `ScriptableObject` data, dice roll values, Mock `GameState`,NUnit,L,TASK-CORE-034
+E2E-UI-001,UI,Non-Functional,System,High,No,"Verify UI layout integrity across supported aspect ratios (16:9, 16:10, 21:9).","The game is running.","1. Set the game resolution to 1920x1080 (16:9). Verify HUD, menus, and modals are correctly laid out.
+2. Change resolution to 1920x1200 (16:10). Verify again.
+3. Change resolution to 2560x1080 (21:9). Verify again.","In all supported aspect ratios, no UI elements are overlapped, distorted, or rendered off-screen. All buttons remain functional.",None,Manual Inspection, Unity Resolution Simulator,M,TASK-UI-003
+PERF-FPS-001,Performance,Non-Functional,System,Critical,No,"Verify the game maintains the required average and minimum FPS on recommended hardware during typical gameplay.","The game is running on a PC that meets the 'Recommended' hardware specifications. Resolution is 1920x1080.","1. Play a standard 4-player game for 10 minutes.
+2. Monitor the FPS during various animations (dice rolls, token movement) and AI turns.
+3. Record the average FPS and the lowest observed FPS.","The average FPS must be at or above 60. The FPS must not drop below 45 at any point.",PC meeting recommended specs,Unity Profiler / External FPS Monitor (e.g., Fraps),L,EPIC-UI
+PERF-LOAD-001,Performance,Non-Functional,System,Critical,No,"Verify that loading a new or saved game takes no more than 10 seconds on recommended hardware.","The game is at the main menu on a PC meeting 'Recommended' specs, including an SSD. A mid-game save file exists.","1. Time the duration from clicking 'Start Game' on the setup screen to the game board being playable.
+2. Time the duration from clicking 'Load' on a save slot to the game board being playable.","Both durations must be less than or equal to 10 seconds.",PC with SSD meeting recommended specs, Stopwatch,M,TASK-GSTATE-006
+IT-SAVE-001,Data Persistence,Functional,Integration,Critical,Yes,"Verify saving a game creates a valid, versioned, checksummed file.","A game is in a savable state.","1. Trigger the save game action.
+2. Check the file system for the new save file.
+3. Open the file and inspect its contents.
+4. Manually re-calculate the checksum of the data portion and compare it.","A JSON file is created. It contains a `gameVersion` field, a `checksum` field, and a `data` field. The calculated checksum matches the stored checksum.",Mid-game `GameState` object,NUnit, File System access,M,TASK-GSTATE-001
+IT-LOAD-002,Data Persistence,Functional,Integration,Critical,Yes,"Verify loading a valid save file correctly restores the `GameState`.","A valid save file exists on disk.","1. Call the `SaveGameRepository.LoadAsync` method with the path to the valid save file.
+2. The method should return a `GameState` object.
+3. Compare the properties of the returned object with the original `GameState` that was saved.","The loaded `GameState` object is a perfect deep copy of the original state.",A valid save file,NUnit,M,TASK-GSTATE-002
+IT-LOAD-003,Data Persistence,Functional,Integration,Critical,No,"Verify the system gracefully handles a corrupted save file.","A save file exists where the data has been altered, invalidating the checksum.","1. Navigate to the 'Load Game' screen in the application.
+2. The application should scan the save files.","The UI for the corrupted save slot is marked as 'Corrupted' or 'Unusable' and the 'Load' button is disabled. The application does not crash.",A manually corrupted save file,Manual Inspection,S,TASK-GSTATE-002
+IT-LOAD-004,Data Persistence,Functional,Integration,Critical,No,"Verify the system gracefully handles an incompatible save file version.","A save file exists with a `gameVersion` that is not supported by the current application.","1. Navigate to the 'Load Game' screen.","The UI for the incompatible save slot is marked as 'Incompatible' and the 'Load' button is disabled. The application does not crash.",A save file with an old version number,Manual Inspection,S,TASK-GSTATE-002
+E2E-AI-001,AI,Functional,System,High,No,"Verify that different AI difficulty levels exhibit distinct strategic behaviors.","Start a 4-player game with the human player and three AIs set to 'Easy', 'Medium', and 'Hard'.","1. Play the game for approximately 30 minutes.
+2. Observe the AI's decisions, particularly regarding property purchases and trades.
+3. Check the DEBUG logs for AI decision-making processes.","The 'Easy' AI will make suboptimal choices (e.g., decline to buy valuable properties). The 'Medium' AI will play competently. The 'Hard' AI will aggressively pursue monopolies and attempt to block other players.",None,Manual Observation, Log File Analysis,L,TASK-AI-009
+IT-DB-001,Data Persistence,Functional,Integration,Critical,Yes,"Verify the statistics database and schema are created on first launch.","The application is launched for the first time (no database file exists in `%APPDATA%`).","1. Start the application.
+2. The `StatisticsRepository` initializes.
+3. Check the `%APPDATA%/MonopolyTycoon` directory.","A SQLite database file is created. Its schema contains the required tables for profiles, statistics, and high scores.",Clean user profile (no existing DB file),NUnit, SQLite Browser,M,TASK-GSTATE-003
+IT-DB-002,Data Persistence,Functional,Integration,High,Yes,"Verify game completion correctly updates persistent player statistics.","A player has existing stats (e.g., 5 games played, 2 wins). A game is completed, and the player wins.","1. The `UpdateStatsFromGameResult` method is called with the game result.
+2. The method performs a transaction on the database.
+3. Query the database for the player's new statistics.","The player's record in the database now shows 6 games played and 3 wins.",A game result object, a pre-populated SQLite DB,NUnit,M,TASK-GSTATE-004
+IT-DB-003,Data Persistence,Resilience,Integration,High,Yes,"Verify the database backup and recovery system functions correctly.","A valid database file and a known-good backup exist.","1. Corrupt the primary database file (e.g., overwrite with garbage data).
+2. Launch the application.
+3. The `StatisticsRepository` should detect the corruption and attempt recovery.
+4. After startup, query the now-restored database.","The application launches without crashing. The data in the database matches the known-good backup, indicating a successful recovery.",A valid DB file, a backup of that file, and a corrupted version,NUnit,S,TASK-GSTATE-005
+E2E-EXCEPT-001,Error Handling,Functional,System,Critical,No,"Verify an unhandled exception triggers the error dialog with a correlated log entry.","A debug button exists in-game to throw an unhandled exception.","1. Play the game and click the debug button to trigger a crash.
+2. Observe the application's behavior.
+3. Note the Error ID from the dialog.
+4. Check the latest log file.","A modal error dialog appears with a unique Error ID and log path instructions. The application does not crash to desktop. The log file contains an ERROR entry with the full stack trace and the same Error ID.",A debug build with an exception trigger,Manual Inspection, Log File Analysis,M,TASK-INFRA-009

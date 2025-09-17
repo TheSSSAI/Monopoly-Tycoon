@@ -1,0 +1,146 @@
+test_id,feature_area,test_type,test_level,priority,automation_candidate,test_description,preconditions,test_steps,expected_result,test_data_needs,tools_required,estimated_effort,dependencies
+TS-INST-001,Installation,Functional,System,Critical,Manual Only,"Verify successful game installation using default settings","User has downloaded the installer.exe. Test machine meets minimum hardware specs and has a clean Windows 10/11 OS. User has admin rights.","1. Run the installer.exe.
+2. Click 'Next' on the Welcome screen.
+3. Accept the EULA and click 'Next'.
+4. Do not change the default installation directory and click 'Next'.
+5. Do not change the default shortcut options and click 'Next'.
+6. Click 'Install'.
+7. On the final screen, ensure 'Launch Game' is checked and click 'Finish'.","The game installs without errors. All files are present in 'C:\Program Files\MonopolyTycoon'. An entry exists in 'Apps & features'. A desktop shortcut is created. The game launches successfully from the installer.",Clean Windows 10/11 VM,VMware/VirtualBox,4,US-001
+TS-INST-002,Installation,Functional,System,High,Manual Only,"Verify installation to a custom directory on a different drive","Test machine has a secondary drive (e.g., D:\) with sufficient space.","1. Run the installer.
+2. Proceed to the 'Choose Install Location' screen.
+3. Click 'Browse...' and select a folder on the D:\ drive.
+4. Complete the installation.","The game installs all files into the selected custom directory (e.g., 'D:\Games\MonopolyTycoon'). The game launches and runs correctly from this location.",VM with multiple partitions,VMware/VirtualBox,2,US-002
+TS-INST-003,Installation,Error Condition,System,High,Manual Only,"Verify installer handles insufficient disk space","Target drive has less than 2 GB of free space.","1. Run the installer.
+2. Proceed to the 'Choose Install Location' screen.
+3. Select the drive with insufficient space.
+4. Attempt to click 'Next' or 'Install'.","The installer displays a clear error message stating 'Insufficient disk space'. The 'Install' button is disabled, preventing the user from proceeding until a valid location is chosen.",VM with a small partition configured,VMware/VirtualBox,2,US-002
+TS-INST-004,Installation,Functional,System,High,Manual Only,"Verify user can opt out of creating a desktop shortcut","User is running the installer.","1. Proceed to the 'Select Additional Tasks' screen.
+2. Uncheck the 'Create a desktop shortcut' option.
+3. Complete the installation.","The game installs successfully. No desktop shortcut is created.",Clean Windows 10/11 VM,VMware/VirtualBox,1,US-003
+TS-INST-005,Installation,Security,System,Critical,Manual Only,"Verify UAC prompt and code signing","User is logged into a standard (non-admin) Windows account. The final installer is digitally signed.","1. Run the signed installer.exe.
+2. Observe the Windows security prompt.","A UAC prompt appears, requesting elevation. The publisher name is correctly displayed (not 'Unknown Publisher'). The installation will not proceed without admin approval.",Signed installer executable; Standard user account on test machine,Code Signing Certificate; VM,2,US-001
+TS-UNINST-001,Uninstallation,Functional,System,Critical,Manual Only,"Verify clean uninstallation of application files","The game is installed with default settings.","1. Go to Windows 'Apps & features'.
+2. Find 'Monopoly Tycoon' and click 'Uninstall'.
+3. Confirm the action in the uninstaller wizard.
+4. When prompted about personal data, select 'No' (keep data).
+5. Let the uninstaller finish.","The application is removed from the 'Apps & features' list. The installation directory, desktop shortcut, and Start Menu entries are all deleted. The '%APPDATA%/MonopolyTycoon' directory remains.",Installed game instance,VMware/VirtualBox,2,US-006
+TS-UNINST-002,Uninstallation,Functional,System,High,Manual Only,"Verify uninstallation with deletion of personal data","The game is installed and has been run to create save/profile data.","1. Initiate uninstallation.
+2. When prompted about personal data, select 'Yes' (delete data).
+3. Let the uninstaller finish.","All application files are removed. The '%APPDATA%/MonopolyTycoon' directory and all its contents are also deleted.",Game save files and profile DB in %APPDATA%,VMware/VirtualBox,2,US-007
+TS-UNINST-003,Uninstallation,Error Condition,System,High,Manual Only,"Verify uninstaller blocks if game is running","The Monopoly Tycoon game is currently running.","1. While the game is running, initiate the uninstallation process from 'Apps & features'.","The uninstaller displays an error message stating the game must be closed. The process is halted. After closing the game, the uninstaller can proceed.",Installed and running game instance,VMware/VirtualBox,1,US-006
+TS-LOG-001,Logging,Functional,Integration,High,High,"Verify Serilog creates structured JSON log files in the correct directory","Application is started for the first time.","1. Launch the game application.
+2. Perform a few actions (e.g., navigate menus).
+3. Close the application.
+4. Navigate to the '%APPDATA%/MonopolyTycoon/logs' directory.","The 'logs' directory is created. A log file exists with a name following the rolling policy. The file content is structured JSON.",None,File Explorer; Text Editor,2,TASK-004-002
+TS-LOG-002,Logging,Non-Functional,Integration,Medium,High,"Verify log file retention policy (by age and size)","Log files from more than 7 days ago exist, or the total size of log files exceeds 50 MB.","1. Manually create old log files or a single large log file to trigger the retention policy.
+2. Launch the application.
+3. Check the log directory.","The oldest/largest files are automatically deleted to bring the directory within the 7-day/50MB limits.",Script to generate dummy log files,File Explorer,4,TASK-004-004
+TS-ERR-001,Error Handling,Functional,System,Critical,Medium,"Verify global exception handler displays modal dialog and logs error with correlation ID","A debug mechanism exists to trigger an unhandled exception.","1. Launch the game.
+2. Trigger the test exception.
+3. Observe the UI.
+4. Note the Error ID from the dialog.
+5. Close the application and inspect the latest error log file.","A modal error dialog appears, pausing the game. The dialog displays a non-technical message, a unique Error ID, and the full path to the log directory. The log file contains a detailed exception stack trace with the exact same Error ID.",A debug build with an exception trigger,Unity; Text Editor,4,US-005
+TS-DB-001,Persistence (DB),Functional,Integration,High,High,"Verify GetOrCreateProfileAsync correctly creates a new profile in the database","The application is launched for the first time (no database exists).","1. Start the game.
+2. On the setup screen, enter a valid new profile name (e.g., 'TestPlayer').
+3. Start the game.
+4. Use a DB tool to inspect the SQLite file created in '%APPDATA%/MonopolyTycoon'.","A SQLite database file is created. It contains a 'PlayerProfile' table. A single record exists with the display name 'TestPlayer' and a unique profile_id.",None,DB Browser for SQLite,4,TASK-006-004
+TS-DB-002,Persistence (DB),Functional,Integration,High,High,"Verify GetOrCreateProfileAsync retrieves an existing profile","A profile named 'TestPlayer' already exists in the database.","1. Start the game.
+2. On the setup screen, enter the name 'TestPlayer'.
+3. Start the game.
+4. Inspect the database.","No new record is created in the 'PlayerProfile' table. The existing record for 'TestPlayer' is used.",Pre-populated SQLite DB with one profile,DB Browser for SQLite,2,TASK-006-004
+TS-DB-003,Persistence (DB),Non-Functional,Integration,Medium,High,"Verify automatic database backup and retention","The main SQLite database file exists.","1. Launch the game. Note the timestamp.
+2. Close the game. Modify the database file (e.g., using a DB tool).
+3. Relaunch the game.
+4. Check the filesystem in '%APPDATA%/MonopolyTycoon'.
+5. Repeat 4 times.","A backup of the database is created on the second launch. After the 5th launch, only the three most recent backup files are retained.",Pre-existing SQLite DB,DB Browser for SQLite; File Explorer,4,TASK-006-002
+TS-SAVE-001,Persistence (Save/Load),Functional,System,Critical,High,"Verify successful save and load cycle preserves game state","A game is in a complex, known state (e.g., Turn 5, player in jail, one property mortgaged).","1. In the game, open the pause menu and save the game to an empty slot.
+2. Note the visual and logical state of the game.
+3. Quit to the main menu.
+4. Select 'Load Game' and load the just-created save.","The game loads and the state is identical to how it was before saving. All player cash, positions, property ownership, mortgage statuses, and turn order are perfectly restored.",A playable game build,Unity,8,US-061; US-062
+TS-SAVE-002,Persistence (Save/Load),Functional,Integration,High,High,"Verify save file validation for a corrupted file","A valid save file exists.","1. Manually edit the content of the save file to invalidate its checksum.
+2. Launch the game and navigate to the 'Load Game' screen.","The corresponding save slot is visually marked as 'Corrupted'. The 'Load' button for this slot is disabled. A tooltip explains the file is unusable.",A valid save game file,Text Editor; Unity,2,US-063
+TS-SAVE-003,Persistence (Save/Load),Functional,Integration,High,High,"Verify save file validation for an incompatible version","A valid save file exists.","1. Manually edit the 'gameVersion' property in the JSON of the save file to an older, unsupported version number.
+2. Launch the game and navigate to the 'Load Game' screen.","The corresponding save slot is visually marked as 'Incompatible Version'. The 'Load' button for this slot is disabled.",A valid save game file,Text Editor; Unity,2,US-063
+TS-SAVE-004,Persistence (Save/Load),Error Condition,System,High,Manual Only,"Verify save option is disabled after rolling dice","Human player's turn, in the 'Pre-Roll Management' phase.","1. Observe that the 'Save Game' button in the pause menu is enabled.
+2. Click the 'Roll Dice' button.
+3. After the dice roll animation, but before the turn ends, open the pause menu again.","The 'Save Game' button is now disabled.",A playable game build,Unity,1,US-061
+TS-CORE-001,Core Logic (Rule Engine),Functional,Unit,Critical,High,"Unit test the Rent Calculation Engine for all property types","The Rent Calculation Engine service is available for testing.","1. For each ownable property, create a series of unit tests.
+2. Simulate different game states (e.g., owner has monopoly, property is mortgaged, owner has 1/2/3/4 railroads).
+3. Call the calculation service with these states.
+4. Assert that the returned rent value is correct according to official rules.","All tests pass, confirming the rent calculation logic is 100% accurate for all scenarios.",Property data (prices, rents),NUnit,16,TASK-013-005
+TS-CORE-002,Core Logic (Rule Engine),Functional,Unit,Critical,High,"Unit test the Even Building Rule Validator","The BuildingService with its validation logic is available for testing.","1. Create a simulated player state with ownership of a 3-property monopoly.
+2. Test case: 0 houses on all properties. Call validator for any property. Expected: True.
+3. Test case: 1 house on prop A, 0 on B/C. Call validator for prop A. Expected: False.
+4. Test case: 1 house on prop A, 0 on B/C. Call validator for prop B. Expected: True.
+5. Repeat for selling logic in reverse.","All assertions pass, confirming the even building/selling logic is correct.",None,NUnit,8,TASK-015-007
+TS-CORE-003,Core Logic (Turn Machine),Functional,Unit,Critical,High,"Unit test the Turn State Machine for doubles and jail rules","The Turn State Machine service is available for testing.","1. Simulate a player turn starting.
+2. Mock a dice roll of doubles. Assert state transitions back to 'Pre-Roll Management' for the same player.
+3. Mock a second doubles roll. Assert counter increments.
+4. Mock a third doubles roll. Assert state transitions to 'GoToJail' and turn ends.
+5. Mock a non-doubles roll. Assert state transitions to next player.","All state transitions occur as expected according to the rules.",None,NUnit,8,TASK-012-001
+TS-CORE-004,Core Logic (Bankruptcy),Functional,Unit,Critical,High,"Unit test the Bankruptcy Rule Engine","The BankruptcyService is available for testing.","1. Create various simulated player states (high cash, low cash, high property value, etc.).
+2. Define a debt amount.
+3. Call the `IsBankrupt` method.
+4. Assert the returned boolean is correct based on the sum of cash + liquidatable assets vs. the debt.","The bankruptcy determination logic is proven to be accurate in all tested financial scenarios.",Property data (prices, mortgage values),NUnit,8,TASK-017-001
+TS-SETUP-001,Game Setup,Functional,System,Critical,Manual Only,"Verify full game setup and launch","Player is on the main menu.","1. Click 'New Game'.
+2. Enter a valid profile name ('PlayerOne').
+3. Select a token (e.g., Top Hat).
+4. Select 3 AI opponents.
+5. Set AI difficulties to Easy, Medium, Hard.
+6. Click 'Start Game'.","The game loads into the main board scene. The HUD displays 4 players. The human player is named 'PlayerOne' and has the Top Hat token. The three AIs have unique, different tokens. A debug log or inspector confirms the AI difficulty settings were correctly applied.",None,Unity,4,"US-009, US-010, US-011, US-014"
+TS-SETUP-002,Game Setup,Functional,Integration,High,High,"Verify profile name validation UI feedback","Player is on the game setup screen.","1. Enter 'A' in the name field.
+2. Enter 'PlayerWithSpecialChars!' in the field.
+3. Enter a 17-character name.
+4. Enter '  ' (spaces) in the field.
+5. Enter a valid name.","1. An error message 'Name must be at least 3 characters long' appears. 'Start Game' button is disabled.
+2. An error message 'Name can only contain letters and numbers' appears. 'Start Game' button is disabled.
+3. Input is truncated to 16 characters.
+4. An error message for length appears. 'Start Game' button is disabled.
+5. All error messages disappear. 'Start Game' button is enabled.",None,Unity Test Framework,2,US-012
+TS-E2E-001,End-to-End Flow,Smoke,System,Critical,High,"Verify critical path smoke test (New Game to Player Turn 1 Action)","Application is at the main menu.","1. Start a New Game with default settings.
+2. Click 'Roll Dice'.
+3. Observe token movement.
+4. If landing on unowned property, click 'Buy'.","The game starts, the HUD is correct. Player can roll dice. The token moves correctly. The property purchase dialog appears and the player can successfully buy the property. The game does not crash.",None,Unity Test Framework,4,US-015
+TS-E2E-002,End-to-End Flow,Regression,System,Critical,Medium,"Verify full game loop to win condition","Player is at the main menu.","1. Start a 2-player game (1 Human, 1 Easy AI).
+2. Play the game until the AI opponent goes bankrupt.
+3. Observe the end-of-game sequence.","The game correctly identifies the AI's bankruptcy. The Victory screen is displayed with correct stats. The player can navigate to the Game Summary screen, and then back to the Main Menu. The game statistics are correctly updated in the database.",None,Unity,16,"US-046, US-048"
+TS-UI-001,UI (Responsiveness),Non-Functional,System,High,Manual Only,"Verify UI layout on all supported aspect ratios","Game is running.","1. Set the game resolution to 1920x1080 (16:9). Verify Main Menu, Setup Screen, HUD, and Pause Menu.
+2. Set the game resolution to 2560x1080 (21:9). Verify all screens.
+3. Set the game resolution to 1920x1200 (16:10). Verify all screens.","On all tested aspect ratios, no UI elements are overlapped, clipped, or distorted. All buttons remain clickable and all text is legible.",None,Unity Editor (Resolution Simulator),8,US-004
+TS-UI-002,UI (HUD),Functional,Integration,Critical,High,"Verify HUD updates from game events","A game is in progress.","1. Trigger a 'Pass Go' event.
+2. Trigger a rent payment event.
+3. Trigger a player bankruptcy event.
+4. Let the turn pass from Player 1 to Player 2.","1. The player's cash in the HUD updates immediately.
+2. The cash values for both renter and owner update in the HUD.
+3. The bankrupt player's HUD panel greys out and shows 'Bankrupt'.
+4. The turn indicator highlight moves from Player 1's panel to Player 2's panel.",A debug tool to fire game events,Unity Test Framework,4,US-049
+TS-AI-001,AI,Functional,Integration,High,Medium,"Verify AI decision-making varies by difficulty level","A test scenario where an AI can buy a valuable property (e.g., Boardwalk) is set up.","1. Run the scenario with the AI set to 'Easy'.
+2. Run the same scenario with the AI set to 'Hard'.
+3. Set up a trade offer that is slightly unfavorable to the AI.
+4. Propose the trade to an 'Easy' AI.
+5. Propose the same trade to a 'Hard' AI.","1. The 'Easy' AI may decline to buy the property even if it can afford it.
+2. The 'Hard' AI will almost always buy the property if it can afford it.
+4. The 'Easy' AI is likely to accept the unfavorable trade.
+5. The 'Hard' AI will reject the unfavorable trade.",Test save files (from TASK-010-004),Unity,8,TASK-019-002
+TS-PERF-001,Performance,Non-Functional,System,Critical,Manual Only,"Verify frame rate performance during gameplay","Game is running on a machine that meets the 'Recommended' hardware specifications.","1. Start a 4-player game.
+2. Play through several turns, triggering various animations (dice rolls, token movement, UI popups).
+3. Monitor the frame rate using a performance overlay.","The average frame rate remains at or above 60 FPS. The frame rate does not drop below 45 FPS during any typical gameplay scenario.",'Recommended' spec test machine,MSI Afterburner / Unity Profiler,4,REQ-1-014
+TS-PERF-002,Performance,Non-Functional,System,High,Manual Only,"Verify game load time","Application is on the main menu on a 'Recommended' spec machine with an SSD.","1. Start a timer.
+2. Click 'New Game' and proceed through setup to start the match.
+3. Stop the timer the moment the game board is visible and interactive.
+4. Repeat for 'Load Game'.","The elapsed time for both 'New Game' and 'Load Game' is less than 10 seconds.",'Recommended' spec test machine,Stopwatch,2,REQ-1-015
+TS-THEME-001,Theming System,Non-Functional,System,Medium,Manual Only,"Verify theme switching and asset loading","A game is in progress.","1. Start a game with the 'Classic' theme. Observe UI, board, and token assets. Listen to music.
+2. Open the settings menu and switch to the 'Futuristic' theme.
+3. Resume the game.","All themeable assets are swapped correctly. The UI skin changes, the 3D board model/textures are different, token models are updated, and the background music track changes. The switch completes without errors.",A build with both themes implemented,Unity,8,US-066
+TS-THEME-002,Theming System,Non-Functional,System,Medium,Manual Only,"Verify theme switching memory management","Game is running on a test machine.","1. Open the Unity Profiler and take a memory snapshot.
+2. In-game, switch from 'Classic' to 'Futuristic' theme.
+3. Switch back to 'Classic' theme.
+4. Switch back to 'Futuristic' theme again.
+5. Force a garbage collection and take another memory snapshot.","The final memory usage is not significantly higher than the initial snapshot. This indicates that assets from the unloaded theme are being correctly released from memory and not causing a leak.",A build with both themes,Unity Profiler,4,RISK-TECH-004
+TS-NET-001,Networking,Functional,Integration,Medium,High,"Verify update checker functionality","A mock web server is set up to respond to the update check URL.","1. Configure the mock server to return a version number higher than the client's. Launch the game.
+2. Configure the mock server to return the same version number. Relaunch.
+3. Configure the mock server to not respond (timeout). Relaunch.
+4. Disconnect the test machine's network. Relaunch.","1. An update notification appears on the main menu.
+2. No notification appears.
+3. The game loads normally with no errors after a short timeout.
+4. The game loads normally with no errors.",Mock server (e.g., mock-server.com or a local Node.js server),Unity,4,US-067

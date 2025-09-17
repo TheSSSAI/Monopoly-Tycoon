@@ -1,27 +1,18 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.8.34322.80
+VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Application.Abstractions", "src\MonopolyTycoon.Application.Abstractions\MonopolyTycoon.Application.Abstractions.csproj", "{A4B1B3A7-8B2E-4B8A-A2E1-1B8F3D1C8C0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Domain", "src\MonopolyTycoon.Domain\MonopolyTycoon.Domain.csproj", "{0C1B0B1A-0A3B-4E3B-8F2D-0B9F7E0F7B7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Domain", "src\MonopolyTycoon.Domain\MonopolyTycoon.Domain.csproj", "{B5C2B4A8-9B3F-4C9B-B3E2-2C9G4E2D9D1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Application.Abstractions", "src\MonopolyTycoon.Application.Abstractions\MonopolyTycoon.Application.Abstractions.csproj", "{1D2C3B4A-5E6F-7G8H-9I0J-1K2L3M4N5P6Q}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Application.Services", "src\MonopolyTycoon.Application.Services\MonopolyTycoon.Application.Services.csproj", "{C6D3C5B9-AC40-4D0A-C4F3-3D0H5F3E0E2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Application.Services", "src\MonopolyTycoon.Application.Services\MonopolyTycoon.Application.Services.csproj", "{2E3D4C5B-6F7G-8H9I-0J1K-2L3M4N5P6Q7R}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Infrastructure", "src\MonopolyTycoon.Infrastructure\MonopolyTycoon.Infrastructure.csproj", "{D7E4D6CA-BD51-4E1B-D5A4-4E1I6A4F1F3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Infrastructure", "src\MonopolyTycoon.Infrastructure\MonopolyTycoon.Infrastructure.csproj", "{3F4E5D6C-7G8H-9I0J-1K2L-3M4N5P6Q7R8S}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Domain.Tests", "tests\MonopolyTycoon.Domain.Tests\MonopolyTycoon.Domain.Tests.csproj", "{E8F5E7DB-CE62-4F2C-E6B5-5F2J7B5A2A4F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Tests.Unit", "tests\MonopolyTycoon.Tests.Unit\MonopolyTycoon.Tests.Unit.csproj", "{4G5F6E7D-8H9I-0J1K-2L3M-4N5P6Q7R8S9T}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Application.Services.Tests", "tests\MonopolyTycoon.Application.Services.Tests\MonopolyTycoon.Application.Services.Tests.csproj", "{F9A6F8EC-DF73-4A3D-F7C6-6A3K8C6B3B5A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{G1B7A9FD-E084-4B4E-A8D7-7B4L9D7C4C6B}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		.gitignore = .gitignore
-		.vsconfig = .vsconfig
-		Directory.Build.props = Directory.Build.props
-		global.json = global.json
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonopolyTycoon.Tests.Integration", "tests\MonopolyTycoon.Tests.Integration\MonopolyTycoon.Tests.Integration.csproj", "{5H6G7F8E-9I0J-1K2L-3M4N-5P6Q7R8S9T0U}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,37 +20,35 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A4B1B3A7-8B2E-4B8A-A2E1-1B8F3D1C8C0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A4B1B3A7-8B2E-4B8A-A2E1-1B8F3D1C8C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A4B1B3A7-8B2E-4B8A-A2E1-1B8F3D1C8C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A4B1B3A7-8B2E-4B8A-A2E1-1B8F3D1C8C0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B5C2B4A8-9B3F-4C9B-B3E2-2C9G4E2D9D1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B5C2B4A8-9B3F-4C9B-B3E2-2C9G4E2D9D1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B5C2B4A8-9B3F-4C9B-B3E2-2C9G4E2D9D1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B5C2B4A8-9B3F-4C9B-B3E2-2C9G4E2D9D1C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6D3C5B9-AC40-4D0A-C4F3-3D0H5F3E0E2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6D3C5B9-AC40-4D0A-C4F3-3D0H5F3E0E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6D3C5B9-AC40-4D0A-C4F3-3D0H5F3E0E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6D3C5B9-AC40-4D0A-C4F3-3D0H5F3E0E2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7E4D6CA-BD51-4E1B-D5A4-4E1I6A4F1F3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7E4D6CA-BD51-4E1B-D5A4-4E1I6A4F1F3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7E4D6CA-BD51-4E1B-D5A4-4E1I6A4F1F3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7E4D6CA-BD51-4E1B-D5A4-4E1I6A4F1F3E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E8F5E7DB-CE62-4F2C-E6B5-5F2J7B5A2A4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8F5E7DB-CE62-4F2C-E6B5-5F2J7B5A2A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8F5E7DB-CE62-4F2C-E6B5-5F2J7B5A2A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8F5E7DB-CE62-4F2C-E6B5-5F2J7B5A2A4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F9A6F8EC-DF73-4A3D-F7C6-6A3K8C6B3B5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9A6F8EC-DF73-4A3D-F7C6-6A3K8C6B3B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9A6F8EC-DF73-4A3D-F7C6-6A3K8C6B3B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9A6F8EC-DF73-4A3D-F7C6-6A3K8C6B3B5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C1B0B1A-0A3B-4E3B-8F2D-0B9F7E0F7B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C1B0B1A-0A3B-4E3B-8F2D-0B9F7E0F7B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C1B0B1A-0A3B-4E3B-8F2D-0B9F7E0F7B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C1B0B1A-0A3B-4E3B-8F2D-0B9F7E0F7B7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D2C3B4A-5E6F-7G8H-9I0J-1K2L3M4N5P6Q}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D2C3B4A-5E6F-7G8H-9I0J-1K2L3M4N5P6Q}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D2C3B4A-5E6F-7G8H-9I0J-1K2L3M4N5P6Q}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D2C3B4A-5E6F-7G8H-9I0J-1K2L3M4N5P6Q}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E3D4C5B-6F7G-8H9I-0J1K-2L3M4N5P6Q7R}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E3D4C5B-6F7G-8H9I-0J1K-2L3M4N5P6Q7R}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E3D4C5B-6F7G-8H9I-0J1K-2L3M4N5P6Q7R}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E3D4C5B-6F7G-8H9I-0J1K-2L3M4N5P6Q7R}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F4E5D6C-7G8H-9I0J-1K2L-3M4N5P6Q7R8S}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F4E5D6C-7G8H-9I0J-1K2L-3M4N5P6Q7R8S}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F4E5D6C-7G8H-9I0J-1K2L-3M4N5P6Q7R8S}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F4E5D6C-7G8H-9I0J-1K2L-3M4N5P6Q7R8S}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4G5F6E7D-8H9I-0J1K-2L3M-4N5P6Q7R8S9T}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4G5F6E7D-8H9I-0J1K-2L3M-4N5P6Q7R8S9T}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4G5F6E7D-8H9I-0J1K-2L3M-4N5P6Q7R8S9T}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4G5F6E7D-8H9I-0J1K-2L3M-4N5P6Q7R8S9T}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5H6G7F8E-9I0J-1K2L-3M4N-5P6Q7R8S9T0U}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5H6G7F8E-9I0J-1K2L-3M4N-5P6Q7R8S9T0U}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5H6G7F8E-9I0J-1K2L-3M4N-5P6Q7R8S9T0U}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5H6G7F8E-9I0J-1K2L-3M4N-5P6Q7R8S9T0U}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {H2C8B0AE-F195-4C5F-B9E8-8C5M0E8D5D7C}
+		SolutionGuid = {A1B2C3D4-E5F6-G7H8-I9J0-K1L2M3N4O5P6}
 	EndGlobalSection
 EndGlobal

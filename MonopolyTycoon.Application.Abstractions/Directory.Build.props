@@ -1,24 +1,33 @@
 <Project>
   <!-- This file applies common properties to all projects in the solution. -->
   <PropertyGroup>
-    <Product>Monopoly Tycoon</Product>
-    <Version>1.0.0</Version>
-    <Company>Monopoly Tycoon Dev Team</Company>
-    <Copyright>Copyright © 2024</Copyright>
-
-    <!-- Enforce .NET 8 and C# 12 features across all projects -->
+    <!-- Target .NET 8 as per REQ-1-009 -->
     <TargetFramework>net8.0</TargetFramework>
+    
+    <!-- Enforce latest C# language version -->
     <LangVersion>12.0</LangVersion>
     
-    <!-- Enable modern C# features and stricter code analysis -->
+    <!-- Enable modern C# features across all projects -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
+    <!-- Common Assembly Info -->
+    <Company>Monopoly Tycoon Dev Team</Company>
+    <Authors>Monopoly Tycoon Dev Team</Authors>
+    <Copyright>Copyright (c) 2024</Copyright>
+    <Product>Monopoly Tycoon</Product>
 
     <!-- Configure source linking for better debugging -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <DebugType>embedded</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- Configure strong naming for release builds -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)MonopolyTycoon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>

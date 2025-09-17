@@ -1,15 +1,17 @@
+using System;
+
 namespace MonopolyTycoon.Application.Abstractions.Services
 {
     /// <summary>
-    /// Defines a contract for an in-process event bus, enabling a decoupled publish-subscribe
-    /// communication pattern between different parts of the application. This is primarily
-    /// used to allow Application Services to notify the Presentation layer of state changes
-    /// without creating a direct dependency.
+    /// Defines a contract for an in-process event bus (Mediator/Observer pattern).
+    /// This enables decoupled communication between application layers, primarily for
+    /// Application Services to notify the Presentation Layer of game state changes
+    /// without a direct reference.
     /// </summary>
     public interface IApplicationEventBus
     {
         /// <summary>
-        /// Publishes an event to all subscribed handlers for that event type.
+        /// Publishes an event to all subscribed handlers for the event's type.
         /// </summary>
         /// <typeparam name="TEvent">The type of the event being published.</typeparam>
         /// <param name="anEvent">The event object to publish.</param>
