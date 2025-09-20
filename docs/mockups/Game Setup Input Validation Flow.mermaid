@@ -1,0 +1,32 @@
+flowchart TD
+    A[User on Game Setup Screen] --> B(User interacts with form <br/> Name Input / Token Selection)
+    
+    B --> C{Is Profile Name Valid?}
+    C -- No --> D
+    subgraph "Name Validation Failed"
+        direction LR
+        D[Show Specific Error Message<br/>- Must be 3-16 characters<br/>- No special characters<br/>- Cannot be empty]
+    end
+    D --> F[Disable 'Start Game' Button]
+    
+    C -- Yes --> E{Is a Token Selected?}
+    E -- No --> G[Show 'Please Select a Token' Error]
+    G --> F
+    
+    E -- Yes --> H[Clear All Validation Errors]
+    H --> I[Enable 'Start Game' Button]
+    
+    F --> B
+    I --> J(User Clicks 'Start Game')
+    J --> K((Load Game Scene))
+    
+    %% Styling
+    classDef errorNode fill:#FBE9EC,stroke:#D7263D,color:#5A0A15
+    classDef successNode fill:#E6F0F6,stroke:#126DA3,color:#032037
+    classDef processNode fill:#F7F5F2,stroke:#7D7871,color:#1C1A17
+    classDef stateNode fill:#fff,stroke:#032037,stroke-width:2px,color:#032037
+    
+    class D,G errorNode
+    class H,I,K successNode
+    class B,J processNode
+    class F stateNode

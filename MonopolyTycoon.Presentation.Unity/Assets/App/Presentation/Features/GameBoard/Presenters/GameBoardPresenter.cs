@@ -1,115 +1,127 @@
-using MonopolyTycoon.Application.Contracts;
-using MonopolyTycoon.Domain.Events;
-using MonopolyTycoon.Presentation.Core;
+using MonopolyTycoon.Application.Abstractions;
+using MonopolyTycoon.Application.DataObjects;
+using MonopolyTycoon.Presentation.Events;
 using MonopolyTycoon.Presentation.Features.GameBoard.Views;
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using VContainer.Unity;
 using UnityEngine;
-using VContainer;
 
 namespace MonopolyTycoon.Presentation.Features.GameBoard.Presenters
 {
-    public class GameBoardPresenter : MonoBehaviour
+    public class GameBoardPresenter : IInitializable, IDisposable
     {
-        [Inject]
+        private readonly IGameBoardView _view;
         private readonly IEventBus _eventBus;
-        [Inject]
-        private readonly ILoggerAdapter<GameBoardPresenter> _logger;
+        private readonly IGameSessionService _gameSessionService;
 
-        private IGameBoardView _view;
-        private GameState _currentGameState;
+        private GameStateDTO _lastGameState;
 
-        private void Awake()
+        public GameBoardPresenter(IGameBoardView view, IEventBus eventBus, IGameSessionService gameSessionService)
         {
-            _view = GetComponent<IGameBoardView>();
-            if (_view == null)
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+            _gameSessionService = gameSessionService ?? throw new ArgumentNullException(nameof(gameSessionService));
+        }
+
+        public void Initialize()
+        {
+            _eventBus.Subscribe<GameStateUpdatedEvent>(OnGameStateUpdated);
+            var initialGameState = _gameSessionService.GetCurrentGameState();
+            if (initialGameState != null)
             {
-                _logger.LogError("GameBoardPresenter requires an IGameBoardView component on the same GameObject.");
-                enabled = false;
+                InitializeBoard(initialGameState);
             }
         }
 
-        private void Start()
-        {
-            _eventBus.Subscribe<GameStateUpdatedEvent>(OnGameStateUpdated);
-            _logger.LogInformation("GameBoardPresenter initialized and subscribed to GameStateUpdatedEvent.");
-        }
-
-        private void OnDestroy()
+        public void Dispose()
         {
             _eventBus.Unsubscribe<GameStateUpdatedEvent>(OnGameStateUpdated);
-            _logger.LogInformation("GameBoardPresenter destroyed and unsubscribed from events.");
+        }
+
+        private void InitializeBoard(GameStateDTO gameState)
+        {
+            _view.InitializeBoard(gameState.Players.Count);
+            
+            foreach (var player in gameState.Players)
+            {
+                _view.CreatePlayerToken(player.Id, player.TokenId, player.CurrentPosition);
+            }
+
+            foreach (var property in gameState.Board.Properties)
+            {
+                if (property.OwnerId != null)
+                {
+                    _view.UpdatePropertyOwnership(property.Position, property.OwnerId);
+                }
+                _view.UpdatePropertyDevelopment(property.Position, property.DevelopmentLevel);
+            }
+
+            _lastGameState = gameState;
         }
 
         private async void OnGameStateUpdated(GameStateUpdatedEvent e)
         {
-            _logger.LogInformation("Received GameStateUpdatedEvent with context: {ChangeContext}", e.ChangeContext);
-            var previousState = _currentGameState;
-            _currentGameState = e.NewGameState;
+            var newState = e.NewState;
 
-            await ProcessVisualUpdates(previousState, _currentGameState);
-        }
-
-        private async Task ProcessVisualUpdates(GameState oldState, GameState newState)
-        {
-            if (oldState == null)
+            if (_lastGameState == null)
             {
-                // This is the first state update, just render the initial state.
-                _view.InitializeBoard(newState);
+                InitializeBoard(newState);
                 return;
             }
 
-            // In a full implementation, we would have a queue of animations.
-            // For now, we'll process them sequentially with awaits.
-
-            // 1. Process player movement
-            for (int i = 0; i < newState.PlayerStates.Count; i++)
-            {
-                var oldPlayerState = oldState.PlayerStates.FirstOrDefault(p => p.PlayerId == newState.PlayerStates[i].PlayerId);
-                if (oldPlayerState != null && oldPlayerState.CurrentPosition != newState.PlayerStates[i].CurrentPosition)
-                {
-                    _logger.LogInformation("Animating token move for Player {PlayerId} from {StartPosition} to {EndPosition}",
-                        newState.PlayerStates[i].PlayerId, oldPlayerState.CurrentPosition, newState.PlayerStates[i].CurrentPosition);
-                    await _view.AnimateTokenMoveAsync(
-                        newState.PlayerStates[i].PlayerId, 
-                        oldPlayerState.CurrentPosition, 
-                        newState.PlayerStates[i].CurrentPosition);
-                }
-            }
-
-            // 2. Process property ownership and development changes
-            foreach (var newPropertyState in newState.BoardState.Properties)
-            {
-                var oldPropertyState = oldState.BoardState.Properties.FirstOrDefault(p => p.Id == newPropertyState.Id);
-                if (oldPropertyState == null) continue;
-
-                // Ownership change
-                if (oldPropertyState.OwnerId != newPropertyState.OwnerId)
-                {
-                    _logger.LogInformation("Updating ownership for property {PropertyId} to Player {OwnerId}", 
-                        newPropertyState.Id, newPropertyState.OwnerId);
-                    _view.UpdateOwnershipVisual(newPropertyState.Id, newPropertyState.OwnerId, newPropertyState.IsMortgaged);
-                }
-                
-                // Mortgage status change
-                else if(oldPropertyState.IsMortgaged != newPropertyState.IsMortgaged)
-                {
-                    _logger.LogInformation("Updating mortgage status for property {PropertyId} to {IsMortgaged}",
-                        newPropertyState.Id, newPropertyState.IsMortgaged);
-                     _view.UpdateOwnershipVisual(newPropertyState.Id, newPropertyState.OwnerId, newPropertyState.IsMortgaged);
-                }
-
-                // Building level change
-                if (oldPropertyState.BuildingLevel != newPropertyState.BuildingLevel)
-                {
-                    _logger.LogInformation("Updating building level for property {PropertyId} to {BuildingLevel}",
-                        newPropertyState.Id, newPropertyState.BuildingLevel);
-                    await _view.UpdateBuildingVisualsAsync(newPropertyState.Id, newPropertyState.BuildingLevel);
-                }
-            }
+            // REQ-1-017: The system shall implement interactive graphical elements to provide visual feedback...
+            // This includes animated token movement, visual highlighting of selected properties, and visual effects...
+            await ProcessPlayerMovements(newState);
+            ProcessPropertyChanges(newState);
             
-            // Further updates for dice rolls, etc., would be handled here.
-            _logger.LogInformation("Visual updates for turn {TurnNumber} complete.", newState.GameMetadata.CurrentTurnNumber);
+            _lastGameState = newState;
+        }
+
+        private async Task ProcessPlayerMovements(GameStateDTO newState)
+        {
+            for (int i = 0; i < newState.Players.Count; i++)
+            {
+                var newPlayerState = newState.Players[i];
+                var oldPlayerState = _lastGameState.Players.Find(p => p.Id == newPlayerState.Id);
+
+                if (oldPlayerState != null && oldPlayerState.CurrentPosition != newPlayerState.CurrentPosition)
+                {
+                    // REQ-1-017: ...animated token movement...
+                    await _view.AnimateTokenMovementAsync(newPlayerState.Id, newPlayerState.CurrentPosition);
+                }
+            }
+        }
+        
+        private void ProcessPropertyChanges(GameStateDTO newState)
+        {
+            foreach (var newProperty in newState.Board.Properties)
+            {
+                var oldProperty = _lastGameState.Board.Properties.Find(p => p.Position == newProperty.Position);
+                if (oldProperty == null) continue;
+
+                // Check for ownership change
+                if (oldProperty.OwnerId != newProperty.OwnerId)
+                {
+                    // REQ-1-072: The system shall visually represent property ownership directly on the game board.
+                    _view.UpdatePropertyOwnership(newProperty.Position, newProperty.OwnerId);
+                }
+
+                // Check for development level change (houses/hotels)
+                if (oldProperty.DevelopmentLevel != newProperty.DevelopmentLevel)
+                {
+                    _view.UpdatePropertyDevelopment(newProperty.Position, newProperty.DevelopmentLevel);
+                }
+
+                // REQ-1-057: ...prevent rent collection on any mortgaged property.
+                // The visual representation for mortgage status is part of the ownership update.
+                if (oldProperty.IsMortgaged != newProperty.IsMortgaged)
+                {
+                     // Ownership view should handle showing mortgage status
+                    _view.UpdatePropertyOwnership(newProperty.Position, newProperty.OwnerId, newProperty.IsMortgaged);
+                }
+            }
         }
     }
 }

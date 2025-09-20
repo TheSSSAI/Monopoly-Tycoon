@@ -2,19 +2,27 @@
     "name": "MonopolyTycoon.Presentation.Features.Tests",
     "rootNamespace": "MonopolyTycoon.Presentation.Features.Tests",
     "references": [
-        "MonopolyTycoon.Presentation.Core",
-        "MonopolyTycoon.Presentation.Features.GameBoard",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "VContainer",
-        "Unity.InputSystem"
+        "MonopolyTycoon.Presentation.Core",
+        "MonopolyTycoon.Presentation.Features.GameBoard",
+        "MonopolyTycoon.Presentation.Features.HUD",
+        "MonopolyTycoon.Presentation.Features.MainMenu",
+        "MonopolyTycoon.Presentation.Features.PropertyManagement",
+        "MonopolyTycoon.Presentation.Features.Trading",
+        "MonopolyTycoon.Application.Core",
+        "MonopolyTycoon.Domain.Core",
+        "Zenject",
+        "Zenject-TestFramework",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "Moq.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

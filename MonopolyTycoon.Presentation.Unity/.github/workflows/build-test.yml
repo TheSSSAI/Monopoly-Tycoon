@@ -1,0 +1,105 @@
+name: Build and Test Monopoly Tycoon
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  UNITY_VERSION: 2023.2.20f1 # Must match ProjectVersion.txt
+
+jobs:
+  build-and-test:
+    name: Build for Windows & Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # Cache the Unity Library folder
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      # Build the Windows standalone player
+      - name: Build for Windows (64-bit)
+        id: build
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneWindows64
+          buildName: MonopolyTycoon
+          buildsPath: build/windows
+
+      # Upload the build artifact
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MonopolyTycoon-Windows-Build
+          path: ${{ steps.build.outputs.buildPath }}
+
+      # Run EditMode tests
+      - name: Run EditMode tests
+        id: editmode-tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: EditMode
+          coverageOptions: 'generateAdditionalReports;generateHtmlReport;generateBadgeReport;assemblyFilters:+MonopolyTycoon.Presentation.Core,+MonopolyTycoon.Application,+MonopolyTycoon.Domain,+MonopolyTycoon.Infrastructure'
+          
+      # Upload EditMode test results
+      - name: Upload EditMode Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: EditMode-Test-Results
+          path: ${{ steps.editmode-tests.outputs.artifactsPath }}
+
+      # Run PlayMode tests
+      - name: Run PlayMode tests
+        id: playmode-tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: PlayMode
+          coverageOptions: 'generateAdditionalReports;generateHtmlReport;generateBadgeReport;assemblyFilters:+MonopolyTycoon.Presentation.Core,+MonopolyTycoon.Application,+MonopolyTycoon.Domain,+MonopolyTycoon.Infrastructure'
+
+      # Upload PlayMode test results
+      - name: Upload PlayMode Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PlayMode-Test-Results
+          path: ${{ steps.playmode-tests.outputs.artifactsPath }}
+
+      # Upload Code Coverage reports
+      - name: Upload Coverage Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Code-Coverage-Results
+          path: |
+            ${{ steps.editmode-tests.outputs.coveragePath }}
+            ${{ steps.playmode-tests.outputs.coveragePath }}

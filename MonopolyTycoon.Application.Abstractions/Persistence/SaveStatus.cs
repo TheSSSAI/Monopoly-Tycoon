@@ -1,8 +1,9 @@
 namespace MonopolyTycoon.Application.Abstractions.Persistence
 {
     /// <summary>
-    /// Represents the integrity status of a saved game file.
-    /// Used to communicate the state of a save slot to the UI layer.
+    /// Provides a clear, type-safe contract for representing the integrity status
+    /// of a save file, as required by sequence diagrams and UI feedback mechanisms.
+    /// Fulfills requirements: REQ-1-088.
     /// </summary>
     public enum SaveStatus
     {
@@ -12,18 +13,18 @@ namespace MonopolyTycoon.Application.Abstractions.Persistence
         Empty = 0,
 
         /// <summary>
-        /// Indicates the save file is present and has passed all integrity checks (e.g., checksum validation).
+        /// Indicates the save file is present and has passed all integrity checks.
         /// </summary>
         Valid = 1,
 
         /// <summary>
-        /// Indicates the save file exists but failed an integrity check and cannot be loaded.
+        /// Indicates the save file exists but failed an integrity check (e.g., checksum mismatch).
         /// </summary>
         Corrupted = 2,
 
         /// <summary>
-        /// Indicates the save file is valid but was created with an older, incompatible version of the game.
+        /// Indicates the save file is from an older, incompatible version of the game.
         /// </summary>
-        IncompatibleVersion = 3
+        Incompatible = 3
     }
 }

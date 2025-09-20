@@ -1,0 +1,32 @@
+flowchart TD
+    subgraph User Journey
+        A[Main Menu UI] -->|User clicks 'New Game'| B[Game Setup UI];
+
+        subgraph B [Game Setup UI]
+            direction TB;
+            C[1. Enter Profile Name <br/><i>REQ-1-032</i>] --> D[2. Select Player Token <br/><i>REQ-1-035</i>];
+            D --> E[3. Configure AI Opponents <br/><i>REQ-1-030, REQ-1-029</i>];
+        end
+
+        E -->|User clicks 'Start Game'| F{Validate Setup};
+        F -->|Invalid| B;
+    end
+
+    subgraph System Process
+        F -->|Valid| G[Collate user choices into GameSetupDTO];
+        G --> H[Game Initialization Service];
+        H --> I[Create PlayerState for Human <br/>(name, token, is_human=true)];
+        H --> J[Create PlayerState for each AI <br/>(difficulty, is_human=false)];
+        I & J --> K[(PlayerState Objects Created <br/><i>REQ-1-031</i>)];
+    end
+    
+    K --> L[Game Session Begins];
+
+    %% Styling
+    classDef uiScreen fill:#e3f2fd,stroke:#2196f3,color:#000;
+    classDef process fill:#e8f5e9,stroke:#4caf50,color:#000;
+    classDef dataObject fill:#fff3e0,stroke:#ff9800,color:#000;
+
+    class A,B uiScreen;
+    class G,H,I,J,L process;
+    class K dataObject;

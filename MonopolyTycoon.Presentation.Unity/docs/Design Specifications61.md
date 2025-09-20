@@ -6,7 +6,7 @@
 | Repository Component Id | MonopolyTycoon.Presentation.Unity |
 | Analysis Completeness Score | 100 |
 | Critical Findings Count | 0 |
-| Analysis Methodology | Systematic decomposition of cached context (requir... |
+| Analysis Methodology | Systematic analysis of cached context including re... |
 
 # 2 Repository Analysis
 
@@ -14,8 +14,8 @@
 
 ### 2.1.1 Scope Boundaries
 
-- Primary: Responsible for all user-facing concerns including rendering the 3D game board, displaying all UI (HUD, menus, dialogs), handling user input, managing animations, and playing audio.
-- Secondary: Acts as the application's 'Composition Root', responsible for initializing the Dependency Injection container at startup, wiring together all application layers, and managing the main game loop and scene transitions.
+- Primary: Act as the application's complete Presentation Layer, responsible for all user-facing concerns including 3D rendering, UI display and management, user input handling, and audio playback.
+- Secondary: Serve as the application's composition root, responsible for initializing the Dependency Injection container at startup and wiring together all application layers.
 
 ### 2.1.2 Technology Stack
 
@@ -24,17 +24,17 @@
 
 ### 2.1.3 Architectural Constraints
 
-- Must adhere to a strict Presentation/Application/Domain layer separation; no business logic is permitted in this repository.
-- Must implement an adapted MVP (Model-View-Presenter) or MVVM (Model-View-ViewModel) pattern to decouple UI rendering (Views) from presentation logic (Presenters/ViewModels).
-- Performance is critical, requiring adherence to an average of 60 FPS on recommended hardware (REQ-1-014), necessitating optimized rendering, asset management, and C# scripting.
+- Must strictly adhere to the Layered Architecture, only communicating with the Application Services Layer via dependency-injected interfaces.
+- Must implement an MVC/MVP/MVVM pattern internally to separate UI rendering logic from presentation state and logic, as specified in the architecture and technology guidelines.
+- Performance Constraint: The implementation must sustain an average of 60 FPS and not drop below 45 FPS at 1080p on recommended hardware (REQ-1-014).
 
 ### 2.1.4 Dependency Relationships
 
-- {'dependency_type': 'Service Consumption', 'target_component': 'REPO-AS-005 (Application Services)', 'integration_pattern': 'Dependency Injection', 'reasoning': "The Presentation layer is the top layer and consumer of the application's core functionality. It resolves service interfaces (IGameSessionService, ITurnManagementService) from a DI container to orchestrate game flow and respond to user actions, as specified in the repository's 'architecture_map'."}
+- {'dependency_type': 'Service Consumption', 'target_component': 'REPO-AS-005 (Application Services Layer)', 'integration_pattern': 'Dependency Injection. Presentation components (e.g., UI Controllers) will resolve application service interfaces from a central DI container initialized at startup.', 'reasoning': 'This follows the Layered Architecture pattern, ensuring the Presentation Layer is decoupled from business logic implementation details by depending on abstractions (interfaces) provided by the Application Services Layer.'}
 
 ### 2.1.5 Analysis Insights
 
-This repository is the most complex component, serving as both the entire game client and the integration hub for the whole system. Its internal architecture must prioritize the separation of concerns (MVP/MVVM) and performance optimization to meet NFRs. The use of Unity-specific patterns like ScriptableObjects for configuration and a feature-driven asset structure will be critical for maintainability.
+This repository is the centerpiece of the user experience, acting as the client application. Its internal architecture is critical for maintainability and performance. The adoption of a pattern like MVVM is essential to manage complexity and enable testability. It serves not just as a view layer but as the integration hub (composition root) for the entire monolithic application.
 
 # 3.0.0 Requirements Mapping
 
@@ -44,24 +44,25 @@ This repository is the most complex component, serving as both the entire game c
 
 #### 3.1.1.1 Requirement Id
 
-REQ-1-011
+REQ-1-071
 
 #### 3.1.1.2 Requirement Description
 
-Render the 3D game board and all its components.
+Display all User Interface elements, including HUD, modal dialogs, menus, and notifications.
 
 #### 3.1.1.3 Implementation Implications
 
-- Requires a 'GameBoardPresenter' component responsible for managing the visual state of the board.
-- Must subscribe to game state update events to dynamically add/remove/update visual elements like tokens, houses, and hotels.
+- Requires implementation of a UI management system (e.g., a ViewManager) to handle the lifecycle of different UI screens.
+- UI elements must be built as reusable prefabs using Unity's UI system (UGUI or UI Toolkit).
 
 #### 3.1.1.4 Required Components
 
-- GameBoardPresenter
+- ViewManager
+- HUDController
 
 #### 3.1.1.5 Analysis Reasoning
 
-This is a core rendering requirement directly fulfilled by a dedicated presenter component that translates domain state into visual representation.
+This is a core responsibility of the Presentation Layer. The specified components directly map to managing and displaying these UI elements.
 
 ### 3.1.2.0 Requirement Id
 
@@ -75,43 +76,39 @@ Execute animations for dice rolls, token movement, and transactions.
 
 #### 3.1.2.3 Implementation Implications
 
-- Requires an animation system or service (e.g., 'VFXManager') to trigger and manage animations.
-- Animations will be triggered in response to domain events (e.g., 'PlayerMovedEvent', 'DiceRolledEvent') to decouple them from the core game logic.
+- Requires use of Unity's animation system (e.g., Animator, Timelines) or a tweening library.
+- The GameBoardPresenter component will be responsible for triggering these animations in response to GameState changes.
 
 #### 3.1.2.4 Required Components
 
-- VFXManager
 - GameBoardPresenter
 
 #### 3.1.2.5 Analysis Reasoning
 
-This requirement dictates the need for a system to handle visual flair, which should be driven by events from the application layer to maintain architectural separation.
+Visual feedback through animation is a key presentation concern. The GameBoardPresenter is the logical component to sync visual state with domain state.
 
 ### 3.1.3.0 Requirement Id
 
 #### 3.1.3.1 Requirement Id
 
-REQ-1-071
+REQ-1-023
 
 #### 3.1.3.2 Requirement Description
 
-Display all user interface elements, including HUD, menus, and modal dialogs.
+Display a modal error dialog for unhandled exceptions.
 
 #### 3.1.3.3 Implementation Implications
 
-- Requires a suite of UI controllers (e.g., 'HUDController', 'TradeUIController') managed by a central 'ViewManager'.
-- The technology guides mandate using Unity's UI Toolkit for a scalable and maintainable UI architecture.
+- The ViewManager must have a method to instantiate and display a generic error dialog prefab.
+- The dialog must be populated with data, including a unique correlation ID, passed from a global exception handler.
 
 #### 3.1.3.4 Required Components
 
 - ViewManager
-- HUDController
-- TradeUIController
-- PropertyManagementUIController
 
 #### 3.1.3.5 Analysis Reasoning
 
-This requirement defines the scope of the UI, which will be implemented as a collection of specialized controller components following the MVP/MVVM pattern.
+This requirement ensures graceful failure. Sequence Diagram ID 192 confirms that the ViewManager is the designated component for displaying this UI dialog.
 
 ## 3.2.0.0 Non Functional Requirements
 
@@ -123,70 +120,70 @@ Performance
 
 #### 3.2.1.2 Requirement Specification
 
-Sustain an average of 60 FPS and not drop below 45 FPS at 1080p on recommended specs (REQ-1-014).
+Sustain an average of 60 FPS (REQ-1-014) and load a game in under 10 seconds (REQ-1-015).
 
 #### 3.2.1.3 Implementation Impact
 
-This heavily constrains rendering techniques, shader complexity, and C# scripting practices. It mandates the use of performance profiling and optimization techniques like draw call batching, object pooling, and minimizing garbage collection.
+Dictates the need for optimized 3D assets, efficient rendering pipelines, object pooling for frequently used GameObjects, and asynchronous loading of scenes and assets to avoid blocking the main thread.
 
 #### 3.2.1.4 Design Constraints
 
-- Optimized 3D assets and shaders must be used.
-- UI must be built with performance in mind (e.g., leveraging UI Toolkit's strengths).
+- Code must be optimized to minimize garbage collection.
+- Rendering draw calls and shader complexity must be carefully managed.
 
 #### 3.2.1.5 Analysis Reasoning
 
-This NFR is a primary driver of the technical implementation within Unity and requires constant vigilance throughout the development process to ensure a smooth user experience.
+Performance is a critical quality attribute for a game client and directly constrains all implementation choices within the Unity environment.
 
 ### 3.2.2.0 Requirement Type
 
 #### 3.2.2.1 Requirement Type
 
-Extensibility
+Maintainability
 
 #### 3.2.2.2 Requirement Specification
 
-All user-facing text must be stored in external resource files (REQ-1-084).
+Adherence to Microsoft C# Coding Conventions (REQ-1-024) and separation of concerns.
 
 #### 3.2.2.3 Implementation Impact
 
-Requires the implementation of a 'LocalizationService' within the Presentation layer. All UI components must fetch text from this service using unique keys instead of using hardcoded strings.
+Requires disciplined implementation of the MVC/MVP/MVVM pattern to decouple UI logic from Unity's MonoBehaviour lifecycle, enhancing testability and readability.
 
 #### 3.2.2.4 Design Constraints
 
-- UI components must not contain hardcoded text.
-- A system for loading language files (e.g., JSON or ScriptableObjects) at runtime is necessary.
+- Views (MonoBehaviours) should contain minimal logic, primarily delegating to ViewModels or Presenters.
+- Presentation logic must be contained in plain C# classes (ViewModels) that are unit-testable.
 
 #### 3.2.2.5 Analysis Reasoning
 
-This requirement enforces a decoupled localization system, which is a standard pattern for creating extensible and maintainable multi-language applications.
+The architecture explicitly chooses patterns that support maintainability; this repository must enforce them at the implementation level.
 
 ### 3.2.3.0 Requirement Type
 
 #### 3.2.3.1 Requirement Type
 
-Reliability
+Extensibility
 
 #### 3.2.3.2 Requirement Specification
 
-Display a modal error dialog for unhandled exceptions (REQ-1-023).
+All user-facing text must be externalized (REQ-1-084) and a theme system for assets must be supported (REQ-1-093).
 
 #### 3.2.3.3 Implementation Impact
 
-Requires a global exception handler to be registered at application startup. This handler will catch any exception that propagates to the top of the call stack, preventing a crash and displaying a user-friendly error UI.
+Requires a localization service to be consumed by all UI text components. An asset management strategy, likely using Unity's Addressables system, is needed to load theme-specific assets dynamically at runtime.
 
 #### 3.2.3.4 Design Constraints
 
-- A pre-fabricated error dialog UI must be created.
-- The handler must be able to instruct the 'ViewManager' to display the dialog.
+- UI components must not hardcode any strings.
+- Asset references should be indirect (e.g., via addressable keys) rather than direct links in the editor to support theming.
 
 #### 3.2.3.5 Analysis Reasoning
 
-This NFR is critical for application stability and providing a professional user experience, transforming crashes into controlled failure states with actionable feedback.
+These NFRs ensure the application can be easily adapted for new markets and content without requiring code changes, a key goal for extensibility.
 
 ## 3.3.0.0 Requirements Analysis Summary
 
-The repository is responsible for a wide range of functional requirements related to rendering and UI, and is heavily constrained by critical performance and extensibility NFRs. The implementation must be carefully architected to balance visual fidelity with performance targets while building a flexible UI system.
+The Presentation Layer is responsible for a wide range of functional and non-functional requirements. The primary challenge is balancing visual fidelity and rich user interaction with stringent performance and maintainability goals. The architectural patterns and technology choices are well-aligned to meet these demands.
 
 # 4.0.0.0 Architecture Analysis
 
@@ -196,48 +193,48 @@ The repository is responsible for a wide range of functional requirements relate
 
 #### 4.1.1.1 Pattern Name
 
-Model-View-Presenter (MVP) / Model-View-ViewModel (MVVM)
+Layered Architecture
 
 #### 4.1.1.2 Pattern Application
 
-This pattern is applied to all UI and game object interactions. 'Views' are Unity MonoBehaviours/UXML files responsible for rendering. 'Presenters/ViewModels' are C# classes that contain presentation logic and communicate with Application Services. This decouples logic from Unity's rendering and input systems.
+This repository embodies the Presentation Layer. It is the top-most layer, interacting with the user and delegating all business operations to the Application Services Layer.
 
 #### 4.1.1.3 Required Components
 
-- HUDController (Presenter)
-- HUDView (View)
-- GameBoardPresenter
+- ViewManager
+- HUDController
 
 #### 4.1.1.4 Implementation Strategy
 
-Presenters will be instantiated and injected with service dependencies via a DI container. Views will be attached to GameObjects in Unity scenes. Communication from View to Presenter will use C# events or UnityEvents, and from Presenter to View will use direct method calls or data binding.
+All communication with lower layers must go through interfaces provided by the Application Services Layer, resolved via Dependency Injection. No direct access to Business Logic or Infrastructure components is permitted.
 
 #### 4.1.1.5 Analysis Reasoning
 
-This pattern is explicitly required by the architecture specification and detailed in the tech guides. It is essential for achieving separation of concerns, which improves maintainability and testability within the Unity environment.
+This enforces a strict separation of concerns, which is a core quality attribute for the system's maintainability.
 
 ### 4.1.2.0 Pattern Name
 
 #### 4.1.2.1 Pattern Name
 
-Layered Architecture
+Model-View-Controller (MVC) / Model-View-Presenter (MVP) / MVVM
 
 #### 4.1.2.2 Pattern Application
 
-This repository serves as the Presentation Layer, the topmost layer of the application. It is responsible for all user interaction and visual representation.
+This pattern is applied *internally* to structure the UI codebase. Views are Unity GameObjects/MonoBehaviours, while Presenters/ViewModels are plain C# classes containing UI logic.
 
 #### 4.1.2.3 Required Components
 
-- ViewManager
-- InputController
+- GameBoardPresenter
+- HUDController
+- TradeUIController
 
 #### 4.1.2.4 Implementation Strategy
 
-All business logic and data access will be invoked through interfaces provided by the Application Services Layer. This repository will have no direct dependencies on the Domain or Infrastructure layers. This boundary is enforced by the DI configuration.
+A View (e.g., 'HUD.cs' MonoBehaviour) will hold references to UI elements and delegate user actions to a Presenter/ViewModel (e.g., 'HUDViewModel.cs'). The ViewModel processes the action, interacts with application services, and updates its state, which the View observes and reflects visually.
 
 #### 4.1.2.5 Analysis Reasoning
 
-The global architecture is defined as Layered. This repository must strictly adhere to its role as the Presentation Layer to maintain the integrity of the architecture.
+This pattern is crucial for decoupling UI logic from the Unity framework, making the logic testable and the overall structure more maintainable and scalable.
 
 ## 4.2.0.0 Integration Points
 
@@ -245,15 +242,15 @@ The global architecture is defined as Layered. This repository must strictly adh
 
 #### 4.2.1.1 Integration Type
 
-Service Consumption
+Service Layer Integration
 
 #### 4.2.1.2 Target Components
 
-- MonopolyTycoon.Application
+- REPO-AS-005
 
 #### 4.2.1.3 Communication Pattern
 
-Asynchronous Method Calls
+Asynchronous method calls (async/await Task) via dependency-injected interfaces.
 
 #### 4.2.1.4 Interface Requirements
 
@@ -262,56 +259,58 @@ Asynchronous Method Calls
 
 #### 4.2.1.5 Analysis Reasoning
 
-The primary integration is with the Application Services layer to drive the game's state. The 'architecture_map' specifies that communication occurs via asynchronous calls to DI-injected service interfaces, ensuring the UI remains responsive.
+This is the primary integration point for the Presentation Layer to execute game logic and state changes. The asynchronous pattern ensures the UI remains responsive during operations.
 
 ### 4.2.2.0 Integration Type
 
 #### 4.2.2.1 Integration Type
 
-Event Subscription
+Internal Eventing
 
 #### 4.2.2.2 Target Components
 
-- MonopolyTycoon.Application
+- HUDController
+- GameBoardPresenter
+- NotificationHandler
 
 #### 4.2.2.3 Communication Pattern
 
-In-Process Event Bus
+Asynchronous publish-subscribe via an in-process event bus.
 
 #### 4.2.2.4 Interface Requirements
 
-- GameStateUpdatedEvent
-- AITradeOfferReceivedEvent
+- IEventBus
+- Event Schemas (e.g., GameStateUpdatedEvent, AITradeOfferReceivedEvent)
 
 #### 4.2.2.5 Analysis Reasoning
 
-For reactive UI updates, the Presentation Layer will subscribe to domain events published by the Application Services Layer. This decouples the UI from the game logic and provides an efficient mechanism for state synchronization, as evidenced by sequence diagrams like ID:181 and ID:186.
+Sequence diagrams (e.g., 181, 184, 186) show this pattern is used to decouple different UI components from each other and from the services that publish state changes. This is a robust pattern for keeping a complex UI synchronized.
 
 ## 4.3.0.0 Layering Strategy
 
 | Property | Value |
 |----------|-------|
-| Layer Organization | This repository constitutes the Presentation Layer... |
-| Component Placement | Components are organized into a strict hierarchy w... |
-| Analysis Reasoning | The layering and internal organization are dictate... |
+| Layer Organization | This repository constitutes the entirety of the Pr... |
+| Component Placement | All components within this repository are part of ... |
+| Analysis Reasoning | The repository's structure and responsibilities al... |
 
 # 5.0.0.0 Database Analysis
 
 ## 5.1.0.0 Entity Mappings
 
-- {'entity_name': 'Not Applicable', 'database_table': 'Not Applicable', 'required_properties': ['This layer does not interact directly with the database or perform entity mapping.'], 'relationship_mappings': ['It consumes Data Transfer Objects (DTOs) or ViewModels provided by the Application Services Layer.'], 'access_patterns': ['Data is received from services, not queried from a database.'], 'analysis_reasoning': 'As the Presentation Layer, this repository is fully abstracted from data persistence concerns. Its data is the state provided by the application layer, which it translates into a visual representation.'}
+- {'entity_name': 'Domain/Application DTOs', 'database_table': 'N/A (View Models)', 'required_properties': ['Data required for a specific view, formatted for display.', "e.g., PlayerHUDViewModel might have 'string PlayerName' and 'string CashText'."], 'relationship_mappings': ['A single View Model may aggregate data from multiple Domain objects or DTOs.'], 'access_patterns': ['View Models are populated by Presenters/Controllers in response to user actions or application events.'], 'analysis_reasoning': "The Presentation Layer does not interact with the database. Its 'data mapping' consists of transforming data from DTOs received from the Application Layer into View Models suitable for direct binding and rendering in the UI. This decouples the view from the domain model."}
 
 ## 5.2.0.0 Data Access Requirements
 
-- {'operation_type': 'Data Consumption', 'required_methods': ["Subscribing to state update events from the application layer (e.g., 'GameStateUpdatedEvent').", "Calling service methods to request data on demand (e.g., 'IGameSessionService.GetCurrentGameState()')."], 'performance_constraints': 'UI must remain responsive. All data retrieval from services must be asynchronous to avoid blocking the main thread. Event-driven updates are preferred over polling to minimize performance overhead.', 'analysis_reasoning': 'The data access pattern for the UI is fundamentally reactive. It must efficiently reflect the state of the application without introducing performance bottlenecks.'}
+- {'operation_type': 'Data Retrieval for UI', 'required_methods': ["Methods on Application Service interfaces (e.g., 'IGameSessionService.LoadGameAsync').", "Handlers for application-level events (e.g., 'OnGameStateUpdated')."], 'performance_constraints': 'Data retrieval for UI updates must be non-blocking to maintain UI responsiveness (60 FPS). Asynchronous patterns are mandatory.', 'analysis_reasoning': "The 'data access' for this layer is read-only consumption of state from the Application Layer. It is event-driven and asynchronous to meet performance NFRs."}
 
 ## 5.3.0.0 Persistence Strategy
 
 | Property | Value |
 |----------|-------|
-| Orm Configuration | Not Applicable |
-| Migration Requirements | Not Applicable |
-| Analysis Reasoning | This layer initiates persistence operations (e.g.,... |
+| Orm Configuration | Not Applicable. This layer is persistence-agnostic... |
+| Migration Requirements | Not Applicable. |
+| Analysis Reasoning | Persistence is handled by the Infrastructure Layer... |
 
 # 6.0.0.0 Sequence Analysis
 
@@ -321,11 +320,11 @@ For reactive UI updates, the Presentation Layer will subscribe to domain events 
 
 #### 6.1.1.1 Sequence Name
 
-Start New Game (ID: 183)
+Start New Game (ID 183)
 
 #### 6.1.1.2 Repository Role
 
-Initiator
+Initiator. The Presentation Layer captures user configuration from the UI, validates it, and initiates the process.
 
 #### 6.1.1.3 Required Interfaces
 
@@ -333,130 +332,89 @@ Initiator
 
 #### 6.1.1.4 Method Specifications
 
-- {'method_name': 'StartNewGameAsync(GameSetupOptions options)', 'interaction_context': "Called by a UI controller (e.g., 'SetupScreenPresenter') after the user configures and confirms new game settings.", 'parameter_analysis': "The UI layer is responsible for gathering user choices (player name, AI count, etc.) and packaging them into a 'GameSetupOptions' DTO.", 'return_type_analysis': "Returns a 'Task'. The presenter will 'await' this call and, upon completion, will trigger a scene transition to the main game board.", 'analysis_reasoning': 'This sequence defines the entry point into the core gameplay loop, originating from user interaction in the UI.'}
+- {'method_name': 'StartNewGameAsync', 'interaction_context': "Called by a UI Controller when the user clicks the 'Start Game' button after configuring the game.", 'parameter_analysis': "Accepts a 'GameSetupDto' containing all user choices (player name, AI count, etc.).", 'return_type_analysis': "Returns a 'Task<StartGameResult>' which, upon completion, signals the UI to transition to the main game board scene.", 'analysis_reasoning': 'This is the primary entry point for the core game loop, translating user input into an application-level command.'}
 
 #### 6.1.1.5 Analysis Reasoning
 
-This interaction demonstrates the repository's role in translating user input into commands for the application layer.
+This sequence demonstrates the clear role of the Presentation Layer: gathering user input and orchestrating the start of a core application use case via the Application Services Layer.
 
 ### 6.1.2.0 Sequence Name
 
 #### 6.1.2.1 Sequence Name
 
-Handle AI-Initiated Trade (ID: 181)
+Handle Corrupted Save File (ID 185, 194)
 
 #### 6.1.2.2 Repository Role
 
-Event Subscriber / Responder
+Consumer and Final Responder. The Presentation Layer requests save game metadata and is responsible for rendering the state of each save slot, including corrupted ones.
 
 #### 6.1.2.3 Required Interfaces
 
-- ITradeOrchestrationService
-- InProcessEventBus
+- IGameSessionService
 
 #### 6.1.2.4 Method Specifications
 
-##### 6.1.2.4.1 Method Name
+- {'method_name': 'GetAllSaveGameMetadataAsync', 'interaction_context': "Called by the 'LoadGameUIController' when the user navigates to the 'Load Game' screen.", 'parameter_analysis': 'No input parameters.', 'return_type_analysis': "Returns a list of 'SaveGameMetadata' DTOs. Each DTO contains a status (e.g., 'Valid', 'Corrupted', 'Empty').", 'analysis_reasoning': "The UI controller uses the status from the DTO to conditionally render the UI for each slot, disabling the 'Load' button and showing a warning icon for corrupted files. This fulfills the graceful error handling requirement of REQ-1-088."}
 
-###### 6.1.2.4.1.1 Method Name
+#### 6.1.2.5 Analysis Reasoning
 
-HandleAITradeOffer(AITradeOfferReceivedEvent event)
+This sequence shows the Presentation Layer's responsibility to provide clear, passive feedback to the user about data integrity issues without crashing, enhancing application reliability.
 
-###### 6.1.2.4.1.2 Interaction Context
+## 6.2.0.0 Communication Protocols
 
-A 'TradeUIController' subscribes to the 'AITradeOfferReceivedEvent'. This method is the event handler.
+### 6.2.1.0 Protocol Type
 
-###### 6.1.2.4.1.3 Parameter Analysis
+#### 6.2.1.1 Protocol Type
 
-The event object contains all necessary data to display the trade proposal to the user.
+In-Process Asynchronous Method Calls
 
-###### 6.1.2.4.1.4 Return Type Analysis
+#### 6.2.1.2 Implementation Requirements
 
-void. The handler's responsibility is to update the UI (e.g., show a modal dialog).
+Use of C# 'async'/'await' keywords and 'Task'-based return types on all service interface methods to ensure non-blocking calls from the UI thread.
 
-###### 6.1.2.4.1.5 Analysis Reasoning
+#### 6.2.1.3 Analysis Reasoning
 
-This shows the reactive nature of the UI. It doesn't poll for changes but instead responds to events pushed from the application.
+This is the standard, high-performance communication method for a monolithic application, preventing the UI from freezing during potentially long-running operations like loading or saving a game.
 
-##### 6.1.2.4.2.0 Method Name
+### 6.2.2.0 Protocol Type
 
-###### 6.1.2.4.2.1 Method Name
+#### 6.2.2.1 Protocol Type
 
-RespondToAITrade(tradeId, response)
+In-Process Publish-Subscribe Bus
 
-###### 6.1.2.4.2.2 Interaction Context
+#### 6.2.2.2 Implementation Requirements
 
-Called by the 'TradeUIController' after the human player clicks 'Accept' or 'Decline' on the trade dialog.
+A central event bus service must be implemented and injected into both publishers (Application Services) and subscribers (UI Controllers). Event message schemas must be strictly defined and shared.
 
-###### 6.1.2.4.2.3 Parameter Analysis
+#### 6.2.2.3 Analysis Reasoning
 
-Passes the ID of the trade and the user's response back to the application service.
+This protocol is essential for decoupling UI components from the game logic core. It allows the UI to react to state changes efficiently without polling, which is critical for performance and maintainability.
 
-###### 6.1.2.4.2.4 Return Type Analysis
-
-Returns a 'Task'. The UI will await the result to confirm the action was processed.
-
-###### 6.1.2.4.2.5 Analysis Reasoning
-
-This completes the interaction loop, sending the user's decision back to the system to be processed by the business logic.
-
-#### 6.1.2.5.0.0 Analysis Reasoning
-
-This sequence is a prime example of the event-driven, reactive architecture required for a dynamic and decoupled UI.
-
-## 6.2.0.0.0.0 Communication Protocols
-
-### 6.2.1.0.0.0 Protocol Type
-
-#### 6.2.1.1.0.0 Protocol Type
-
-Asynchronous Method Invocation
-
-#### 6.2.1.2.0.0 Implementation Requirements
-
-All calls to application services must use the 'async'/'await' pattern to prevent blocking the UI thread. UI controllers must handle the returned 'Task' and manage UI state accordingly (e.g., show a spinner).
-
-#### 6.2.1.3.0.0 Analysis Reasoning
-
-This is a fundamental protocol for maintaining a responsive user experience in a client application.
-
-### 6.2.2.0.0.0 Protocol Type
-
-#### 6.2.2.1.0.0 Protocol Type
-
-Event Aggregator / Pub-Sub
-
-#### 6.2.2.2.0.0 Implementation Requirements
-
-UI controllers will subscribe to specific event types from a shared, in-process event bus. Handlers must be thread-safe and designed to efficiently update UI elements upon receiving an event.
-
-#### 6.2.2.3.0.0 Analysis Reasoning
-
-This protocol is essential for decoupling the UI from the game's core logic, enabling a highly maintainable and scalable system where UI components react to state changes without direct coupling.
-
-# 7.0.0.0.0.0 Critical Analysis Findings
+# 7.0.0.0 Critical Analysis Findings
 
 *No items available*
 
-# 8.0.0.0.0.0 Analysis Traceability
+# 8.0.0.0 Analysis Traceability
 
-## 8.1.0.0.0.0 Cached Context Utilization
+## 8.1.0.0 Cached Context Utilization
 
-Analysis is based on a 100% utilization of the provided context cache. The repository's description, architecture_map, and requirements_map were the primary sources, cross-referenced against the global Architecture, Database Design, and Sequence Design documents. The Unity-specific technology guides were used extensively to define the implementation strategy.
+Analysis is derived directly from the repository's description, architecture_map, requirements_map, and cross-referenced with the global Architecture document (layers, patterns), Database Design (for context on what this layer *doesn't* do), and Sequence Diagrams (to validate component interactions and responsibilities). Technology-specific guidelines for Unity provided critical implementation details.
 
-## 8.2.0.0.0.0 Analysis Decision Trail
+## 8.2.0.0 Analysis Decision Trail
 
-- Decision: Define the repository as the 'Composition Root'. Justification: The repository description explicitly states this role.
-- Decision: Mandate an MVP/MVVM pattern. Justification: This is required by the global architecture document and is a best practice for testability in Unity, as detailed in the tech guides.
-- Decision: Emphasize an event-driven approach for UI updates. Justification: Sequence diagrams (e.g., 181, 186) clearly show an 'InProcessEventBus' being used, which is superior to polling for performance and decoupling.
+- Decision: Defined repository scope as purely presentation plus composition root, based on its description and architectural role.
+- Decision: Confirmed internal UI pattern as MVC/MVP/MVVM, as specified in architecture and detailed in tech guidelines.
+- Decision: Mapped sequence diagram roles (e.g., 'HUDController', 'ViewManager') to the repository's component list to confirm their functions.
+- Decision: Interpreted 'data access' for this layer as communication with the Application Layer, not a database, which is consistent with the Layered Architecture.
 
-## 8.3.0.0.0.0 Assumption Validations
+## 8.3.0.0 Assumption Validations
 
-- Assumption: A Dependency Injection container (like VContainer or Zenject) will be used. Validation: The 'architecture_map' specifies 'Dependency Injection' as the integration pattern, and the tech guides mention DI frameworks, confirming this is a valid assumption.
-- Assumption: The Application Layer will provide an event bus for UI updates. Validation: Sequence diagrams 181, 186, and 190 explicitly feature an 'InProcessEventBus' publishing events that the UI is expected to handle.
+- Assumption: A Unity-compatible Dependency Injection framework will be used, as the 'composition root' responsibility and DI integration pattern are explicitly stated. This is a standard practice in modern Unity development.
+- Assumption: An in-process event bus will be used for decoupled UI updates, as multiple sequence diagrams (181, 184, 186) show this pattern with components like 'InProcessEventBus'.
 
-## 8.4.0.0.0.0 Cross Reference Checks
+## 8.4.0.0 Cross Reference Checks
 
-- Verification: The interfaces listed in the repository's 'architecture_map' ('IGameSessionService', 'ITurnManagementService') are consistent with the roles and interactions shown in sequence diagrams for starting, saving, and loading games.
-- Verification: The performance NFR ('REQ-1-014') is addressed in the global architecture's Quality Attributes section, and the tactics listed there (asynchronous loading, optimized serialization) align with the analysis of this repository's implementation.
+- Verification: The repository's responsibilities listed in the architecture document's 'Presentation Layer' description match the repository's own description and its mapped requirements (e.g., REQ-1-071 for UI).
+- Verification: The integration pattern in the repository's 'architecture_map' (Dependency Injection) matches the overall architectural patterns.
+- Verification: Components like 'HUDController' and 'GameBoardPresenter' mentioned in sequence diagrams are consistent with the 'components_map' of this repository.
 

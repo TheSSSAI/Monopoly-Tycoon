@@ -1,0 +1,58 @@
+flowchart TD
+    subgraph App Start
+        A[Launch Application] --> B(Main Menu)
+    end
+
+    B --> C{First Time Play?}
+    C -->|Yes, Start Tutorial| D[Interactive Tutorial]
+    D --> B
+    C -->|No, Start New Game| E[Navigate to Game Setup]
+
+    subgraph Game Setup Process
+        direction TB
+        E --> F(Game Setup Screen)
+        F --> G[1. Enter Profile Name]
+        G --> H[2. Select Player Token]
+        H --> I[3. Configure AI Opponents & Difficulty]
+        I --> J[Confirm & Start Match]
+    end
+
+    J --> K(Game Board Loads / HUD Initialized)
+
+    subgraph Core Gameplay Loop
+        direction TB
+        K --> L(Start Player's Turn)
+        L --> M[Pre-Roll Management Phase]
+        M --> N{Manage Assets?}
+        N -- Yes --> O[Open Property/Trade UI]
+        O --> M
+        N -- No / Done --> P[Roll Dice & Animate Token]
+        P --> Q[Resolve Landing Space Action]
+        Q --> R{Game End Condition Met?}
+    end
+    
+    R -- No --> S{Roll was Doubles?}
+    S -- Yes --> L
+    S -- No --> T[End Turn & Advance to Next Player]
+    T --> L
+    
+    subgraph Game End Sequence
+        direction TB
+        R -- Yes --> U{Human Player is Winner?}
+        U -- Yes --> V[Display Victory Screen]
+        U -- No --> W[Display Game Over Screen]
+        W --> X[Simulate Remaining AI Turns]
+        V --> Y(Game Summary Screen)
+        X --> Y
+        Y --> Z[Return to Main Menu]
+    end
+
+    Z --> B
+
+    classDef screen fill:#e3f2fd,stroke:#2196f3,color:#000
+    classDef process fill:#e8f5e9,stroke:#4caf50,color:#000
+    classDef decision fill:#fff3e0,stroke:#fb8c00,color:#000
+
+    class B,F,K,V,W,Y,Z screen
+    class D,G,H,I,J,M,O,P,Q,T,X process
+    class C,N,R,S,U decision

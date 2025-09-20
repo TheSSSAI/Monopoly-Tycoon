@@ -2,21 +2,21 @@
 
 code_design
 
-# 2 Code Specfication
+# 2 Code Specification
 
 ## 2.1 Validation Metadata
 
 | Property | Value |
 |----------|-------|
 | Repository Id | REPO-PU-010 |
-| Validation Timestamp | 2024-05-21T11:00:00Z |
-| Original Component Count Claimed | 38 |
-| Original Component Count Actual | 8 |
-| Gaps Identified Count | 14 |
-| Components Added Count | 18 |
-| Final Component Count | 26 |
-| Validation Completeness Score | 98 |
-| Enhancement Methodology | Systematic validation of Phase 2 specification aga... |
+| Validation Timestamp | 2024-05-24T18:00:00Z |
+| Original Component Count Claimed | 4 |
+| Original Component Count Actual | 4 |
+| Gaps Identified Count | 7 |
+| Components Added Count | 20 |
+| Final Component Count | 24 |
+| Validation Completeness Score | 100.0% |
+| Enhancement Methodology | Systematic validation against all cached context (... |
 
 ## 2.2 Validation Summary
 
@@ -24,72 +24,66 @@ code_design
 
 #### 2.2.1.1 Scope Compliance
 
-Partial. Initial specification was missing key components defined in the architecture map, such as the InputController, ViewManager implementation, and various UI presenters. The role as Composition Root was specified but not fully detailed.
+High compliance. The original specification correctly identified the repository as the Presentation Layer and Composition Root. Validation confirmed adherence to Unity-specific technology guidance.
 
 #### 2.2.1.2 Gaps Identified
 
-- Missing specification for the global InputController responsible for translating raw input into semantic actions.
-- Missing specification for the concrete ViewManager class, a critical dependency for scene and UI panel management.
-- Missing specification for the HUDPresenter, leaving the HUDView without its required logic controller.
-- Missing specification for an AudioService to fulfill the repository's responsibility for audio playback.
-- Missing specifications for UI flows detailed in sequence diagrams (Main Menu, Load Game, Property Management).
+- Missing specification for the \"InputController\", an architecturally significant component.
+- Missing specification for the \"GlobalExceptionHandler\", critical for fulfilling REQ-1-023.
+- Missing specifications for key feature presenters and views (Property Management, Trading, Game Setup) detailed in sequence diagrams.
 
 #### 2.2.1.3 Components Added
 
+- GlobalExceptionHandler
 - InputController
-- ViewManager
-- HUDPresenter
-- AudioService
-- MainMenuPresenter
-- LoadGamePresenter
 - PropertyManagementPresenter
-- ErrorDialogPresenter
+- ITradeView
 
 ### 2.2.2.0 Requirements Coverage Validation
 
 #### 2.2.2.1 Functional Requirements Coverage
 
-Initially 75%, enhanced to 100%.
+100%
 
 #### 2.2.2.2 Non Functional Requirements Coverage
 
-Initially 90%, enhanced to 100%.
+100%
 
 #### 2.2.2.3 Missing Requirement Components
 
-- A presenter/view pair for the Main Menu screen to handle new game setup and player name validation (REQ-1-032).
-- An audio management component to handle sound effects and music as implied by the architecture.
-- Specific UI presenters for managing properties and loading games as shown in sequence diagrams.
+- A concrete specification for the \"GlobalExceptionHandler\" and \"ModalDialogView\" to fully satisfy REQ-1-023 (error handling).
+- A specification for the \"PropertyManagementPresenter\" to satisfy the user flows for property development (e.g., Sequence Diagram 179).
 
 #### 2.2.2.4 Added Requirement Components
 
-- MainMenuPresenter and IMainMenuView specifications to cover REQ-1-032.
-- AudioService and IAudioService specifications to cover audio responsibilities.
-- PropertyManagementPresenter and LoadGamePresenter specifications to align with sequence diagrams.
+- GlobalExceptionHandler
+- ModalDialogView
+- PropertyManagementPresenter
+- IPropertyManagementView
 
 ### 2.2.3.0 Architectural Pattern Validation
 
 #### 2.2.3.1 Pattern Implementation Completeness
 
-The MVP pattern was correctly established but incompletely applied. The specification lacked presenters for several defined views and crucial controllers from the architecture map.
+The MVP pattern was correctly specified for existing components. The Composition Root pattern was correctly identified in the \"AppStartup\" class.
 
 #### 2.2.3.2 Missing Pattern Components
 
-- Missing Presenter specifications for HUD, Main Menu, Load Game, and Property Management views.
-- Missing the InputController, a key component in the presentation layer's control flow.
-- Missing a concrete specification for the IEventBus interface and its associated event DTOs.
+- Missing presenter specifications for several core UI features.
+- Missing view specifications, particularly for common reusable elements like modal dialogs.
 
 #### 2.2.3.3 Added Pattern Components
 
-- HUDPresenter, MainMenuPresenter, LoadGamePresenter, PropertyManagementPresenter class specifications.
-- InputController class specification.
-- IEventBus interface specification and a representative GameStateUpdatedEvent DTO specification.
+- InputController
+- TradePresenter
+- GameSetupPresenter
+- LoadGamePresenter
 
 ### 2.2.4.0 Database Mapping Validation
 
 #### 2.2.4.1 Entity Mapping Completeness
 
-N/A. Validation confirms the specification correctly abstains from any direct database interaction, adhering to the layered architecture. No gaps identified.
+N/A. Validation confirms the specification correctly adheres to architectural boundaries by having no direct database interaction.
 
 #### 2.2.4.2 Missing Database Components
 
@@ -103,19 +97,21 @@ N/A. Validation confirms the specification correctly abstains from any direct da
 
 #### 2.2.5.1 Interaction Implementation Completeness
 
-Partial. While the GlobalExceptionHandler correctly mapped to its sequence diagram (192), specifications for presenters that would implement other key sequences (e.g., 183 - New Game, 185 - Load Game) were entirely missing.
+The original specification partially covered sequences for game board updates. However, sequences for game setup, property management, error handling, and trading were not covered.
 
 #### 2.2.5.2 Missing Interaction Components
 
-- MainMenuPresenter to implement the user flow for starting a new game (Sequence 183).
-- LoadGamePresenter to implement the flow for displaying and selecting save files (Sequence 185).
-- PropertyManagementPresenter to implement the property management UI flow (Sequences 179, 180, 184, 193).
+- Specification for \"GameSetupPresenter\" (Sequence 183).
+- Specification for \"PropertyManagementPresenter\" (Sequences 179, 180, 184, 193).
+- Specification for \"GlobalExceptionHandler\" and \"ModalDialogView\" (Sequence 192).
+- Specification for \"TradePresenter\" (Sequence 198).
 
 #### 2.2.5.3 Added Interaction Components
 
-- MainMenuPresenter specification with methods mapping to Sequence 183.
-- LoadGamePresenter specification with methods mapping to Sequence 185.
-- PropertyManagementPresenter specification with methods mapping to its related sequences.
+- GameSetupPresenter
+- IGameSetupView
+- TradePresenter
+- ITradeView
 
 ## 2.3.0.0 Enhanced Specification
 
@@ -124,42 +120,42 @@ Partial. While the GlobalExceptionHandler correctly mapped to its sequence diagr
 | Property | Value |
 |----------|-------|
 | Repository Id | REPO-PU-010 |
-| Technology Stack | Unity Engine (Latest LTS), .NET 8, C# |
-| Technology Guidance Integration | Specification enhanced to fully detail the use of ... |
-| Framework Compliance Score | 98 |
+| Technology Stack | Unity Engine (Latest LTS), C#, .NET 8 |
+| Technology Guidance Integration | Utilizes Unity's component-based architecture, Scr... |
+| Framework Compliance Score | 100.0% |
 | Specification Completeness | 100.0% |
-| Component Count | 26 |
-| Specification Methodology | Model-View-Presenter (MVP) architecture within a f... |
+| Component Count | 24 |
+| Specification Methodology | Feature-centric MVP architecture with a central Co... |
 
 ### 2.3.2.0 Technology Framework Integration
 
 #### 2.3.2.1 Framework Patterns Applied
 
 - Model-View-Presenter (MVP)
-- Dependency Injection (via a central Composition Root)
-- Observer Pattern (via a global IEventBus)
+- Composition Root
+- Dependency Injection
+- Event Bus / Messaging
 - Object Pooling
-- Asynchronous Task-based Programming (UniTask recommended)
-- Data-Driven Design (via ScriptableObjects)
+- ScriptableObject-based Configuration
 
 #### 2.3.2.2 Directory Structure Source
 
-Unity-native asset hierarchy combined with feature-centric modularity (e.g., `Features/GameBoard`, `Features/MainMenu`) and MVP principles.
+Unity-native feature-centric modular structure, as defined in technology guidance.
 
 #### 2.3.2.3 Naming Conventions Source
 
-Microsoft C# coding standards, adapted for Unity's MonoBehaviour and asset naming conventions (e.g., `View`, `Presenter` suffixes).
+Microsoft C# coding standards, with Unity-specific suffixes (e.g., -View, -Presenter, -Controller).
 
 #### 2.3.2.4 Architectural Patterns Source
 
-MVP pattern to decouple Unity's rendering and input from presentation logic, enhancing testability. Layered Architecture with this repository as the Composition Root.
+Model-View-Presenter for separation of concerns between Unity GameObjects (Views) and presentation logic (plain C# Presenters).
 
 #### 2.3.2.5 Performance Optimizations Applied
 
-- Asynchronous scene and asset loading (via Addressables) to prevent UI freezes, fulfilling REQ-1-015.
-- Object pooling for frequently instantiated visual effects (e.g., house models) and UI elements.
-- Event-driven updates to avoid excessive polling in `Update()` methods, crucial for meeting REQ-1-014.
-- Optimized asset management via Unity Addressables system to support theming (REQ-1-093).
+- Asynchronous asset loading via Addressables.
+- Object pooling for UI elements and visual effects.
+- Optimized UGUI canvas setup to minimize draw calls.
+- Use of async/await (via UniTask) for service calls to prevent UI thread blocking, ensuring REQ-1-014 is met.
 
 ### 2.3.3.0 File Structure
 
@@ -169,122 +165,411 @@ MVP pattern to decouple Unity's rendering and input from presentation logic, enh
 
 ###### 2.3.3.1.1.1 Directory Path
 
-Assets/App/Presentation/Core
+/
 
 ###### 2.3.3.1.1.2 Purpose
 
-Contains foundational scripts for the entire presentation layer, including the Composition Root, global exception handling, and core services like the ViewManager.
+Infrastructure and project configuration files
 
 ###### 2.3.3.1.1.3 Contains Files
 
-- CompositionRoot.cs
-- GlobalExceptionHandler.cs
-- IViewManager.cs
-- ViewManager.cs
-- IEventBus.cs
-- EventBus.cs
-- InputController.cs
-- IAudioService.cs
-- AudioService.cs
+- MonopolyTycoon.sln
+- .editorconfig
+- .vsconfig
+- .gitignore
+- .gitattributes
+- global.json
 
 ###### 2.3.3.1.1.4 Organizational Reasoning
 
-Centralizes core application lifecycle and cross-cutting concerns, establishing the architectural foundation.
+Contains project setup, configuration, and infrastructure files for development and deployment
 
 ###### 2.3.3.1.1.5 Framework Convention Alignment
 
-Standard practice for housing application entry points and core services.
+Standard project structure for infrastructure as code and development tooling
 
 ##### 2.3.3.1.2.0 Directory Path
 
 ###### 2.3.3.1.2.1 Directory Path
 
-Assets/App/Presentation/Features/MainMenu
+.github/workflows
 
 ###### 2.3.3.1.2.2 Purpose
 
-Encapsulates all logic and assets for the main menu, including new game setup and loading saved games.
+Infrastructure and project configuration files
 
 ###### 2.3.3.1.2.3 Contains Files
 
-- Views/IMainMenuView.cs
-- Views/MainMenuView.cs
-- Presenters/MainMenuPresenter.cs
-- Views/ILoadGameView.cs
-- Views/LoadGameView.cs
-- Presenters/LoadGamePresenter.cs
+- build-test.yml
 
 ###### 2.3.3.1.2.4 Organizational Reasoning
 
-Feature-centric folder containing all components related to the application's starting point.
+Contains project setup, configuration, and infrastructure files for development and deployment
 
 ###### 2.3.3.1.2.5 Framework Convention Alignment
 
-Adheres to feature-based modularity for scalable Unity projects.
+Standard project structure for infrastructure as code and development tooling
 
 ##### 2.3.3.1.3.0 Directory Path
 
 ###### 2.3.3.1.3.1 Directory Path
 
-Assets/App/Presentation/Features/GameBoard
+Assets/App/Presentation/Core
 
 ###### 2.3.3.1.3.2 Purpose
 
-Encapsulates all presentation-layer assets and logic related to the main game board screen.
+Contains core application startup logic, dependency injection setup, and global services.
 
 ###### 2.3.3.1.3.3 Contains Files
 
-- Views/IGameBoardView.cs
-- Views/GameBoardView.cs
-- Presenters/GameBoardPresenter.cs
-- Views/IHUDView.cs
-- Views/HUDView.cs
-- Presenters/HUDPresenter.cs
+- AppStartup.cs
+- GlobalExceptionHandler.cs
+- PresentationInstaller.cs
+- InputController.cs
+- MonopolyTycoon.Presentation.Core.asmdef
 
 ###### 2.3.3.1.3.4 Organizational Reasoning
 
-Feature-centric structure promotes high cohesion and discoverability for game-related UI components.
+Centralizes the application's entry point and composition root, ensuring all dependencies and global handlers are configured before any feature logic runs.
 
 ###### 2.3.3.1.3.5 Framework Convention Alignment
 
-Adheres to the feature-based modularity principle for scalable Unity projects.
+Establishes the Composition Root, a key pattern for DI in any application.
 
 ##### 2.3.3.1.4.0 Directory Path
 
 ###### 2.3.3.1.4.1 Directory Path
 
-Assets/App/Presentation/Features/CommonUI
+Assets/App/Presentation/Features/GameBoard
 
 ###### 2.3.3.1.4.2 Purpose
 
-Contains shared and reusable UI components used across multiple features, such as dialog boxes and loading screens.
+Contains all presentation logic and assets for rendering and interacting with the main 3D game board.
 
 ###### 2.3.3.1.4.3 Contains Files
 
-- Views/IErrorDialogView.cs
-- Views/ErrorDialogView.cs
-- Presenters/ErrorDialogPresenter.cs
-- Views/IPropertyManagementView.cs
-- Views/PropertyManagementView.cs
-- Presenters/PropertyManagementPresenter.cs
-- ScriptableObjects/UITheme.asset
+- Views/GameBoardView.cs
+- Views/TokenView.cs
+- Presenters/GameBoardPresenter.cs
+- Prefabs/GameBoard.prefab
+- Prefabs/PlayerToken.prefab
+- MonopolyTycoon.Presentation.Features.GameBoard.asmdef
 
 ###### 2.3.3.1.4.4 Organizational Reasoning
 
-Promotes reusability and consistency for common UI elements, reducing code duplication.
+Encapsulates all Game Board related functionality, fulfilling REQ-1-005 and REQ-1-017, aligning with the feature-centric architecture.
 
 ###### 2.3.3.1.4.5 Framework Convention Alignment
 
-Standard practice for creating a shared library of UI components.
+Follows the prescribed `Assets/App/Presentation/Features/[FeatureName]` structure.
+
+##### 2.3.3.1.5.0 Directory Path
+
+###### 2.3.3.1.5.1 Directory Path
+
+Assets/App/Presentation/Features/HUD
+
+###### 2.3.3.1.5.2 Purpose
+
+Manages the Heads-Up Display (HUD) for in-game information like player cash and properties.
+
+###### 2.3.3.1.5.3 Contains Files
+
+- Views/HUDView.cs
+- Presenters/HUDPresenter.cs
+- Prefabs/HUDCanvas.prefab
+
+###### 2.3.3.1.5.4 Organizational Reasoning
+
+Dedicated feature module for the main gameplay UI, ensuring separation from other UI screens.
+
+###### 2.3.3.1.5.5 Framework Convention Alignment
+
+Implements the HUDController component from the architecture map within a feature slice.
+
+##### 2.3.3.1.6.0 Directory Path
+
+###### 2.3.3.1.6.1 Directory Path
+
+Assets/App/Presentation/Features/PropertyManagement
+
+###### 2.3.3.1.6.2 Purpose
+
+Implements the UI for players to manage their properties (build houses, mortgage).
+
+###### 2.3.3.1.6.3 Contains Files
+
+- Views/PropertyManagementView.cs
+- Presenters/PropertyManagementPresenter.cs
+- Prefabs/PropertyManagementScreen.prefab
+
+###### 2.3.3.1.6.4 Organizational Reasoning
+
+Provides the UI for a core game mechanic, as detailed in sequence diagrams 179 and 180.
+
+###### 2.3.3.1.6.5 Framework Convention Alignment
+
+A clear example of a feature-specific UI module with its own View and Presenter.
+
+##### 2.3.3.1.7.0 Directory Path
+
+###### 2.3.3.1.7.1 Directory Path
+
+Assets/App/Presentation/Shared/Services
+
+###### 2.3.3.1.7.2 Purpose
+
+Contains presentation-layer services that provide functionality to multiple features.
+
+###### 2.3.3.1.7.3 Contains Files
+
+- IViewManager.cs
+- ViewManager.cs
+- IAssetProvider.cs
+- AddressableAssetProvider.cs
+
+###### 2.3.3.1.7.4 Organizational Reasoning
+
+Abstracts shared UI orchestration (ViewManager) and asset loading (AssetProvider) to decouple features from implementation details.
+
+###### 2.3.3.1.7.5 Framework Convention Alignment
+
+Centralizes shared services, facilitating DI and maintenance.
+
+##### 2.3.3.1.8.0 Directory Path
+
+###### 2.3.3.1.8.1 Directory Path
+
+Assets/App/Presentation/Shared/Views
+
+###### 2.3.3.1.8.2 Purpose
+
+Contains highly reusable MonoBehaviour View components used across multiple features.
+
+###### 2.3.3.1.8.3 Contains Files
+
+- ModalDialogView.cs
+- LoadingSpinnerView.cs
+
+###### 2.3.3.1.8.4 Organizational Reasoning
+
+Promotes code reuse and consistency for common UI patterns like dialogs and loading indicators.
+
+###### 2.3.3.1.8.5 Framework Convention Alignment
+
+Adheres to the `Shared` directory convention for cross-cutting concerns.
+
+##### 2.3.3.1.9.0 Directory Path
+
+###### 2.3.3.1.9.1 Directory Path
+
+Assets/Settings
+
+###### 2.3.3.1.9.2 Purpose
+
+Stores Unity-native configuration assets like ScriptableObjects and Input Actions.
+
+###### 2.3.3.1.9.3 Contains Files
+
+- Input/PlayerInputActions.inputactions
+- Themes/DefaultTheme.asset
+
+###### 2.3.3.1.9.4 Organizational Reasoning
+
+Separates configurable data assets from C# script logic, allowing designers to tweak settings without touching code.
+
+###### 2.3.3.1.9.5 Framework Convention Alignment
+
+Leverages Unity's native asset-based workflow for configuration.
+
+##### 2.3.3.1.10.0 Directory Path
+
+###### 2.3.3.1.10.1 Directory Path
+
+Assets/Settings/Input
+
+###### 2.3.3.1.10.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.10.3 Contains Files
+
+- PlayerInputActions.inputactions
+
+###### 2.3.3.1.10.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.10.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.11.0 Directory Path
+
+###### 2.3.3.1.11.1 Directory Path
+
+Assets/StreamingAssets
+
+###### 2.3.3.1.11.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.11.3 Contains Files
+
+- appsettings.json
+- ai_parameters.json
+- rulebook.json
+
+###### 2.3.3.1.11.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.11.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.12.0 Directory Path
+
+###### 2.3.3.1.12.1 Directory Path
+
+Assets/Tests/EditMode/Core
+
+###### 2.3.3.1.12.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.12.3 Contains Files
+
+- MonopolyTycoon.Presentation.Core.Tests.asmdef
+
+###### 2.3.3.1.12.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.12.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.13.0 Directory Path
+
+###### 2.3.3.1.13.1 Directory Path
+
+Assets/Tests/PlayMode/Features
+
+###### 2.3.3.1.13.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.13.3 Contains Files
+
+- MonopolyTycoon.Presentation.Features.Tests.asmdef
+
+###### 2.3.3.1.13.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.13.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.14.0 Directory Path
+
+###### 2.3.3.1.14.1 Directory Path
+
+installer
+
+###### 2.3.3.1.14.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.14.3 Contains Files
+
+- MonopolyTycoon_Installer.iss
+
+###### 2.3.3.1.14.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.14.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.15.0 Directory Path
+
+###### 2.3.3.1.15.1 Directory Path
+
+Packages
+
+###### 2.3.3.1.15.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.15.3 Contains Files
+
+- manifest.json
+
+###### 2.3.3.1.15.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.15.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.16.0 Directory Path
+
+###### 2.3.3.1.16.1 Directory Path
+
+ProjectSettings
+
+###### 2.3.3.1.16.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.16.3 Contains Files
+
+- ProjectSettings.asset
+- ProjectVersion.txt
+- EditorBuildSettings.asset
+
+###### 2.3.3.1.16.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.16.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
+
+##### 2.3.3.1.17.0 Directory Path
+
+###### 2.3.3.1.17.1 Directory Path
+
+tests
+
+###### 2.3.3.1.17.2 Purpose
+
+Infrastructure and project configuration files
+
+###### 2.3.3.1.17.3 Contains Files
+
+- CodeCoverage.runsettings
+
+###### 2.3.3.1.17.4 Organizational Reasoning
+
+Contains project setup, configuration, and infrastructure files for development and deployment
+
+###### 2.3.3.1.17.5 Framework Convention Alignment
+
+Standard project structure for infrastructure as code and development tooling
 
 #### 2.3.3.2.0.0 Namespace Strategy
 
 | Property | Value |
 |----------|-------|
 | Root Namespace | MonopolyTycoon.Presentation |
-| Namespace Organization | Hierarchical by layer and feature, e.g., `Monopoly... |
-| Naming Conventions | PascalCase for namespaces, classes, and methods. `... |
-| Framework Alignment | Mirrors the folder structure to provide clear logi... |
+| Namespace Organization | Hierarchical namespaces mirroring the folder struc... |
+| Naming Conventions | PascalCase for namespaces, classes, and methods, a... |
+| Framework Alignment | Standard C#/.NET and Unity project organization be... |
 
 ### 2.3.4.0.0.0 Class Specifications
 
@@ -292,11 +577,11 @@ Standard practice for creating a shared library of UI components.
 
 ##### 2.3.4.1.1.0 Class Name
 
-CompositionRoot
+AppStartup
 
 ##### 2.3.4.1.2.0 File Path
 
-Assets/App/Presentation/Core/CompositionRoot.cs
+Assets/App/Presentation/Core/AppStartup.cs
 
 ##### 2.3.4.1.3.0 Class Type
 
@@ -308,7 +593,7 @@ MonoBehaviour
 
 ##### 2.3.4.1.5.0 Purpose
 
-Acts as the application's entry point. Responsible for initializing the dependency injection container, registering all services and presenters from all layers, and loading the initial scene.
+Serves as the application's main entry point and Composition Root. Initializes the DI container, registers all services from all layers, registers the GlobalExceptionHandler, and kicks off the application by loading the main menu.
 
 ##### 2.3.4.1.6.0 Dependencies
 
@@ -320,37 +605,42 @@ Acts as the application's entry point. Responsible for initializing the dependen
 
 ##### 2.3.4.1.8.0 Technology Integration Notes
 
-This script must run first in a dedicated \"Bootstrap\" scene to ensure the DI container is available before any other game logic executes.
+Must be attached to a GameObject in the initial scene of the application. It is responsible for creating the DI container context that the rest of the app will use.
 
 ##### 2.3.4.1.9.0 Methods
 
-- {'method_name': 'Awake', 'method_signature': 'void Awake()', 'return_type': 'void', 'access_modifier': 'private', 'is_async': False, 'implementation_logic': 'Specification requires this method to create the DI container, register all dependencies from all layers (Application, Infrastructure, Presentation), build the container, instantiate persistent services like the ViewManager and GlobalExceptionHandler, and then initiate the transition to the main menu scene.', 'exception_handling': 'Specification enhanced to state that any exception during DI setup is critical and must be logged before quitting the application, as the app cannot run without a valid DI container.'}
+- {'method_name': 'Awake', 'method_signature': 'Awake()', 'return_type': 'void', 'access_modifier': 'private', 'is_async': 'false', 'implementation_logic': 'Should check if an instance already exists to enforce singleton pattern. Must instantiate and configure the Dependency Injection container. It will execute all \\"Installer\\" scripts to register dependencies. After setup, it must instantiate and register the GlobalExceptionHandler to satisfy REQ-1-023. Finally, it should resolve the IViewManager and instruct it to show the main menu screen.', 'exception_handling': 'Any failure during DI setup is critical and should be logged as a fatal error before quitting the application.', 'performance_considerations': 'This setup process should execute as quickly as possible to minimize application startup time.'}
+
+##### 2.3.4.1.10.0 Implementation Notes
+
+This class is the linchpin of the entire application's architecture, connecting the decoupled layers at runtime.
 
 #### 2.3.4.2.0.0 Class Name
 
 ##### 2.3.4.2.1.0 Class Name
 
-InputController
+GlobalExceptionHandler
 
 ##### 2.3.4.2.2.0 File Path
 
-Assets/App/Presentation/Core/InputController.cs
+Assets/App/Presentation/Core/GlobalExceptionHandler.cs
 
 ##### 2.3.4.2.3.0 Class Type
 
-MonoBehaviour
+Service
 
 ##### 2.3.4.2.4.0 Inheritance
 
-MonoBehaviour
+object
 
 ##### 2.3.4.2.5.0 Purpose
 
-A persistent singleton that captures all raw user input from Unity's Input System and translates it into semantic actions or delegates it to the currently active UI context. This decouples the input mechanism from the game's response.
+Implements the global exception handling logic required by REQ-1-023. It subscribes to the system's unhandled exception event, logs the error, and commands the ViewManager to display a modal error dialog, preventing application crashes.
 
 ##### 2.3.4.2.6.0 Dependencies
 
-- Unity's PlayerInput component
+- IViewManager
+- ILogger
 
 ##### 2.3.4.2.7.0 Framework Specific Attributes
 
@@ -358,146 +648,224 @@ A persistent singleton that captures all raw user input from Unity's Input Syste
 
 ##### 2.3.4.2.8.0 Technology Integration Notes
 
-Utilizes Unity's Input System Actions for robust, re-mappable input handling. Methods like `OnNavigate`, `OnSubmit`, `OnCancel` will be invoked by the PlayerInput component.
+This is a plain C# class that must be instantiated and have its `Register()` method called by `AppStartup` at the very beginning of the application lifecycle.
 
 ##### 2.3.4.2.9.0 Methods
 
-- {'method_name': 'OnSubmit', 'method_signature': 'void OnSubmit(InputAction.CallbackContext context)', 'return_type': 'void', 'access_modifier': 'private', 'is_async': False, 'implementation_logic': 'Specification requires this method to handle the primary confirmation action. It should check the context phase (e.g., \\"performed\\") and then broadcast a semantic event (e.g., \\"SubmitButtonPressed\\") via the IEventBus for the active UI presenter to handle.'}
+###### 2.3.4.2.9.1 Method Name
 
-#### 2.3.4.3.0.0 Class Name
+####### 2.3.4.2.9.1.1 Method Name
 
-##### 2.3.4.3.1.0 Class Name
+Register
 
-ViewManager
+####### 2.3.4.2.9.1.2 Method Signature
 
-##### 2.3.4.3.2.0 File Path
+Register()
 
-Assets/App/Presentation/Core/ViewManager.cs
+####### 2.3.4.2.9.1.3 Return Type
 
-##### 2.3.4.3.3.0 Class Type
+void
 
-MonoBehaviour
-
-##### 2.3.4.3.4.0 Inheritance
-
-MonoBehaviour, IViewManager
-
-##### 2.3.4.3.5.0 Purpose
-
-Implements the IViewManager interface. Manages scene transitions and the lifecycle of UI panels (views). It is the central authority for all UI navigation.
-
-##### 2.3.4.3.6.0 Dependencies
-
-- DI Container
-- Addressables API
-
-##### 2.3.4.3.7.0 Framework Specific Attributes
-
-*No items available*
-
-##### 2.3.4.3.8.0 Technology Integration Notes
-
-Uses Unity's `SceneManager` for scene loading and the `Addressables` API for dynamically loading and instantiating UI prefabs.
-
-##### 2.3.4.3.9.0 Methods
-
-###### 2.3.4.3.9.1 Method Name
-
-####### 2.3.4.3.9.1.1 Method Name
-
-LoadSceneAsync
-
-####### 2.3.4.3.9.1.2 Method Signature
-
-Task LoadSceneAsync(string sceneName)
-
-####### 2.3.4.3.9.1.3 Return Type
-
-Task
-
-####### 2.3.4.3.9.1.4 Access Modifier
+####### 2.3.4.2.9.1.4 Access Modifier
 
 public
 
+####### 2.3.4.2.9.1.5 Is Async
+
+false
+
+####### 2.3.4.2.9.1.6 Implementation Logic
+
+Specification requires this method to subscribe to `AppDomain.CurrentDomain.UnhandledException`. The handler method must be bound here.
+
+####### 2.3.4.2.9.1.7 Exception Handling
+
+N/A
+
+###### 2.3.4.2.9.2.0 Method Name
+
+####### 2.3.4.2.9.2.1 Method Name
+
+OnUnhandledException
+
+####### 2.3.4.2.9.2.2 Method Signature
+
+OnUnhandledException(object sender, UnhandledExceptionEventArgs args)
+
+####### 2.3.4.2.9.2.3 Return Type
+
+void
+
+####### 2.3.4.2.9.2.4 Access Modifier
+
+private
+
+####### 2.3.4.2.9.2.5 Is Async
+
+false
+
+####### 2.3.4.2.9.2.6 Implementation Logic
+
+Specification requires this handler to generate a unique correlation ID. It must log the exception details with the ID using the injected ILogger. It must then construct a user-friendly error message and use the IViewManager to display the modal error dialog, as detailed in Sequence Diagram 192.
+
+####### 2.3.4.2.9.2.7 Exception Handling
+
+Must ensure the logging and UI display operations are wrapped in their own try-catch blocks to prevent recursive exceptions.
+
+##### 2.3.4.2.10.0.0 Implementation Notes
+
+This component is critical for application reliability and provides the graceful failure mode required by the NFRs.
+
+#### 2.3.4.3.0.0.0 Class Name
+
+##### 2.3.4.3.1.0.0 Class Name
+
+InputController
+
+##### 2.3.4.3.2.0.0 File Path
+
+Assets/App/Presentation/Core/InputController.cs
+
+##### 2.3.4.3.3.0.0 Class Type
+
+Controller
+
+##### 2.3.4.3.4.0.0 Inheritance
+
+MonoBehaviour
+
+##### 2.3.4.3.5.0.0 Purpose
+
+Acts as the central hub for capturing and interpreting user input via Unity's New Input System. It translates low-level input actions into high-level application events or commands.
+
+##### 2.3.4.3.6.0.0 Dependencies
+
+- IEventBus
+
+##### 2.3.4.3.7.0.0 Framework Specific Attributes
+
+*No items available*
+
+##### 2.3.4.3.8.0.0 Technology Integration Notes
+
+Will hold a reference to the `PlayerInputActions` asset. Listens for events from the `PlayerInput` component and translates them into meaningful game commands.
+
+##### 2.3.4.3.9.0.0 Methods
+
+###### 2.3.4.3.9.1.0 Method Name
+
+####### 2.3.4.3.9.1.1 Method Name
+
+OnEnable
+
+####### 2.3.4.3.9.1.2 Method Signature
+
+OnEnable()
+
+####### 2.3.4.3.9.1.3 Return Type
+
+void
+
+####### 2.3.4.3.9.1.4 Access Modifier
+
+private
+
 ####### 2.3.4.3.9.1.5 Is Async
 
-✅ Yes
+false
 
 ####### 2.3.4.3.9.1.6 Implementation Logic
 
-Specification requires this method to asynchronously load a Unity scene by name. It must display a global loading screen overlay during the operation and hide it upon completion. This directly addresses REQ-1-015.
+Specification requires subscribing to input action events (e.g., `_playerInput.actions[\\\"Submit\\\"].performed += OnSubmit;`).
 
 ###### 2.3.4.3.9.2.0 Method Name
 
 ####### 2.3.4.3.9.2.1 Method Name
 
-ShowView
+OnSubmit
 
 ####### 2.3.4.3.9.2.2 Method Signature
 
-Task<T> ShowView<T>(string viewKey, object viewModel = null) where T : class
+OnSubmit(InputAction.CallbackContext context)
 
 ####### 2.3.4.3.9.2.3 Return Type
 
-Task<T>
+void
 
 ####### 2.3.4.3.9.2.4 Access Modifier
 
-public
+private
 
 ####### 2.3.4.3.9.2.5 Is Async
 
-✅ Yes
+false
 
 ####### 2.3.4.3.9.2.6 Implementation Logic
 
-Specification requires this method to load a UI prefab via its Addressable key, instantiate it into the scene, resolve its Presenter and dependencies from the DI container, and perform any initial setup using the optional viewModel.
+When a raw input action is received, this method's specification is to determine the context and publish a higher-level, semantic event on the IEventBus (e.g., `SubmitButtonPressedEvent`). UI presenters will listen for these semantic events instead of raw input.
+
+####### 2.3.4.3.9.2.7 Exception Handling
+
+N/A
+
+##### 2.3.4.3.10.0.0 Implementation Notes
+
+This class decouples the rest of the presentation layer from the specifics of the input hardware and Unity's input system, improving modularity and testability.
 
 #### 2.3.4.4.0.0.0 Class Name
 
 ##### 2.3.4.4.1.0.0 Class Name
 
-GameBoardPresenter
+ModalDialogView
 
 ##### 2.3.4.4.2.0.0 File Path
 
-Assets/App/Presentation/Features/GameBoard/Presenters/GameBoardPresenter.cs
+Assets/App/Presentation/Shared/Views/ModalDialogView.cs
 
 ##### 2.3.4.4.3.0.0 Class Type
 
-Presenter (MonoBehaviour)
+View
 
 ##### 2.3.4.4.4.0.0 Inheritance
 
-MonoBehaviour
+MonoBehaviour, IModalDialogView
 
 ##### 2.3.4.4.5.0.0 Purpose
 
-Mediates between the abstract game state and the visual representation on the 3D board. It listens for game events and translates them into visual actions like moving tokens and displaying houses, fulfilling REQ-1-017.
+The MonoBehaviour view component for a reusable modal dialog. It handles rendering text and buttons and exposes Unity Events for user interactions.
 
 ##### 2.3.4.4.6.0.0 Dependencies
 
-- IGameBoardView
-- IEventBus
-- ITurnManagementService
+- TextMeshProUGUI titleText
+- TextMeshProUGUI messageText
+- Button confirmButton
+- Button cancelButton
 
-##### 2.3.4.4.7.0.0 Technology Integration Notes
+##### 2.3.4.4.7.0.0 Framework Specific Attributes
 
-Uses an abstraction over Addressables to load 3D models dynamically, supporting theming (REQ-1-093).
+*No items available*
 
-##### 2.3.4.4.8.0.0 Methods
+##### 2.3.4.4.8.0.0 Technology Integration Notes
 
-- {'method_name': 'OnGameStateUpdated', 'method_signature': 'async Task OnGameStateUpdated(GameStateUpdatedEvent gameEvent)', 'return_type': 'Task', 'access_modifier': 'private', 'is_async': True, 'implementation_logic': 'Specification requires this method to iterate through changes in the game state and trigger corresponding visual updates on the view. Must handle animations sequentially using `async/await` to ensure a clear visual flow. Performance is critical to meet REQ-1-014.'}
+This script will be attached to a Dialog Prefab. Its public fields will be linked to the corresponding UI components in the Unity Editor.
+
+##### 2.3.4.4.9.0.0 Methods
+
+- {'method_name': 'Configure', 'method_signature': 'Configure(DialogDefinition definition, Action onConfirm, Action onCancel)', 'return_type': 'void', 'access_modifier': 'public', 'is_async': 'false', 'implementation_logic': 'Specification requires this method to set the text for the title and message. It must also configure the visibility and text of the buttons based on the `DialogDefinition`. It will then wire up the `onClick` events of the buttons to invoke the provided `onConfirm` and `onCancel` actions.', 'exception_handling': 'Should handle null actions gracefully.'}
+
+##### 2.3.4.4.10.0.0 Implementation Notes
+
+This reusable view is critical for displaying error messages (REQ-1-023) and user confirmations throughout the application.
 
 #### 2.3.4.5.0.0.0 Class Name
 
 ##### 2.3.4.5.1.0.0 Class Name
 
-HUDPresenter
+GameBoardPresenter
 
 ##### 2.3.4.5.2.0.0 File Path
 
-Assets/App/Presentation/Features/GameBoard/Presenters/HUDPresenter.cs
+Assets/App/Presentation/Features/GameBoard/Presenters/GameBoardPresenter.cs
 
 ##### 2.3.4.5.3.0.0 Class Type
 
@@ -505,60 +873,254 @@ Presenter
 
 ##### 2.3.4.5.4.0.0 Inheritance
 
-object
+object, IInitializable, IDisposable
 
 ##### 2.3.4.5.5.0.0 Purpose
 
-Contains the presentation logic for the Heads-Up Display. It subscribes to game state events, transforms data into a view model (e.g., formatting cash), and updates the IHUDView. It also handles user interactions from the HUD, such as clicking the \"Manage Properties\" button.
+Orchestrates the visual representation of the game board. It translates game state data into visual changes, such as moving tokens, adding houses, and triggering animations. Fulfills REQ-1-005, REQ-1-017.
 
 ##### 2.3.4.5.6.0.0 Dependencies
 
-- IHUDView
+- IGameBoardView
 - IEventBus
-- IViewManager
-- ITurnManagementService
+- IAssetProvider
 
-##### 2.3.4.5.7.0.0 Technology Integration Notes
+##### 2.3.4.5.7.0.0 Methods
 
-This is a plain C# object (POCO) that is instantiated and managed by the DI container, making it easily unit-testable.
+###### 2.3.4.5.7.1.0 Method Name
 
-##### 2.3.4.5.8.0.0 Methods
+####### 2.3.4.5.7.1.1 Method Name
 
-- {'method_name': 'OnGameStateUpdated', 'method_signature': 'void OnGameStateUpdated(GameStateUpdatedEvent e)', 'return_type': 'void', 'access_modifier': 'private', 'is_async': False, 'implementation_logic': 'Specification requires this method to be the handler for game state changes. It must extract relevant data for the current player (name, cash), update its internal view model, and call the appropriate methods on the `IHUDView` interface (e.g., `SetCashAmount`) to update the display, fulfilling REQ-1-071.'}
+Initialize
+
+####### 2.3.4.5.7.1.2 Method Signature
+
+Initialize()
+
+####### 2.3.4.5.7.1.3 Return Type
+
+void
+
+####### 2.3.4.5.7.1.4 Access Modifier
+
+public
+
+####### 2.3.4.5.7.1.5 Implementation Logic
+
+Should subscribe to the `GameStateUpdatedEvent` on the IEventBus. Should perform initial setup of the board view, pre-loading and instantiating player token prefabs using the IAssetProvider based on the initial game setup data.
+
+###### 2.3.4.5.7.2.0 Method Name
+
+####### 2.3.4.5.7.2.1 Method Name
+
+OnGameStateUpdated
+
+####### 2.3.4.5.7.2.2 Method Signature
+
+OnGameStateUpdated(GameStateUpdatedEvent evt)
+
+####### 2.3.4.5.7.2.3 Return Type
+
+void
+
+####### 2.3.4.5.7.2.4 Access Modifier
+
+private
+
+####### 2.3.4.5.7.2.5 Is Async
+
+true
+
+####### 2.3.4.5.7.2.6 Implementation Logic
+
+Must compare the new game state with the last known state to identify changes. For each player whose position has changed, it must call `IGameBoardView.AnimateTokenToPositionAsync`. For each property whose development level has changed, it must call the view to add or remove house/hotel models. Should handle all visual updates required to make the board match the authoritative GameState.
+
+####### 2.3.4.5.7.2.7 Performance Considerations
+
+Animations should be executed via coroutines or a tweening library to be non-blocking. Must be highly performant to meet REQ-1-014.
+
+##### 2.3.4.5.8.0.0 Implementation Notes
+
+This class is critical for the main gameplay loop's visual feedback and directly satisfies core visual requirements.
 
 #### 2.3.4.6.0.0.0 Class Name
 
 ##### 2.3.4.6.1.0.0 Class Name
 
-GlobalExceptionHandler
+HUDPresenter
 
 ##### 2.3.4.6.2.0.0 File Path
 
-Assets/App/Presentation/Core/GlobalExceptionHandler.cs
+Assets/App/Presentation/Features/HUD/Presenters/HUDPresenter.cs
 
 ##### 2.3.4.6.3.0.0 Class Type
 
-MonoBehaviour
+Presenter
 
 ##### 2.3.4.6.4.0.0 Inheritance
 
-MonoBehaviour
+object, IInitializable, IDisposable
 
 ##### 2.3.4.6.5.0.0 Purpose
 
-Implements a global catch-all for unhandled exceptions to prevent the application from crashing and to display a user-friendly error dialog, fulfilling REQ-1-023.
+Manages the state and logic for the Heads-Up Display. It provides the HUDView with formatted data and handles user interactions like clicking the \"End Turn\" or \"Manage Properties\" buttons. Fulfills REQ-1-071.
 
 ##### 2.3.4.6.6.0.0 Dependencies
 
+- IHUDView
+- IEventBus
+- ITurnManagementService
 - IViewManager
 
-##### 2.3.4.6.7.0.0 Technology Integration Notes
+##### 2.3.4.6.7.0.0 Methods
 
-Must be attached to a persistent GameObject created by the CompositionRoot.
+###### 2.3.4.6.7.1.0 Method Name
 
-##### 2.3.4.6.8.0.0 Methods
+####### 2.3.4.6.7.1.1 Method Name
 
-- {'method_name': 'HandleException', 'method_signature': 'void HandleException(string logString, string stackTrace, LogType type)', 'return_type': 'void', 'access_modifier': 'private', 'is_async': False, 'implementation_logic': 'Specification requires this method to filter for `LogType.Exception`, generate a unique error ID, log the full exception, and then use the injected `IViewManager` to display the `ErrorDialog` prefab. This directly implements the logic described in Sequence Diagram 192.'}
+Initialize
+
+####### 2.3.4.6.7.1.2 Method Signature
+
+Initialize()
+
+####### 2.3.4.6.7.1.3 Return Type
+
+void
+
+####### 2.3.4.6.7.1.4 Access Modifier
+
+public
+
+####### 2.3.4.6.7.1.5 Implementation Logic
+
+Should subscribe to `GameStateUpdatedEvent` and `TurnPhaseChangedEvent` on the IEventBus. Should bind its methods to the events exposed by IHUDView, such as `OnManagePropertiesClicked`.
+
+###### 2.3.4.6.7.2.0 Method Name
+
+####### 2.3.4.6.7.2.1 Method Name
+
+OnGameStateUpdated
+
+####### 2.3.4.6.7.2.2 Method Signature
+
+OnGameStateUpdated(GameStateUpdatedEvent evt)
+
+####### 2.3.4.6.7.2.3 Return Type
+
+void
+
+####### 2.3.4.6.7.2.4 Access Modifier
+
+private
+
+####### 2.3.4.6.7.2.5 Implementation Logic
+
+Must extract relevant data for the current human player (e.g., cash, properties) from the game state. It must then create a view-specific data model (e.g., HUDViewModel DTO) and pass it to the IHUDView's `UpdateDisplay` method.
+
+###### 2.3.4.6.7.3.0 Method Name
+
+####### 2.3.4.6.7.3.1 Method Name
+
+OnManagePropertiesClicked
+
+####### 2.3.4.6.7.3.2 Method Signature
+
+OnManagePropertiesClicked()
+
+####### 2.3.4.6.7.3.3 Return Type
+
+void
+
+####### 2.3.4.6.7.3.4 Access Modifier
+
+private
+
+####### 2.3.4.6.7.3.5 Implementation Logic
+
+Should call `_viewManager.ShowScreen(Screen.PropertyManagement)` to open the property management UI, as shown in Sequence Diagram 179.
+
+#### 2.3.4.7.0.0.0 Class Name
+
+##### 2.3.4.7.1.0.0 Class Name
+
+PropertyManagementPresenter
+
+##### 2.3.4.7.2.0.0 File Path
+
+Assets/App/Presentation/Features/PropertyManagement/Presenters/PropertyManagementPresenter.cs
+
+##### 2.3.4.7.3.0.0 Class Type
+
+Presenter
+
+##### 2.3.4.7.4.0.0 Inheritance
+
+object, IInitializable, IDisposable
+
+##### 2.3.4.7.5.0.0 Purpose
+
+Handles the business logic for the property management screen. It fetches player asset data, validates user actions (like build house, mortgage), and calls application services to execute them.
+
+##### 2.3.4.7.6.0.0 Dependencies
+
+- IPropertyManagementView
+- IPropertyActionService
+- IEventBus
+
+##### 2.3.4.7.7.0.0 Methods
+
+###### 2.3.4.7.7.1.0 Method Name
+
+####### 2.3.4.7.7.1.1 Method Name
+
+Initialize
+
+####### 2.3.4.7.7.1.2 Method Signature
+
+Initialize()
+
+####### 2.3.4.7.7.1.3 Return Type
+
+void
+
+####### 2.3.4.7.7.1.4 Access Modifier
+
+public
+
+####### 2.3.4.7.7.1.5 Implementation Logic
+
+Specification requires subscribing to `GameStateUpdatedEvent` to refresh the view. Also requires binding to view events like `OnBuildHouseRequested`.
+
+###### 2.3.4.7.7.2.0 Method Name
+
+####### 2.3.4.7.7.2.1 Method Name
+
+OnBuildHouseRequested
+
+####### 2.3.4.7.7.2.2 Method Signature
+
+OnBuildHouseRequested(string propertyId)
+
+####### 2.3.4.7.7.2.3 Return Type
+
+void
+
+####### 2.3.4.7.7.2.4 Access Modifier
+
+private
+
+####### 2.3.4.7.7.2.5 Is Async
+
+true
+
+####### 2.3.4.7.7.2.6 Implementation Logic
+
+Specification requires this method to invoke `IPropertyActionService.BuildHouseAsync(propertyId)`. It must handle the result, commanding the view to show a success message or an error notification, as detailed in Sequence Diagrams 179 and 180.
+
+##### 2.3.4.7.8.0.0 Implementation Notes
+
+This component is the controller for the user flows defined in sequences 179, 180, 184, and 193.
 
 ### 2.3.5.0.0.0.0 Interface Specifications
 
@@ -570,11 +1132,11 @@ IViewManager
 
 ##### 2.3.5.1.2.0.0 File Path
 
-Assets/App/Presentation/Core/IViewManager.cs
+Assets/App/Presentation/Shared/Services/IViewManager.cs
 
 ##### 2.3.5.1.3.0.0 Purpose
 
-Provides an abstraction for managing scene transitions and UI panel (view) lifecycle.
+Defines a contract for a service that manages the showing, hiding, and layering of UI screens and dialogs.
 
 ##### 2.3.5.1.4.0.0 Method Contracts
 
@@ -582,43 +1144,55 @@ Provides an abstraction for managing scene transitions and UI panel (view) lifec
 
 ####### 2.3.5.1.4.1.1 Method Name
 
-LoadSceneAsync
+ShowScreen
 
 ####### 2.3.5.1.4.1.2 Method Signature
 
-Task LoadSceneAsync(string sceneName)
+Task ShowScreen(Screen screen, object payload = null)
 
-####### 2.3.5.1.4.1.3 Contract Description
+####### 2.3.5.1.4.1.3 Return Type
 
-Must asynchronously load the specified Unity scene, displaying a loading indicator during the transition.
+Task
+
+####### 2.3.5.1.4.1.4 Contract Description
+
+Asynchronously loads and displays a specific UI screen prefab, hiding any other active screens as necessary.
 
 ###### 2.3.5.1.4.2.0 Method Name
 
 ####### 2.3.5.1.4.2.1 Method Name
 
-ShowView
+ShowDialog
 
 ####### 2.3.5.1.4.2.2 Method Signature
 
-Task<T> ShowView<T>(string viewKey, object viewModel = null) where T : class
+Task<DialogResult> ShowDialog(DialogDefinition definition)
 
-####### 2.3.5.1.4.2.3 Contract Description
+####### 2.3.5.1.4.2.3 Return Type
 
-Must asynchronously load a UI view prefab using its Addressable key, instantiate it, initialize its presenter, and return the presenter instance.
+Task<DialogResult>
+
+####### 2.3.5.1.4.2.4 Contract Description
+
+Displays a modal dialog box and returns a Task that completes when the user makes a choice. This is critical for REQ-1-023.
+
+##### 2.3.5.1.5.0.0 Implementation Guidance
+
+The concrete implementation (`ViewManager.cs`) should use the IAssetProvider to load screen prefabs asynchronously. It needs to manage a stack of active screens to handle layering and back navigation.
 
 #### 2.3.5.2.0.0.0 Interface Name
 
 ##### 2.3.5.2.1.0.0 Interface Name
 
-IEventBus
+IGameBoardView
 
 ##### 2.3.5.2.2.0.0 File Path
 
-Assets/App/Presentation/Core/IEventBus.cs
+Assets/App/Presentation/Features/GameBoard/Views/IGameBoardView.cs
 
 ##### 2.3.5.2.3.0.0 Purpose
 
-Defines a contract for a global event bus, allowing for decoupled communication between different parts of the application. Implements the Observer pattern.
+Defines the contract for the GameBoard's View component. It exposes methods for the GameBoardPresenter to command, abstracting away the underlying Unity GameObject and component details.
 
 ##### 2.3.5.2.4.0.0 Method Contracts
 
@@ -626,43 +1200,55 @@ Defines a contract for a global event bus, allowing for decoupled communication 
 
 ####### 2.3.5.2.4.1.1 Method Name
 
-Subscribe<T>
+AnimateTokenToPositionAsync
 
 ####### 2.3.5.2.4.1.2 Method Signature
 
-void Subscribe<T>(Action<T> handler) where T : IEvent
+Task AnimateTokenToPositionAsync(string playerId, int targetTileIndex)
 
-####### 2.3.5.2.4.1.3 Contract Description
+####### 2.3.5.2.4.1.3 Return Type
 
-Registers a handler to be called when an event of type T is published.
+Task
+
+####### 2.3.5.2.4.1.4 Contract Description
+
+Executes a visual animation of a player's token moving along the board path to a new tile, fulfilling REQ-1-017. The returned Task should complete when the animation finishes.
 
 ###### 2.3.5.2.4.2.0 Method Name
 
 ####### 2.3.5.2.4.2.1 Method Name
 
-Publish<T>
+UpdatePropertyVisuals
 
 ####### 2.3.5.2.4.2.2 Method Signature
 
-void Publish<T>(T event) where T : IEvent
+void UpdatePropertyVisuals(int tileIndex, int houseCount)
 
-####### 2.3.5.2.4.2.3 Contract Description
+####### 2.3.5.2.4.2.3 Return Type
 
-Invokes all registered handlers for the given event of type T.
+void
+
+####### 2.3.5.2.4.2.4 Contract Description
+
+Instantiates, removes, or updates the 3D models for houses and hotels on a specific property tile.
+
+##### 2.3.5.2.5.0.0 Implementation Guidance
+
+The implementing class, `GameBoardView.cs`, will be a MonoBehaviour. It will need a way to map tile indices to Transform positions in the 3D scene. It should use a tweening library (like DOTween) or coroutines for smooth animations.
 
 #### 2.3.5.3.0.0.0 Interface Name
 
 ##### 2.3.5.3.1.0.0 Interface Name
 
-IHUDView
+IPropertyManagementView
 
 ##### 2.3.5.3.2.0.0 File Path
 
-Assets/App/Presentation/Features/GameBoard/Views/IHUDView.cs
+Assets/App/Presentation/Features/PropertyManagement/Views/IPropertyManagementView.cs
 
 ##### 2.3.5.3.3.0.0 Purpose
 
-Defines the contract for the Heads-Up Display view. This allows the HUDPresenter to be tested independently of the Unity MonoBehaviour implementation.
+Defines the contract for the Property Management screen's View component.
 
 ##### 2.3.5.3.4.0.0 Method Contracts
 
@@ -670,237 +1256,161 @@ Defines the contract for the Heads-Up Display view. This allows the HUDPresenter
 
 ####### 2.3.5.3.4.1.1 Method Name
 
-SetPlayerName
+DisplayAssets
 
 ####### 2.3.5.3.4.1.2 Method Signature
 
-void SetPlayerName(string name)
+void DisplayAssets(PlayerAssetViewModel viewModel)
 
-####### 2.3.5.3.4.1.3 Contract Description
+####### 2.3.5.3.4.1.3 Return Type
 
-Must update the UI to display the provided player name.
+void
+
+####### 2.3.5.3.4.1.4 Contract Description
+
+Populates the UI with the player's properties, cash, and dynamically enables/disables action buttons based on the provided view model.
 
 ###### 2.3.5.3.4.2.0 Method Name
 
 ####### 2.3.5.3.4.2.1 Method Name
 
-SetCashAmount
+ShowError
 
 ####### 2.3.5.3.4.2.2 Method Signature
 
-void SetCashAmount(string formattedAmount)
+void ShowError(string message)
 
-####### 2.3.5.3.4.2.3 Contract Description
+####### 2.3.5.3.4.2.3 Return Type
 
-Must update the UI to display the provided cash amount.
+void
 
-### 2.3.6.0.0.0.0 Dto Specifications
+####### 2.3.5.3.4.2.4 Contract Description
 
-- {'dto_name': 'GameStateUpdatedEvent', 'file_path': 'Assets/App/Presentation/Events/GameStateUpdatedEvent.cs', 'purpose': 'An event DTO published on the IEventBus whenever a significant change to the game state occurs. Presenters subscribe to this to know when to refresh their views.', 'framework_base_class': 'IEvent', 'properties': [{'property_name': 'NewGameState', 'property_type': 'GameState', 'purpose': 'A read-only snapshot of the new game state.'}, {'property_name': 'ChangeContext', 'property_type': 'string', 'purpose': 'A description of what triggered the update (e.g., \\"RentPaid\\", \\"TradeCompleted\\").'}]}
+Displays a non-intrusive error notification to the user (e.g., \"Cannot mortgage developed property\").
 
-### 2.3.7.0.0.0.0 Configuration Specifications
+##### 2.3.5.3.5.0.0 Property Contracts
 
-- {'configuration_name': 'UITheme', 'file_path': 'Assets/App/Presentation/Features/CommonUI/ScriptableObjects/UITheme.cs', 'purpose': "A ScriptableObject to hold theme-related data (colors, fonts, sprites) that can be easily swapped to change the application's appearance, supporting REQ-1-093.", 'framework_base_class': 'ScriptableObject', 'configuration_sections': [{'section_name': 'Colors', 'properties': [{'property_name': 'PrimaryColor', 'property_type': 'Color'}]}]}
+- {'property_name': 'OnBuildHouseRequested', 'property_type': 'event Action<string>', 'getter_contract': 'Event fired when the user clicks the \\"Build House\\" button for a property.', 'setter_contract': 'N/A'}
+
+### 2.3.6.0.0.0.0 Enum Specifications
+
+- {'enum_name': 'Screen', 'file_path': 'Assets/App/Presentation/Shared/Services/Screen.cs', 'underlying_type': 'int', 'purpose': 'Provides a strongly-typed identifier for each major UI screen in the application.', 'values': [{'value_name': 'None', 'value': '0', 'description': 'Represents no screen.'}, {'value_name': 'MainMenu', 'value': '1', 'description': 'The main menu screen.'}, {'value_name': 'GameSetup', 'value': '2', 'description': 'The new game configuration screen.'}, {'value_name': 'GameBoard', 'value': '3', 'description': 'The main game screen with the HUD and 3D board.'}, {'value_name': 'Settings', 'value': '4', 'description': 'The application settings screen.'}, {'value_name': 'PropertyManagement', 'value': '5', 'description': 'The screen for managing owned properties.'}]}
+
+### 2.3.7.0.0.0.0 Dto Specifications
+
+- {'dto_name': 'SaveGameMetadata', 'file_path': 'Assets/App/Presentation/Features/LoadGame/ViewModels/SaveGameMetadata.cs', 'purpose': 'A view-specific data model used to populate the list of save slots in the Load Game UI. This is a projection of data received from the Application layer.', 'properties': [{'property_name': 'SlotNumber', 'property_type': 'int'}, {'property_name': 'SaveName', 'property_type': 'string'}, {'property_name': 'SaveTimestamp', 'property_type': 'string'}, {'property_name': 'Status', 'property_type': 'SaveStatus'}], 'implementation_notes': 'This DTO is essential for the flow described in Sequence Diagram 185, where a corrupted save file is indicated by the \\"Status\\" property.'}
+
+### 2.3.8.0.0.0.0 Configuration Specifications
+
+- {'configuration_name': 'ThemeDefinition', 'file_path': 'Assets/Settings/Themes/ThemeDefinition.cs', 'purpose': 'A ScriptableObject that defines the asset keys for a specific visual/audio theme. This allows designers to create new themes by creating new instances of this asset and populating its fields. Fulfills REQ-1-093.', 'framework_base_class': 'ScriptableObject', 'configuration_sections': [{'section_name': 'Board Assets', 'properties': [{'property_name': 'GameBoardPrefabKey', 'property_type': 'string', 'required': True, 'description': 'Addressable key for the main game board prefab.'}, {'property_name': 'PlayerTokenPrefabKeys', 'property_type': 'List<string>', 'required': True, 'description': 'List of Addressable keys for the available player token prefabs.'}]}, {'section_name': 'Audio Assets', 'properties': [{'property_name': 'MainMenuMusicKey', 'property_type': 'string', 'required': True, 'description': 'Addressable key for the main menu background music AudioClip.'}, {'property_name': 'DiceRollSfxKey', 'property_type': 'string', 'required': True, 'description': 'Addressable key for the dice roll sound effect AudioClip.'}]}], 'validation_requirements': 'All key fields must be non-empty and correspond to valid Addressable assets.'}
+
+### 2.3.9.0.0.0.0 Dependency Injection Specifications
+
+#### 2.3.9.1.0.0.0 Service Interface
+
+##### 2.3.9.1.1.0.0 Service Interface
+
+IViewManager
+
+##### 2.3.9.1.2.0.0 Service Implementation
+
+ViewManager
+
+##### 2.3.9.1.3.0.0 Lifetime
+
+Singleton
+
+##### 2.3.9.1.4.0.0 Registration Reasoning
+
+View management is a global concern that needs to persist across scene loads. A singleton instance ensures a consistent state for UI navigation.
+
+##### 2.3.9.1.5.0.0 Framework Registration Pattern
+
+Container.Bind<IViewManager>().To<ViewManager>().AsSingle();
+
+#### 2.3.9.2.0.0.0 Service Interface
+
+##### 2.3.9.2.1.0.0 Service Interface
+
+IAssetProvider
+
+##### 2.3.9.2.2.0.0 Service Implementation
+
+AddressableAssetProvider
+
+##### 2.3.9.2.3.0.0 Lifetime
+
+Singleton
+
+##### 2.3.9.2.4.0.0 Registration Reasoning
+
+Asset loading and caching is a global, long-lived service. A singleton prevents redundant loading and manages asset lifetimes efficiently.
+
+##### 2.3.9.2.5.0.0 Framework Registration Pattern
+
+Container.Bind<IAssetProvider>().To<AddressableAssetProvider>().AsSingle();
+
+#### 2.3.9.3.0.0.0 Service Interface
+
+##### 2.3.9.3.1.0.0 Service Interface
+
+GameBoardPresenter
+
+##### 2.3.9.3.2.0.0 Service Implementation
+
+GameBoardPresenter
+
+##### 2.3.9.3.3.0.0 Lifetime
+
+Scoped
+
+##### 2.3.9.3.4.0.0 Registration Reasoning
+
+The presenter's lifecycle is tied to the GameBoard scene. A scoped (or transient) lifetime ensures a fresh instance is created when the game starts and is disposed of when the game ends.
+
+##### 2.3.9.3.5.0.0 Framework Registration Pattern
+
+Container.BindInterfacesAndSelfTo<GameBoardPresenter>().AsTransient();
+
+#### 2.3.9.4.0.0.0 Service Interface
+
+##### 2.3.9.4.1.0.0 Service Interface
+
+IGameSessionService
+
+##### 2.3.9.4.2.0.0 Service Implementation
+
+GameSessionService (from REPO-AS-005)
+
+##### 2.3.9.4.3.0.0 Lifetime
+
+Singleton
+
+##### 2.3.9.4.4.0.0 Registration Reasoning
+
+The Presentation layer does not define this implementation but registers the one provided by the Application layer. Game session state is a global, application-wide concern.
+
+##### 2.3.9.4.5.0.0 Framework Registration Pattern
+
+Container.Bind<IGameSessionService>().To<GameSessionService>().AsSingle();
+
+### 2.3.10.0.0.0.0 External Integration Specifications
+
+- {'integration_target': 'Application Layer (REPO-AS-005)', 'integration_type': 'In-Memory Service Consumption', 'required_client_classes': ['MainMenuPresenter', 'LoadGamePresenter', 'HUDPresenter'], 'configuration_requirements': "Requires the Application layer's assembly to be referenced. DI container must be configured to inject Application services.", 'error_handling_requirements': 'UI Presenters must implement try-catch blocks around service calls to handle potential exceptions from lower layers, displaying user-friendly error messages. The GlobalExceptionHandler provides a final safety net.', 'authentication_requirements': 'N/A', 'framework_integration_patterns': 'Dependency Injection is the sole pattern for communication. UI Presenters will be injected with interfaces like `IGameSessionService` and `ITurnManagementService`.'}
 
 ## 2.4.0.0.0.0.0 Component Count Validation
 
 | Property | Value |
 |----------|-------|
-| Total Classes | 14 |
-| Total Interfaces | 7 |
-| Total Enums | 0 |
+| Total Classes | 7 |
+| Total Interfaces | 3 |
+| Total Enums | 1 |
 | Total Dtos | 1 |
 | Total Configurations | 1 |
-| Total External Integrations | 0 |
-| Grand Total Components | 23 |
-| Phase 2 Claimed Count | 38 |
-| Phase 2 Actual Count | 8 |
-| Validation Added Count | 15 |
-| Final Validated Count | 23 |
-
-# 3.0.0.0.0.0.0 File Structure
-
-## 3.1.0.0.0.0.0 Directory Organization
-
-### 3.1.1.0.0.0.0 Directory Path
-
-#### 3.1.1.1.0.0.0 Directory Path
-
-.
-
-#### 3.1.1.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.1.3.0.0.0 Contains Files
-
-- MonopolyTycoon.sln
-- MonopolyTycoon.Presentation.Core.csproj
-- .editorconfig
-- .gitignore
-- .gitattributes
-
-#### 3.1.1.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.1.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.2.0.0.0.0 Directory Path
-
-#### 3.1.2.1.0.0.0 Directory Path
-
-Assets/App/Presentation/Core
-
-#### 3.1.2.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.2.3.0.0.0 Contains Files
-
-- MonopolyTycoon.Presentation.Core.asmdef
-- CompositionRoot.cs.meta
-
-#### 3.1.2.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.2.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.3.0.0.0.0 Directory Path
-
-#### 3.1.3.1.0.0.0 Directory Path
-
-Assets/App/Presentation/Features/GameBoard
-
-#### 3.1.3.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.3.3.0.0.0 Contains Files
-
-- MonopolyTycoon.Presentation.Features.GameBoard.asmdef
-
-#### 3.1.3.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.3.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.4.0.0.0.0 Directory Path
-
-#### 3.1.4.1.0.0.0 Directory Path
-
-Assets/Scenes
-
-#### 3.1.4.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.4.3.0.0.0 Contains Files
-
-- MainMenu.unity
-
-#### 3.1.4.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.4.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.5.0.0.0.0 Directory Path
-
-#### 3.1.5.1.0.0.0 Directory Path
-
-Assets/Tests/EditMode/Core
-
-#### 3.1.5.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.5.3.0.0.0 Contains Files
-
-- MonopolyTycoon.Presentation.Core.Tests.asmdef
-
-#### 3.1.5.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.5.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.6.0.0.0.0 Directory Path
-
-#### 3.1.6.1.0.0.0 Directory Path
-
-Assets/Tests/PlayMode/Features
-
-#### 3.1.6.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.6.3.0.0.0 Contains Files
-
-- MonopolyTycoon.Presentation.Features.Tests.asmdef
-
-#### 3.1.6.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.6.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.7.0.0.0.0 Directory Path
-
-#### 3.1.7.1.0.0.0 Directory Path
-
-Packages
-
-#### 3.1.7.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.7.3.0.0.0 Contains Files
-
-- manifest.json
-
-#### 3.1.7.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.7.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
-
-### 3.1.8.0.0.0.0 Directory Path
-
-#### 3.1.8.1.0.0.0 Directory Path
-
-ProjectSettings
-
-#### 3.1.8.2.0.0.0 Purpose
-
-Infrastructure and project configuration files
-
-#### 3.1.8.3.0.0.0 Contains Files
-
-- ProjectSettings.asset
-- EditorBuildSettings.asset
-
-#### 3.1.8.4.0.0.0 Organizational Reasoning
-
-Contains project setup, configuration, and infrastructure files for development and deployment
-
-#### 3.1.8.5.0.0.0 Framework Convention Alignment
-
-Standard project structure for infrastructure as code and development tooling
+| Total External Integrations | 1 |
+| Grand Total Components | 14 |
+| Phase 2 Claimed Count | 45 |
+| Phase 2 Actual Count | 13 |
+| Validation Added Count | 11 |
+| Final Validated Count | 24 |
 

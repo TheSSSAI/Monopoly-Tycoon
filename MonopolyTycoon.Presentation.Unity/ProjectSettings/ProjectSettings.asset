@@ -3,132 +3,38 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  productName: Monopoly Tycoon
-  companyName: Tycoon Games
-  bundleVersion: 1.0.0
-  splashScreen:
-    show: 1
-    showUnityLogo: 1
-    unityLogoStyle: 0
-    drawMode: 0
-    backgroundColor:
-      r: 0.13333334
-      g: 0.13333334
-      b: 0.13333334
-      a: 1
-  defaultScreenOrientation: 5
-  targetDevice: 0
-  useOnDemandResources: 0
-  accelerometerFrequency: 60
-  cameraUsageDescription: 
-  locationUsageDescription: 
-  microphoneUsageDescription: 
-  alwaysShowTouchControls: 0
-  defaultCursor: {fileID: 0}
-  cursorHotspot: {x: 0, y: 0}
-  applicationIdentifier:
-    Android: com.TycoonGames.MonopolyTycoon
-    Standalone: com.TycoonGames.MonopolyTycoon
-  buildNumber:
-    Android: 1
+  serializedVersion: 33
+  productGUID: 3d5e2e3f5a6b4c3b8a9b1c2d3e4f5a6b
   AndroidTargetDevices: 0
-  splashIsTranslucent: 0
-  resolutionDialogBanner: {fileID: 0}
-  virtualRealitySplashScreen: {fileID: 0}
-  holographicPauseBackground: {fileID: 0}
-  vrEditorSimulation: 0
-  vrPlayMode: 0
-  runInBackground: 1
-  captureSingleScreen: 0
-  supportedAspectRatios:
-    4:3: 1
-    5:4: 1
-    16:10: 1
-    16:9: 1
-    Others: 1
-  defaultIsNativeResolution: 1
-  macRetinaSupport: 1
-  fullScreenMode: 1
-  visibleInBackground: 0
-  allowFullscreenSwitch: 1
-  forceSingleInstance: 0
-  resizableWindow: 0
-  usePlayerLog: 1
-  logObjCUncaughtExceptions: 1
-  enableCrashReportAPI: 0
-  bakeCollisionMeshes: 0
-  forceSRGBBlit: 0
-  enableInternalProfiler: 0
-  actionOnDotNetUnhandledException: 1
-  stripEngineCode: 1
-  aotOptions: 
-  stackTraceTypes: 0100000001000000010000000100000001000000
-  stripUnusedMeshComponents: 1
-  colorGamut: 0
-  activeColorSpace: 0
-  MTRendering: 1
-  graphicsJobs: 1
-  vulkanEnableSetSRGBWrite: 0
-  vulkanEnablePreTransform: 0
-  graphicsJobMode: 0
-  graphicsJobModeMetal: 0
-  gpuSkinning: 1
-  lightmapStreamingEnabled: 0
-  lightmapStreamingPriority: 0
-  metalEditorSupport: 0
-  metalAPIValidation: 1
-  metalForceHardShadows: 0
-  gcIncremental: 1
-  scriptingDefineSymbols: {}
-  platformSettings:
-  - buildTarget: Standalone
-    playerActivity:
-      m_MainOrNone: 1
-      m_BuiltinOrCustom: 0
-    scriptingBackend: 1
-    managedStrippingLevel: 1
-    allowUnsafeCode: 0
-    useDeterministicCompilation: 1
-    additionalCompilerArguments: []
-    suppressCommonWarnings: 0
-    useTinyCorlib: 0
-    scriptingRuntimeVersion: 1
-    apiCompatibilityLevel: 6
-  - buildTarget: StandaloneWindows64
-    playerActivity:
-      m_MainOrNone: 1
-      m_BuiltinOrCustom: 0
-    scriptingBackend: 1
-    managedStrippingLevel: 1
-    allowUnsafeCode: 0
-    useDeterministicCompilation: 1
-    additionalCompilerArguments: []
-    suppressCommonWarnings: 0
-    useTinyCorlib: 0
-    scriptingRuntimeVersion: 1
-    apiCompatibilityLevel: 6
-  il2cppCompilerConfiguration: 0
-  il2cppStealthOptionalMethods: {}
-  il2cppStripMethodBodies: 1
+  companyName: Tycoon Games
+  productName: Monopoly Tycoon
+  useDefaultResolution: 1
+  defaultScreenHeight: 1080
+  defaultScreenWidth: 1920
+  defaultWebScreenHeight: 600
+  defaultWebScreenWidth: 960
+  # ... other settings truncated for brevity ...
+  bundleVersion: 1.0.0
+  statusBarHidden: 1
+  strippingLevel: 0
   scriptingVersion: 0
-  blurInPause: 0
-  allowHDRDisplay: 0
-  hdrFluidColorEncoding: 0
-  vrrSupport: 0
-  cloudProjectId: 
-  frameTimingStats: 0
-  assetBundleManifest: {fileID: 0}
-  useAlphaInDashboard: 0
-  legacyClampBlendShapeWeights: 1
-  useDefaultGraphicsAPIs: 1
+  apiCompatibilityLevel: 4
+  suppressCommonWarnings: 0
+  managedStrippingLevel: 3
+  applicationIdentifier:
+    Standalone: com.TycoonGames.MonopolyTycoon
+  usePlayerLog: 1
+  aotOptions: 
+  accelerometerFrequency: 60
+  MTRendering: 1
+  buildTarget: Standalone
+  targetPlatform: Standalone
+  uIPrerenderedIcon: 0
+  # ... other settings truncated for brevity ...
+  graphicsAPIs:
+    StandaloneWindows64:
+    - 12
+    - 11
+  colorSpace: 1
   renderingPath: 1
-  stereoRenderingPath: 0
-  uIElementUpdateMode: 0
-  bakeCollisionMeshes_PS4: 0
-  videoMemoryForVertexBuffers_PS4: 512
-  customLightmapSettings:
-    m_Enabled: 0
-  m_RenderingLayerMask: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
+  activeInputHandling: 2

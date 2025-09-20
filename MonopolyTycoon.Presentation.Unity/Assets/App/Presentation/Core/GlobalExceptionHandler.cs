@@ -1,121 +1,149 @@
-using MonopolyTycoon.Application.Services;
-using MonopolyTycoon.Presentation.Features.CommonUI.ViewModels;
+using MonopolyTycoon.Application.Abstractions.Logging;
+using MonopolyTycoon.Presentation.Shared.Services;
+using MonopolyTycoon.Presentation.Shared.Views;
 using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
+using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace MonopolyTycoon.Presentation.Core
 {
     /// <summary>
-    /// Implements a global catch-all for unhandled exceptions to prevent the application
-    /// from crashing and to display a user-friendly error dialog.
-    /// Fulfills requirement REQ-1-023.
+    /// Implements the global exception handling logic required by REQ-1-023.
+    /// It subscribes to the system's unhandled exception event at startup,
+    /// logs the error with a unique correlation ID, and commands the ViewManager
+    /// to display a modal error dialog, preventing an ungraceful application crash.
     /// </summary>
-    public class GlobalExceptionHandler : MonoBehaviour
+    public sealed class GlobalExceptionHandler : IDisposable
     {
-        private IViewManager _viewManager;
-        private ILogger _logger;
+        private readonly ILogger _logger;
+        private readonly IViewManager _viewManager;
+        private bool _disposed = false;
 
-        private static readonly ConcurrentQueue<Action> _mainThreadActions = new ConcurrentQueue<Action>();
-        private volatile bool _isHandlingException = false;
+        public GlobalExceptionHandler(ILogger logger, IViewManager viewManager)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _viewManager = viewManager ?? throw new ArgumentNullException(nameof(viewManager));
+        }
 
         /// <summary>
-        /// Injected by the CompositionRoot. This method is used instead of constructor injection
-        /// for MonoBehaviours.
+        /// Registers the global exception handler to catch all unhandled exceptions
+        /// within the current application domain. This should be called once at startup.
         /// </summary>
-        public void Initialize(IViewManager viewManager, ILogger logger)
+        public void Register()
         {
-            _viewManager = viewManager;
-            _logger = logger;
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            Application.logMessageReceived += OnUnityLogMessageReceived;
+            _logger.Information("Global Exception Handler registered.");
         }
 
-        private void Awake()
+        /// <summary>
+        /// Unregisters the global exception handler.
+        /// </summary>
+        public void Dispose()
         {
-            // Using the threaded version is crucial to catch exceptions from any thread.
-            Application.logMessageReceivedThreaded += HandleLog;
+            if (_disposed) return;
+            AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+            Application.logMessageReceived -= OnUnityLogMessageReceived;
+            _disposed = true;
         }
 
-        private void OnDestroy()
+        /// <summary>
+        /// Handles unhandled exceptions from Unity's logging system, specifically for critical errors.
+        /// </summary>
+        private void OnUnityLogMessageReceived(string condition, string stackTrace, LogType type)
         {
-            Application.logMessageReceivedThreaded -= HandleLog;
-        }
-
-        private void Update()
-        {
-            // Process any actions that were queued to run on the main thread.
-            if (_mainThreadActions.TryDequeue(out var action))
+            if (type == LogType.Exception)
             {
-                action.Invoke();
+                // This is a fallback for exceptions that might be caught by Unity's logger before AppDomain
+                // We create a synthetic exception object to pass to our main handler.
+                var syntheticException = new Exception($"{condition}\n{stackTrace}");
+                HandleException(syntheticException);
             }
         }
 
-        private void HandleLog(string logString, string stackTrace, LogType type)
+        /// <summary>
+        /// The primary handler for any unhandled exceptions in the AppDomain.
+        /// </summary>
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs args)
         {
-            // We are only interested in unhandled exceptions.
-            if (type != LogType.Exception)
+            if (args.ExceptionObject is Exception ex)
             {
-                return;
+                HandleException(ex);
             }
-
-            // Prevent recursive error handling or multiple dialogs for a single crash event.
-            if (_isHandlingException)
-            {
-                return;
-            }
-            _isHandlingException = true;
-            
-            // Generate a unique identifier to correlate the user-facing message with the log entry.
-            // This is critical for effective bug reporting and diagnosis.
-            var correlationId = Guid.NewGuid().ToString();
-
-            // The full exception details are logged for developers.
-            // The logString and stackTrace provided by Unity are concatenated.
-            var exceptionMessage = $"Unhandled Exception Caught by Global Handler.\nCorrelation ID: {correlationId}\nLog: {logString}\nStackTrace: {stackTrace}";
-            _logger.Error(new Exception(logString), exceptionMessage);
-
-            // UI operations must be performed on the main thread.
-            // We queue the action to be executed in the Update() loop.
-            _mainThreadActions.Enqueue(() => 
-            {
-                // Ensure the application quits even if showing the dialog fails.
-                try
-                {
-                    ShowErrorDialogOnMainThread(correlationId);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"CRITICAL FAILURE: Could not display the global error dialog. Forcing application quit. Inner Exception: {ex.Message}");
-                    Application.Quit();
-                }
-            });
         }
 
-        private void ShowErrorDialogOnMainThread(string correlationId)
+        /// <summary>
+        /// Central logic for processing a caught exception.
+        /// This method generates a correlation ID, logs the exception, and displays a user-friendly dialog.
+        /// </summary>
+        /// <param name="ex">The exception that was thrown.</param>
+        private void HandleException(Exception ex)
         {
-            string logPath;
+            // This is a safety measure to prevent recursive error handling if the error handler itself fails.
+            // We unregister immediately to prevent any further exceptions from being caught by this handler.
+            Dispose();
+
+            string correlationId = Guid.NewGuid().ToString("N");
+
             try
             {
-                // As per REQ-1-020, user data is stored here.
-                logPath = System.IO.Path.Combine(Application.persistentDataPath, "logs");
-            }
-            catch
-            {
-                // Fallback if persistentDataPath is somehow inaccessible.
-                logPath = "Could not determine log path.";
-            }
+                // REQ-1-022: No PII is explicitly added here. The logger is configured to handle sanitization.
+                // The only permitted PII is the profile name for debugging context, which is handled by the logger itself.
+                _logger.Fatal(ex, "FATAL UNHANDLED EXCEPTION. Correlation ID: {CorrelationId}", correlationId);
 
-            var viewModel = new ErrorDialogViewModel
-            {
-                Title = "Unexpected Error",
-                Message = "An unexpected error occurred and the application must close. Please provide the following information to support when reporting this issue.",
-                CorrelationId = correlationId,
-                LogFilePath = logPath
-            };
+                // REQ-1-023: The dialog must provide a unique error identifier and instruct the user on how to find logs.
+                string logPath = GetLogDirectoryPath();
 
-            // This should be a fire-and-forget call. The ErrorDialogPresenter
-            // will handle the logic for closing the application.
-            _viewManager.ShowView<object>("ErrorDialogView", viewModel);
+                var dialogMessage = new StringBuilder();
+                dialogMessage.AppendLine("An unexpected error has occurred and the application must close.");
+                dialogMessage.AppendLine("The error has been logged for diagnosis.");
+                dialogMessage.AppendLine();
+                dialogMessage.AppendLine($"<b>Error ID:</b> {correlationId}");
+                dialogMessage.AppendLine();
+                dialogMessage.AppendLine("Please include this ID and the log files when reporting the issue.");
+                dialogMessage.AppendLine($"<b>Log Location:</b> {logPath}");
+
+                var dialogDefinition = new ModalDialogView.DialogDefinition
+                {
+                    Title = "Application Error",
+                    Message = dialogMessage.ToString(),
+                    ConfirmButtonText = "Close Application"
+                };
+
+                // We don't await this because the application is in a terminal state.
+                // We just want to show the dialog and then quit.
+                _viewManager.ShowDialog(dialogDefinition).ContinueWith(_ => QuitApplication());
+            }
+            catch (Exception innerEx)
+            {
+                // Last resort if the logger or view manager fails.
+                Debug.LogError($"CRITICAL FAILURE IN EXCEPTION HANDLER. Correlation ID: {correlationId}. Original Exception: {ex}. Handler Exception: {innerEx}");
+                QuitApplication();
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the path to the log directory, fulfilling REQ-1-020 and REQ-1-023.
+        /// </summary>
+        /// <returns>The absolute path to the log directory.</returns>
+        private string GetLogDirectoryPath()
+        {
+            // REQ-1-020: Log files are stored in a 'logs' subdirectory within the application's data folder at `%APPDATA%/MonopolyTycoon/`.
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string appDirectory = Path.Combine(appDataPath, "MonopolyTycoon");
+            return Path.Combine(appDirectory, "logs");
+        }
+
+        private void QuitApplication()
+        {
+            // In a standalone build, this will close the application.
+            // In the editor, it will stop play mode.
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
     }
 }

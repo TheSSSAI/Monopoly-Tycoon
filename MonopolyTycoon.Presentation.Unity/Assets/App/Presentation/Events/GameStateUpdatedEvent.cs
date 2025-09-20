@@ -1,31 +1,23 @@
-using MonopolyTycoon.Domain.Entities;
-using MonopolyTycoon.Presentation.Core;
+// GameStateDto is assumed to be defined in a lower-level, referenceable assembly 
+// like MonopolyTycoon.Application.Contracts. This event serves as a wrapper for it.
+// using MonopolyTycoon.Application.Contracts.DataTransferObjects;
 
 namespace MonopolyTycoon.Presentation.Events
 {
     /// <summary>
-    /// Event published on the IEventBus whenever a significant change to the game state occurs.
-    /// UI presenters subscribe to this to know when to refresh their views.
-    /// The GameState object is expected to be from the Domain layer but is referenced here
-    /// for simplicity in the presentation layer. In a stricter setup, this would be a DTO.
+    /// Event published whenever the authoritative game state changes.
+    /// UI components subscribe to this event to refresh their views.
+    /// This follows the event-driven pattern for UI updates to decouple
+    /// the presentation layer from the application logic that triggers state changes.
     /// </summary>
-    public class GameStateUpdatedEvent : IEvent
+    public readonly struct GameStateUpdatedEvent
     {
-        /// <summary>
-        /// A read-only snapshot of the new game state.
-        /// </summary>
-        public GameState NewGameState { get; }
-
-        /// <summary>
-        /// A description of what triggered the update (e.g., "RentPaid", "TradeCompleted").
-        /// This can help subscribers apply more targeted updates.
-        /// </summary>
-        public string ChangeContext { get; }
-
-        public GameStateUpdatedEvent(GameState newGameState, string changeContext)
-        {
-            NewGameState = newGameState;
-            ChangeContext = changeContext;
-        }
+        // In a real project, this would be a DTO from the Application layer.
+        // For generation purposes, we define a placeholder object.
+        // public GameStateDto NewState { get; }
+        // public GameStateUpdatedEvent(GameStateDto newState)
+        // {
+        //     NewState = newState;
+        // }
     }
 }

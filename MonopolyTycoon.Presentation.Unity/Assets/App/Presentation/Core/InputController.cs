@@ -1,78 +1,60 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using MonopolyTycoon.Presentation.Core;
-using MonopolyTycoon.Presentation.Events;
-using VContainer;
+using Zenject;
+using MonopolyTycoon.Application.Abstractions;
+using MonopolyTycoon.Presentation.Shared.Events;
+using System;
 
 namespace MonopolyTycoon.Presentation.Core
 {
     /// <summary>
-    /// A persistent singleton responsible for capturing raw input from Unity's Input System
-    /// and translating it into semantic events on the global IEventBus.
-    /// This decouples specific input hardware from the UI/game logic that consumes the actions.
-    /// It requires a PlayerInput component attached to the same GameObject.
+    /// Centralized handler for Unity's Input System.
+    /// It translates low-level input actions into high-level, semantic application events.
+    /// This decouples the rest of the application from the specifics of the input device.
     /// </summary>
-    [RequireComponent(typeof(PlayerInput))]
     public class InputController : MonoBehaviour
     {
-        private IEventBus eventBus;
+        private IEventBus _eventBus;
+        private PlayerInputActions _playerInputActions;
 
         [Inject]
         public void Construct(IEventBus eventBus)
         {
-            this.eventBus = eventBus;
+            _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
-        // These methods are invoked by the PlayerInput component via "Send Messages" broadcast.
-        // Their names must match the Action names in the Input Action Asset.
-
-        public void OnNavigate(InputAction.CallbackContext context)
+        private void Awake()
         {
-            if (context.performed)
-            {
-                eventBus.Publish(new NavigateEvent { Direction = context.ReadValue<Vector2>() });
-            }
+            _playerInputActions = new PlayerInputActions();
         }
 
-        public void OnSubmit(InputAction.CallbackContext context)
+        private void OnEnable()
         {
-            if (context.performed)
-            {
-                eventBus.Publish(new SubmitEvent());
-            }
+            _playerInputActions.UI.Enable();
+            _playerInputActions.UI.Submit.performed += OnSubmitPerformed;
+            _playerInputActions.UI.Cancel.performed += OnCancelPerformed;
+            // Add other subscriptions as needed (e.g., Navigate)
         }
 
-        public void OnCancel(InputAction.CallbackContext context)
+        private void OnDisable()
         {
-            if (context.performed)
-            {
-                eventBus.Publish(new CancelEvent());
-            }
+            _playerInputActions.UI.Submit.performed -= OnSubmitPerformed;
+            _playerInputActions.UI.Cancel.performed -= OnCancelPerformed;
+            _playerInputActions.UI.Disable();
         }
 
-        public void OnPause(InputAction.CallbackContext context)
+        private void OnSubmitPerformed(InputAction.CallbackContext context)
         {
-            if (context.performed)
-            {
-                eventBus.Publish(new PauseEvent());
-            }
+            // Instead of handling logic here, we publish a semantic event
+            // that interested systems (like a UI presenter) can subscribe to.
+            _eventBus.Publish(new SubmitButtonPressedEvent());
+        }
+        
+        private void OnCancelPerformed(InputAction.CallbackContext context)
+        {
+            // Publish a cancel event, useful for closing menus or dialogs
+            // with the 'Escape' key.
+            _eventBus.Publish(new CancelButtonPressedEvent());
         }
     }
-
-    #region Input Event DTOs
-
-    // These simple structs act as event data carriers on the event bus.
-
-    public struct NavigateEvent : IEvent
-    {
-        public Vector2 Direction;
-    }
-
-    public struct SubmitEvent : IEvent { }
-
-    public struct CancelEvent : IEvent { }
-
-    public struct PauseEvent : IEvent { }
-
-    #endregion
 }

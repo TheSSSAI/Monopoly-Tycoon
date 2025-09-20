@@ -1,0 +1,53 @@
+flowchart TD
+    subgraph Legend
+        direction LR
+        legendUserInput[User Action]:::userInput
+        legendSystemProcess[System Process]:::systemProcess
+        legendDecision{Decision Point}:::decision
+        legendError[Error Path]:::errorState
+    end
+
+    A[User selects 'New Game' from Main Menu] --> B[Game Setup Screen is displayed]:::systemProcess
+
+    subgraph "Step 1: Player Profile"
+        B --> C(Enter Profile Name):::userInput
+        C --> D{Validate Name (3-16 chars, no special chars)}:::decision
+        D -- "Invalid (US-012)" --> E[Display specific validation error]:::errorState
+        E --> C
+        D -- "Valid (US-011)" --> F(Select Player Token):::userInput
+    end
+
+    subgraph "Step 2: Opponent Configuration"
+        F --> G{Select Number of AI Opponents (US-009)}:::decision
+        G -- "1 AI" --> H1(Set AI 1 Difficulty):::userInput
+        G -- "2 AIs" --> S2(Configure 2 Opponents)
+        G -- "3 AIs" --> S3(Configure 3 Opponents)
+        
+        subgraph S2 [ ]
+            direction TB
+            H1_2(Set AI 1 Difficulty):::userInput --> H2_2(Set AI 2 Difficulty):::userInput
+        end
+        
+        subgraph S3 [ ]
+            direction TB
+            H1_3(Set AI 1 Difficulty):::userInput --> H2_3(Set AI 2 Difficulty):::userInput
+            H2_3 --> H3_3(Set AI 3 Difficulty):::userInput
+        end
+    end
+
+    subgraph "Step 3: Finalize and Start"
+        H1 --> I(Click 'Start Game'):::userInput
+        S2 --> I
+        S3 --> I
+        I --> J{Final Validation Check}:::decision
+        J -- "Invalid (e.g., no token selected)" --> K[Display error message]:::errorState
+        K --> B
+        J -- "Valid" --> L[Initialize GameState object with all settings]:::systemProcess
+        L --> M[Transition to Game Board Scene]:::systemProcess
+    end
+
+    %% Styling
+    classDef userInput fill:#e3f2fd,stroke:#1976d2,color:#000
+    classDef systemProcess fill:#e8f5e9,stroke:#388e3c,color:#000
+    classDef decision fill:#f3e5f5,stroke:#7b1fa2,color:#000
+    classDef errorState fill:#ffebee,stroke:#d32f2f,color:#000

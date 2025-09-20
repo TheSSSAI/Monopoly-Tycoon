@@ -1,11 +1,10 @@
 {
     "name": "MonopolyTycoon.Presentation.Core.Tests",
-    "rootNamespace": "MonopolyTycoon.Presentation.Tests",
+    "rootNamespace": "MonopolyTycoon.Presentation.Core.Tests",
     "references": [
-        "MonopolyTycoon.Presentation.Core",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "VContainer"
+        "GUID:9e2a510519154d89a244081c73a1103c",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:27619889b8ba6c04792e8a7157a32b21"
     ],
     "includePlatforms": [
         "Editor"
@@ -14,7 +13,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "Moq.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

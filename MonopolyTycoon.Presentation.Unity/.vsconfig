@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "components": [
+    "Microsoft.VisualStudio.Component.CoreEditor",
+    "Microsoft.VisualStudio.Workload.ManagedDesktop",
+    "Microsoft.VisualStudio.Workload.Universal",
+    "Microsoft.VisualStudio.Component.Unity",
+    "Microsoft.VisualStudio.Component.NuGet",
+    "Microsoft.Net.Component.4.7.1.TargetingPack",
+    "Microsoft.NetCore.Component.SDK"
+  ]
+}

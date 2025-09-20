@@ -1,54 +1,50 @@
 using System;
 using System.Collections.Generic;
-using MonopolyTycoon.Presentation.Core;
+using MonopolyTycoon.Presentation.Features.LoadGame.ViewModels;
 
 namespace MonopolyTycoon.Presentation.Features.MainMenu.Views
 {
     /// <summary>
-    /// Defines the contract for the view that displays saved game slots.
-    /// Supports User Stories US-062 and US-063.
+    /// Contract for the Load Game view. This interface allows the presenter
+    /// to interact with the view without any knowledge of its Unity implementation.
     /// </summary>
-    public interface ILoadGameView : IView
+    public interface ILoadGameView
     {
         /// <summary>
-        /// Event fired when the user clicks to load a specific save slot.
-        /// The payload is the slot number (e.g., 0-4).
+        /// Event fired when the user requests to load a game from a specific slot.
         /// </summary>
-        event Action<int> OnLoadSlotClicked;
-        
+        event Action<int> OnLoadGameRequested;
+
+        /// <summary>
+        /// Event fired when the user requests to delete a game from a specific slot.
+        /// </summary>
+        event Action<int> OnDeleteGameRequested;
+
         /// <summary>
         /// Event fired when the user clicks the back button to return to the main menu.
         /// </summary>
-        event Action OnBackClicked;
+        event Action OnBackRequested;
 
         /// <summary>
-        /// Populates the view with the list of save slots and their statuses.
+        /// Populates the view with the metadata for all available save slots.
         /// </summary>
-        /// <param name="saveSlots">A list of view models representing each save slot.</param>
-        void DisplaySaveSlots(List<SaveSlotViewModel> saveSlots);
-    }
+        /// <param name="saveSlots">A list of metadata objects, one for each save slot.</param>
+        void DisplaySaveSlots(IReadOnlyList<SaveGameMetadata> saveSlots);
 
-    /// <summary>
-    /// ViewModel containing the data for a single save slot in the UI.
-    /// </summary>
-    public class SaveSlotViewModel
-    {
-        public int SlotNumber { get; set; }
-        public SaveSlotStatus Status { get; set; }
-        public string PlayerName { get; set; }
-        public string SaveTimestamp { get; set; } // Formatted string
-        public int TurnNumber { get; set; }
-        public string PlayerCashFormatted { get; set; }
-    }
+        /// <summary>
+        /// Shows a loading indicator.
+        /// </summary>
+        void ShowLoading();
 
-    /// <summary>
-    /// Represents the status of a save game slot.
-    /// </summary>
-    public enum SaveSlotStatus
-    {
-        Empty,
-        Valid,
-        Corrupted,
-        IncompatibleVersion
+        /// <summary>
+        /// Hides the loading indicator.
+        /// </summary>
+        void HideLoading();
+
+        /// <summary>
+        /// Shows an error message to the user.
+        /// </summary>
+        /// <param name="message">The error message to display.</param>
+        void ShowError(string message);
     }
 }

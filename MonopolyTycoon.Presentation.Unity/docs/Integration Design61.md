@@ -5,7 +5,7 @@
 | Property | Value |
 |----------|-------|
 | Repository Id | REPO-PU-010 |
-| Extraction Timestamp | 2024-05-21T11:30:00Z |
+| Extraction Timestamp | 2024-05-23T10:00:00Z |
 | Mapping Validation Score | 100% |
 | Context Completeness Score | 100% |
 | Implementation Readiness Level | High |
@@ -20,69 +20,71 @@ REQ-1-014
 
 #### 1.2.1.2 Requirement Text
 
-The application SHALL maintain an average of 60 frames per second (FPS) and not drop below 45 FPS at 1080p resolution on the recommended hardware specifications.
+Sustain an average of 60 FPS and not drop below 45 FPS at 1080p on recommended specs.
 
 #### 1.2.1.3 Validation Criteria
 
-- Application performance measured using a standard profiling tool (e.g., Unity Profiler) under typical gameplay scenarios.
-- FPS must remain within the specified bounds during a 10-minute automated playtest.
+- Application maintains a smooth frame rate during typical gameplay on target hardware.
+- Performance profiling shows frame rate consistency.
 
 #### 1.2.1.4 Implementation Implications
 
-- All calls from the Presentation Layer to the Application Services Layer must be asynchronous to prevent blocking the main rendering thread.
-- UI update logic must be event-driven rather than polling-based to minimize CPU usage in `Update()` loops.
+- Rendering pipelines (URP/HDRP) must be optimized.
+- Draw calls, texture sizes, and shader complexity must be carefully managed.
+- Scripts, especially in Update() loops, must be performant.
 
 #### 1.2.1.5 Extraction Reasoning
 
-This core performance requirement dictates the asynchronous nature of all integration points with lower layers, making it a primary driver for the integration architecture.
+This is a core non-functional requirement explicitly assigned to the Presentation Layer, as it is solely responsible for rendering and performance. The repository's technology guidance directly references this requirement.
 
 ### 1.2.2.0 Requirement Id
 
 #### 1.2.2.1 Requirement Id
 
-REQ-1-073
+REQ-1-071
 
 #### 1.2.2.2 Requirement Text
 
-The system's UI shall use two distinct methods for presenting information: 1) Modal dialogs that halt gameplay must be used for critical human player decisions. 2) Non-intrusive, auto-dismissing notifications must be used for informational events that do not require player input.
+The game MUST provide a complete User Interface (UI) for all player interactions.
 
 #### 1.2.2.3 Validation Criteria
 
-- Landing on an unowned property displays a modal dialog.
-- An AI-to-AI trade displays a non-intrusive notification.
+- All required game actions are accessible through UI elements.
+- UI includes HUD, menus, and modal dialogs as needed.
 
 #### 1.2.2.4 Implementation Implications
 
-- Direct, awaited method calls to application services are used for user-initiated actions that expect a direct response (modal flows).
-- A subscription to a global event bus is required for the UI to react to game events that were not initiated by the user (non-intrusive notifications).
+- Unity's UI system (e.g., UI Toolkit or UGUI) will be used to build all screens.
+- Components like HUDController, ViewManager, and others are needed to manage UI state and visibility.
 
 #### 1.2.2.5 Extraction Reasoning
 
-This requirement explicitly defines the need for two primary integration patterns: direct asynchronous calls for commands and a publish-subscribe model for events, which must be reflected in the dependency interfaces.
+This requirement is a primary responsibility of the Presentation repository, as stated in both the repository's description and the architecture's Presentation Layer definition.
 
 ### 1.2.3.0 Requirement Id
 
 #### 1.2.3.1 Requirement Id
 
-REQ-1-059
+REQ-1-017
 
 #### 1.2.3.2 Requirement Text
 
-The system shall facilitate trading between the human player and AI opponents... When an AI proposes a trade to the human, a modal dialog must be displayed with options to 'Accept', 'Decline', or 'Propose Counter-Offer'.
+All player actions, such as token movement and dice rolls, MUST be clearly animated.
 
 #### 1.2.3.3 Validation Criteria
 
-- The UI can be triggered to display a trade offer from an AI.
-- The player's response is correctly communicated back to the game logic.
+- Dice rolls are visually represented.
+- Player tokens animate their movement from one space to another.
+- Transactions are accompanied by visual feedback.
 
 #### 1.2.3.4 Implementation Implications
 
-- The Presentation Layer must depend on an `ITradeOrchestrationService` to handle trade logic.
-- The UI must subscribe to an event (e.g., `AITradeProposedEvent`) to know when to display the offer dialog.
+- Unity's animation system (Animator, timelines) will be used.
+- The GameBoardPresenter component will be responsible for triggering and managing these animations.
 
 #### 1.2.3.5 Extraction Reasoning
 
-This requirement mandates a specific, complex interaction flow that necessitates dedicated service interfaces (`ITradeOrchestrationService`) and event-driven integration patterns for the UI to function correctly.
+The architecture document explicitly assigns responsibility for executing animations (REQ-1-017) to the Presentation Layer.
 
 ### 1.2.4.0 Requirement Id
 
@@ -92,21 +94,70 @@ REQ-1-023
 
 #### 1.2.4.2 Requirement Text
 
-In the event of an unhandled exception, the system shall display a modal error dialog to the user... The displayed error identifier must directly correlate to a specific entry in the error log.
+The application MUST NOT crash on unhandled exceptions. Instead, it MUST display a modal error dialog to the user.
 
 #### 1.2.4.3 Validation Criteria
 
-- An unhandled exception results in a user-facing dialog.
-- The dialog contains a unique ID that is also present in the log files.
+- An unhandled exception from any layer results in a user-facing dialog, not a crash.
+- The dialog contains a unique error ID for support purposes.
 
 #### 1.2.4.4 Implementation Implications
 
-- A `GlobalExceptionHandler` component in this repository must have a dependency on a logging service (`ILogger`) to write the exception details before showing the UI.
-- This component also needs a dependency on a `ViewManager` or similar UI service to display the error dialog.
+- A global exception handler must be implemented at the application's entry point.
+- A reusable modal dialog prefab must be created in Unity.
+- The ViewManager will be responsible for displaying this dialog.
 
 #### 1.2.4.5 Extraction Reasoning
 
-This reliability requirement necessitates an integration between the top-level Presentation Layer's exception handler and the Infrastructure Layer's logging service, demonstrating a key cross-layer integration point.
+This repository is responsible for the application's composition root and UI, making it the only place to implement a global exception handler that can display a UI dialog as required.
+
+### 1.2.5.0 Requirement Id
+
+#### 1.2.5.1 Requirement Id
+
+REQ-1-093
+
+#### 1.2.5.2 Requirement Text
+
+The game's visual and audio assets MUST be replaceable via a theme system.
+
+#### 1.2.5.3 Validation Criteria
+
+- Assets (models, textures, sounds) can be swapped by changing a configuration.
+- The system can load different asset packs at runtime.
+
+#### 1.2.5.4 Implementation Implications
+
+- Unity's Addressables system must be used for asset management to allow for dynamic loading.
+- Asset references in code and scenes must be indirect (via Addressables) rather than direct.
+
+#### 1.2.5.5 Extraction Reasoning
+
+This is an extensibility requirement that directly impacts how assets are managed and loaded within the Unity environment, a core responsibility of this repository.
+
+### 1.2.6.0 Requirement Id
+
+#### 1.2.6.1 Requirement Id
+
+REQ-1-080
+
+#### 1.2.6.2 Requirement Text
+
+The settings menu shall contain data management options to 'Reset Statistics' and 'Delete Saved Games'.
+
+#### 1.2.6.3 Validation Criteria
+
+- A button in the settings UI triggers the reset statistics workflow.
+- A button in the settings UI triggers the delete all saves workflow.
+
+#### 1.2.6.4 Implementation Implications
+
+- The UI must call a dedicated application service to perform these data management tasks.
+- Confirmation dialogs must be presented before executing destructive actions.
+
+#### 1.2.6.5 Extraction Reasoning
+
+This repository implements the user-facing settings menu and must integrate with the application layer to provide the functionality for these data management options.
 
 ## 1.3.0.0 Relevant Components
 
@@ -118,64 +169,68 @@ CompositionRoot
 
 #### 1.3.1.2 Component Specification
 
-The application's entry point. A MonoBehaviour script in a startup scene responsible for initializing the Dependency Injection (DI) container and wiring together all application layers. It resolves and registers concrete implementations from Infrastructure repositories against the abstract interfaces consumed by the Application and Presentation layers.
+A non-visual component executed at application startup. It is responsible for initializing the Dependency Injection container, registering all services from all layers (Application, Domain, Infrastructure), and starting the main application flow by loading the main menu.
 
 #### 1.3.1.3 Implementation Requirements
 
-- Must run before any other application logic.
-- Must configure and build the DI container, registering all services.
+- Must execute before any other application logic.
+- Must correctly wire concrete implementations (e.g., `SqliteStatisticsRepository`) to their abstractions (e.g., `IStatisticsRepository`).
 
 #### 1.3.1.4 Architectural Context
 
-Presentation Layer. This component embodies the repository's role as the Composition Root.
+Belongs to the Presentation Layer, but acts as the central configuration hub for the entire monolithic application.
 
 #### 1.3.1.5 Extraction Reasoning
 
-This is the most critical integration component, as it establishes all connections between the Presentation Layer and the rest of the application.
+The repository description explicitly states it serves as the application's composition root, which is a critical architectural responsibility for wiring the layered architecture together.
 
 ### 1.3.2.0 Component Name
 
 #### 1.3.2.1 Component Name
 
-MainMenuPresenter
+ViewManager
 
 #### 1.3.2.2 Component Specification
 
-Handles the logic for the main menu, including starting a new game. It translates user input from the `IMainMenuView` into calls to the application services.
+Handles the lifecycle of scenes and UI panels/screens. Responsible for activating, deactivating, and transitioning between different views like the Main Menu, Game Board, and Settings screen.
 
 #### 1.3.2.3 Implementation Requirements
 
-- Must call `IPlayerProfileRepository.GetOrCreateProfileAsync` and `IGameSessionService.StartNewGameAsync`.
+- Manage a collection of UI prefabs.
+- Provide methods to show/hide specific UI panels, often with animations.
+- Handle scene loading and unloading.
 
 #### 1.3.2.4 Architectural Context
 
-Presentation Layer. Presenter in the MVP pattern.
+Belongs to the Presentation Layer. Acts as a high-level controller for the application's overall UI state.
 
 #### 1.3.2.5 Extraction Reasoning
 
-This component demonstrates the consumption of multiple application and repository interfaces to fulfill the 'New Game' use case (REQ-1-030, REQ-1-032).
+This component is explicitly listed in the architecture's Presentation Layer and is essential for managing the UI as required by REQ-1-071.
 
 ### 1.3.3.0 Component Name
 
 #### 1.3.3.1 Component Name
 
-HUDPresenter
+GameBoardPresenter
 
 #### 1.3.3.2 Component Specification
 
-Handles the logic for the main game's Heads-Up Display. It subscribes to game state events to reactively update UI elements with player information.
+Updates the visual state of the 3D game board, including player tokens, properties (houses/hotels), and other visual effects. It subscribes to game state updates and translates them into visual changes.
 
 #### 1.3.3.3 Implementation Requirements
 
-- Must subscribe to `GameStateUpdatedEvent` via an `IEventBus`.
+- Hold references to 3D models for tokens, houses, and hotels.
+- Implement logic to animate token movement between board spaces.
+- Listen for GameStateUpdated events to refresh the visual representation of the board.
 
 #### 1.3.3.4 Architectural Context
 
-Presentation Layer. Presenter in the MVP pattern.
+Belongs to the Presentation Layer. Acts as the Presenter in an MVP pattern for the main game board view.
 
 #### 1.3.3.5 Extraction Reasoning
 
-This component is the primary consumer of the event-driven integration pattern, required to keep the UI synchronized with the game state without direct coupling.
+This component is listed in the architecture and is the primary component responsible for fulfilling rendering and animation requirements (REQ-1-005, REQ-1-017).
 
 ### 1.3.4.0 Component Name
 
@@ -185,24 +240,24 @@ GlobalExceptionHandler
 
 #### 1.3.4.2 Component Specification
 
-A persistent MonoBehaviour that registers itself to handle all unhandled exceptions from the application. It logs the exception details and displays a user-friendly error dialog.
+A non-visual component that registers itself to handle all unhandled exceptions application-wide. It logs the exception details and uses the ViewManager to display a final error dialog to the user.
 
 #### 1.3.4.3 Implementation Requirements
 
-- Must be instantiated by the CompositionRoot.
-- Must have dependencies on `ILogger` and `IViewManager`.
+- Must be instantiated once at startup by the CompositionRoot.
+- Must depend on ILogger and IViewManager.
 
 #### 1.3.4.4 Architectural Context
 
-Presentation Layer. A cross-cutting concern handler.
+Belongs to the Presentation Layer. This is the only layer that can both handle a global event and display a UI element in response.
 
 #### 1.3.4.5 Extraction Reasoning
 
-This component implements the critical reliability requirement REQ-1-023 and is a key integration point for the logging service.
+This component is the direct implementation of the critical reliability requirement REQ-1-023 and is a key integration point between the application's core logic and UI feedback during failure.
 
 ## 1.4.0.0 Architectural Layers
 
-- {'layer_name': 'Presentation Layer', 'layer_responsibilities': "Responsible for all user-facing elements and interactions, including rendering the 3D game, displaying all UI, handling user input, managing animations, and playing audio. It also serves as the application's Composition Root, initializing the DI container.", 'layer_constraints': ['Must not contain any core game rule logic (e.g., rent calculation).', 'Must not perform direct data persistence; all such operations must be delegated to the Application Services Layer through abstract interfaces.'], 'implementation_patterns': ['Model-View-Presenter (MVP)', 'Dependency Injection (as Composition Root)', 'Observer (subscribing to events from lower layers)'], 'extraction_reasoning': "This repository is the sole and complete implementation of the Presentation Layer as defined in the solution's architecture."}
+- {'layer_name': 'Presentation Layer', 'layer_responsibilities': 'Responsible for all user-facing elements and interactions, including rendering the 3D world and 2D UI, handling user input, managing animations, and playing audio/visual effects. Also acts as the Composition Root for the application.', 'layer_constraints': ['Must not contain any core game rule logic (e.g., rent calculation, trade validation).', 'Must not perform direct data access (e.g., reading save files); must delegate all such operations to the Application Services layer.', 'Must be optimized to meet strict performance targets (REQ-1-014).'], 'implementation_patterns': ['Model-View-Presenter (MVP)', 'Dependency Injection (as the Composition Root)', 'Event-Driven (subscribing to game state events)'], 'extraction_reasoning': 'This repository IS the implementation of the Presentation Layer. Its entire scope, responsibilities, and constraints are defined by this architectural layer.'}
 
 ## 1.5.0.0 Dependency Interfaces
 
@@ -210,11 +265,11 @@ This component implements the critical reliability requirement REQ-1-023 and is 
 
 #### 1.5.1.1 Interface Name
 
-IGameSessionService
+Application Service Interfaces
 
 #### 1.5.1.2 Source Repository
 
-REPO-AA-004
+REPO-AS-005
 
 #### 1.5.1.3 Method Contracts
 
@@ -222,7 +277,7 @@ REPO-AA-004
 
 ###### 1.5.1.3.1.1 Method Name
 
-StartNewGameAsync
+IGameSessionService.StartNewGameAsync
 
 ###### 1.5.1.3.1.2 Method Signature
 
@@ -230,47 +285,83 @@ Task StartNewGameAsync(GameSetupOptions options)
 
 ###### 1.5.1.3.1.3 Method Purpose
 
-Initiates the creation of a new game session based on user-selected options from the setup screen.
+Initiates a new game session based on the player's configuration choices from the UI.
 
 ###### 1.5.1.3.1.4 Integration Context
 
-Called from a UI presenter (e.g., MainMenuPresenter) when the user clicks the 'Start Game' button.
+Called from the 'Start Game' button action in the game setup UI.
 
 ##### 1.5.1.3.2.0 Method Name
 
 ###### 1.5.1.3.2.1 Method Name
 
-LoadGameAsync
+ITurnManagementService.ExecutePlayerActionAsync
 
 ###### 1.5.1.3.2.2 Method Signature
 
-Task LoadGameAsync(int slot)
+Task ExecutePlayerActionAsync(PlayerAction action)
 
 ###### 1.5.1.3.2.3 Method Purpose
 
-Loads a previously saved game state from a specified slot.
+Processes a specific game action submitted by the player (e.g., build house, mortgage property).
 
 ###### 1.5.1.3.2.4 Integration Context
 
-Called from the 'Load Game' screen presenter when the user selects a save slot.
+Called from various UI elements like the Property Management screen when the player confirms an action.
 
 ##### 1.5.1.3.3.0 Method Name
 
 ###### 1.5.1.3.3.1 Method Name
 
-SaveGameAsync
+ITradeOrchestrationService.ProposeTradeAsync
 
 ###### 1.5.1.3.3.2 Method Signature
 
-Task SaveGameAsync(int slot)
+Task<TradeResult> ProposeTradeAsync(TradeProposal proposal)
 
 ###### 1.5.1.3.3.3 Method Purpose
 
-Saves the current game state to a specified slot.
+Submits a trade proposal constructed in the UI to the application layer for AI evaluation.
 
 ###### 1.5.1.3.3.4 Integration Context
 
-Called from the in-game pause menu presenter when the user clicks 'Save Game'.
+Called from the trading UI when the player confirms their trade offer.
+
+##### 1.5.1.3.4.0 Method Name
+
+###### 1.5.1.3.4.1 Method Name
+
+IUserDataManagementService.ResetStatisticsAsync
+
+###### 1.5.1.3.4.2 Method Signature
+
+Task ResetStatisticsAsync()
+
+###### 1.5.1.3.4.3 Method Purpose
+
+Triggers the deletion of all historical statistics for the current player.
+
+###### 1.5.1.3.4.4 Integration Context
+
+Called from the settings menu in response to the user action defined in REQ-1-080.
+
+##### 1.5.1.3.5.0 Method Name
+
+###### 1.5.1.3.5.1 Method Name
+
+IStatisticsQueryService.GetTopScoresAsync
+
+###### 1.5.1.3.5.2 Method Signature
+
+Task<List<TopScoreDto>> GetTopScoresAsync()
+
+###### 1.5.1.3.5.3 Method Purpose
+
+Retrieves the high scores list for display in the UI.
+
+###### 1.5.1.3.5.4 Integration Context
+
+Called when the user navigates to the 'Top Scores' screen (REQ-1-091).
 
 #### 1.5.1.4.0.0 Integration Pattern
 
@@ -278,17 +369,17 @@ Dependency Injection
 
 #### 1.5.1.5.0.0 Communication Protocol
 
-In-memory asynchronous method calls.
+In-memory asynchronous method calls
 
 #### 1.5.1.6.0.0 Extraction Reasoning
 
-This is the primary dependency for managing the game's lifecycle. The Presentation Layer orchestrates these high-level actions based on user input, delegating all logic to the Application Layer via this interface.
+This is the primary dependency for the Presentation Layer. It consumes the facades provided by the Application Services Layer to execute all game logic and user-initiated commands, ensuring a clean separation of concerns.
 
 ### 1.5.2.0.0.0 Interface Name
 
 #### 1.5.2.1.0.0 Interface Name
 
-ITurnManagementService
+Cross-Cutting Service Abstractions
 
 #### 1.5.2.2.0.0 Source Repository
 
@@ -296,7 +387,59 @@ REPO-AA-004
 
 #### 1.5.2.3.0.0 Method Contracts
 
-- {'method_name': 'ExecutePlayerActionAsync', 'method_signature': 'Task ExecutePlayerActionAsync(PlayerAction action)', 'method_purpose': 'Processes a specific game action initiated by the player, such as buying property, building a house, or rolling the dice.', 'integration_context': 'Called by various UI presenters (e.g., PropertyManagementPresenter, DiceRollPresenter) in response to user button clicks.'}
+##### 1.5.2.3.1.0 Method Name
+
+###### 1.5.2.3.1.1 Method Name
+
+IApplicationEventBus.Subscribe
+
+###### 1.5.2.3.1.2 Method Signature
+
+void Subscribe<TEvent>(Action<TEvent> handler)
+
+###### 1.5.2.3.1.3 Method Purpose
+
+Allows UI components (Presenters) to subscribe to application-wide events, such as 'GameStateUpdated'.
+
+###### 1.5.2.3.1.4 Integration Context
+
+Used by components like the HUDPresenter and GameBoardPresenter to reactively update the view based on state changes originating from the core logic.
+
+##### 1.5.2.3.2.0 Method Name
+
+###### 1.5.2.3.2.1 Method Name
+
+ILogger.Error
+
+###### 1.5.2.3.2.2 Method Signature
+
+void Error(Exception ex, string messageTemplate, params object[] propertyValues)
+
+###### 1.5.2.3.2.3 Method Purpose
+
+Allows the global exception handler to log detailed error information before displaying a UI dialog.
+
+###### 1.5.2.3.2.4 Integration Context
+
+Called by the GlobalExceptionHandler component to fulfill REQ-1-023.
+
+##### 1.5.2.3.3.0 Method Name
+
+###### 1.5.2.3.3.1 Method Name
+
+IConfigurationProvider.LoadAsync
+
+###### 1.5.2.3.3.2 Method Signature
+
+Task<T?> LoadAsync<T>(string configPath) where T : class
+
+###### 1.5.2.3.3.3 Method Purpose
+
+Allows the presentation layer to load its own configuration or content files, such as the rulebook or localization strings.
+
+###### 1.5.2.3.3.4 Integration Context
+
+Called by UI components responsible for displaying content defined in external files (e.g., the Rulebook screen loading 'rulebook.json' as per REQ-1-083).
 
 #### 1.5.2.4.0.0 Integration Pattern
 
@@ -304,89 +447,11 @@ Dependency Injection
 
 #### 1.5.2.5.0.0 Communication Protocol
 
-In-memory asynchronous method calls.
+In-process method calls
 
 #### 1.5.2.6.0.0 Extraction Reasoning
 
-This dependency allows the UI to submit all player game actions for validation and execution without needing to know any of the underlying game rules, ensuring a clean separation of concerns.
-
-### 1.5.3.0.0.0 Interface Name
-
-#### 1.5.3.1.0.0 Interface Name
-
-ITradeOrchestrationService
-
-#### 1.5.3.2.0.0 Source Repository
-
-REPO-AA-004
-
-#### 1.5.3.3.0.0 Method Contracts
-
-- {'method_name': 'ProposeTradeAsync', 'method_signature': 'Task<TradeResult> ProposeTradeAsync(TradeProposal proposal)', 'method_purpose': 'Submits a trade proposal from the human player to an AI for evaluation.', 'integration_context': 'Called by the `TradePresenter` when the user finalizes and submits a trade offer.'}
-
-#### 1.5.3.4.0.0 Integration Pattern
-
-Dependency Injection
-
-#### 1.5.3.5.0.0 Communication Protocol
-
-In-memory asynchronous method calls.
-
-#### 1.5.3.6.0.0 Extraction Reasoning
-
-This interface is required to handle the complex, multi-step trading use case initiated by the player, as specified in requirements like REQ-1-059 and detailed in user stories.
-
-### 1.5.4.0.0.0 Interface Name
-
-#### 1.5.4.1.0.0 Interface Name
-
-IEventBus
-
-#### 1.5.4.2.0.0 Source Repository
-
-REPO-AA-004
-
-#### 1.5.4.3.0.0 Method Contracts
-
-- {'method_name': 'Subscribe<T>', 'method_signature': 'void Subscribe<T>(Action<T> handler) where T : IEvent', 'method_purpose': 'Allows a UI component to register a callback method that will be invoked when a specific game event occurs.', 'integration_context': 'Called by presenters (e.g., HUDPresenter, GameBoardPresenter) during their initialization to listen for game state changes.'}
-
-#### 1.5.4.4.0.0 Integration Pattern
-
-Publish-Subscribe
-
-#### 1.5.4.5.0.0 Communication Protocol
-
-In-memory event aggregation.
-
-#### 1.5.4.6.0.0 Extraction Reasoning
-
-This dependency is critical for decoupling the UI from the game logic. It allows the UI to react to state changes (e.g., an AI-to-AI trade, cash changing) without the game logic needing any knowledge of the UI, fulfilling the pattern shown in sequence diagrams and REQ-1-073.
-
-### 1.5.5.0.0.0 Interface Name
-
-#### 1.5.5.1.0.0 Interface Name
-
-ILogger
-
-#### 1.5.5.2.0.0 Source Repository
-
-REPO-AA-004
-
-#### 1.5.5.3.0.0 Method Contracts
-
-- {'method_name': 'Error', 'method_signature': 'void Error(Exception ex, string messageTemplate, params object[] propertyValues)', 'method_purpose': 'Logs critical, unhandled exceptions caught by the global exception handler.', 'integration_context': 'Called by the `GlobalExceptionHandler` component before it displays the user-facing error dialog, ensuring the error details are persisted for debugging.'}
-
-#### 1.5.5.4.0.0 Integration Pattern
-
-Dependency Injection
-
-#### 1.5.5.5.0.0 Communication Protocol
-
-In-memory synchronous method calls.
-
-#### 1.5.5.6.0.0 Extraction Reasoning
-
-Required to fulfill the reliability requirement REQ-1-023, which mandates that unhandled exceptions are both logged and displayed to the user. This connects the top-level Presentation Layer to the Infrastructure Layer's logging service.
+The Presentation Layer depends on these cross-cutting abstractions to integrate with services like logging, eventing, and configuration without being tightly coupled to their specific infrastructure implementations.
 
 ## 1.6.0.0.0.0 Exposed Interfaces
 
@@ -396,28 +461,29 @@ Required to fulfill the reliability requirement REQ-1-023, which mandates that u
 
 ### 1.7.1.0.0.0 Framework Requirements
 
-Unity Engine (Latest LTS) with .NET 8. Must adhere to Unity best practices, including the use of prefabs for UI, ScriptableObjects for configuration, and the Addressables system for asset management to support theming (REQ-1-093).
+Must be built using the Unity Engine (Latest LTS) and C# with .NET 8 compatibility. All code must be organized within the MonopolyTycoon.Presentation namespace.
 
 ### 1.7.2.0.0.0 Integration Technologies
 
-- Microsoft.Extensions.DependencyInjection (as the DI Container)
-- An in-process, custom Event Bus for publish-subscribe communication
-- Unity Test Framework for integration testing of presenters and views
+- Unity Test Framework (for playmode and integration tests)
+- Unity Addressables System (for theme support per REQ-1-093)
+- Unity Input System (for handling user input)
+- A Unity-compatible Dependency Injection framework (e.g., Zenject, VContainer)
 
 ### 1.7.3.0.0.0 Performance Constraints
 
-Must maintain an average of 60 FPS (REQ-1-014) and load scenes/saves in under 10 seconds (REQ-1-015). All integration points with lower layers must be asynchronous to prevent blocking the render thread.
+Must maintain an average of 60 FPS on recommended hardware (REQ-1-014). This requires careful management of rendering, physics, and script execution. All service calls to lower layers involving I/O must be asynchronous.
 
 ### 1.7.4.0.0.0 Security Requirements
 
-Not applicable for this client-side repository. No sensitive data is handled or transmitted.
+Not applicable for this repository, as it is a client-side application with no direct handling of sensitive user data or server communication.
 
 ## 1.8.0.0.0.0 Extraction Validation
 
 | Property | Value |
 |----------|-------|
-| Mapping Completeness Check | All repository connections have been identified by... |
-| Cross Reference Validation | The dependencies on interfaces from `REPO-AA-004` ... |
-| Implementation Readiness Assessment | The integration specification is highly actionable... |
-| Quality Assurance Confirmation | Systematic review confirms the integration design ... |
+| Mapping Completeness Check | All repository connections have been fully specifi... |
+| Cross Reference Validation | All extracted elements show strong consistency. Re... |
+| Implementation Readiness Assessment | The context is highly implementation-ready. It pro... |
+| Quality Assurance Confirmation | Systematic analysis confirms that the repository's... |
 

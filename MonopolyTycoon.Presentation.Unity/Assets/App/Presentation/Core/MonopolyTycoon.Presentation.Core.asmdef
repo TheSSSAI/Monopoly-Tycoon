@@ -1,9 +1,10 @@
 {
     "name": "MonopolyTycoon.Presentation.Core",
-    "rootNamespace": "MonopolyTycoon.Presentation",
+    "rootNamespace": "MonopolyTycoon.Presentation.Core",
     "references": [
-        "VContainer",
-        "Unity.InputSystem"
+        "GUID:560b04d448269e2438fb388fa750575f",
+        "GUID:75469AD4D38634E559750D17036D5275",
+        "GUID:f51ebe6a0ceec4240a699833d6309b26"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

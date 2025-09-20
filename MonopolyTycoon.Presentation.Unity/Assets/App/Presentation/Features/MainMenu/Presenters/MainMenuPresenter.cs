@@ -1,136 +1,61 @@
+using MonopolyTycoon.Presentation.Shared.Services;
 using System;
-using System.Threading.Tasks;
-using MonopolyTycoon.Application.Abstractions;
-using MonopolyTycoon.Presentation.Core;
+using UniRx;
+using VContainer.Unity;
+using UnityEngine;
 using MonopolyTycoon.Presentation.Features.MainMenu.Views;
-using VContainer;
-using MonopolyTycoon.Domain.Objects;
 
 namespace MonopolyTycoon.Presentation.Features.MainMenu.Presenters
 {
-    public class MainMenuPresenter : IDisposable
+    public class MainMenuPresenter : IInitializable, IDisposable
     {
-        private readonly IMainMenuView view;
-        private readonly IViewManager viewManager;
-        private readonly IGameSessionService gameSessionService;
-        private readonly IPlayerProfileRepository playerProfileRepository;
+        private readonly IMainMenuView _view;
+        private readonly IViewManager _viewManager;
+        private readonly CompositeDisposable _disposables = new();
 
-        [Inject]
-        public MainMenuPresenter(IMainMenuView view, IViewManager viewManager, IGameSessionService gameSessionService, IPlayerProfileRepository playerProfileRepository)
+        public MainMenuPresenter(IMainMenuView view, IViewManager viewManager)
         {
-            this.view = view;
-            this.viewManager = viewManager;
-            this.gameSessionService = gameSessionService;
-            this.playerProfileRepository = playerProfileRepository;
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _viewManager = viewManager ?? throw new ArgumentNullException(nameof(viewManager));
         }
 
         public void Initialize()
         {
-            view.OnNewGameClicked += HandleNewGameClicked;
-            view.OnLoadGameClicked += HandleLoadGameClicked;
-            view.OnSettingsClicked += HandleSettingsClicked;
-            view.OnQuitClicked += HandleQuitClicked;
-            view.OnPlayerNameChanged += HandlePlayerNameChanged;
-
-            // Set initial state
-            view.SetPlayerName("");
-            view.SetNewGameButtonInteractable(false);
+            _view.OnNewGameClicked.Subscribe(_ => OnNewGame()).AddTo(_disposables);
+            _view.OnLoadGameClicked.Subscribe(_ => OnLoadGame()).AddTo(_disposables);
+            _view.OnSettingsClicked.Subscribe(_ => OnSettings()).AddTo(_disposables);
+            _view.OnQuitClicked.Subscribe(_ => OnQuit()).AddTo(_disposables);
         }
 
-        private void HandlePlayerNameChanged(string newName)
+        private void OnNewGame()
         {
-            // REQ-1-032: The display name input must be validated to be between 3 and 16 characters long and must not contain special characters.
-            var validationResult = PlayerProfile.ValidateDisplayName(newName);
-            view.SetNewGameButtonInteractable(validationResult.IsValid);
-            if (validationResult.IsValid)
-            {
-                view.HideValidationError();
-            }
-            else
-            {
-                view.ShowValidationError(validationResult.ErrorMessage);
-            }
+            // US-008: Start a new game from the main menu
+            _viewManager.ShowScreenAsync(Screen.GameSetup).Forget();
         }
 
-        private async void HandleNewGameClicked()
+        private void OnLoadGame()
         {
-            var playerName = view.GetPlayerName().Trim();
-            var validationResult = PlayerProfile.ValidateDisplayName(playerName);
-
-            if (!validationResult.IsValid)
-            {
-                view.ShowValidationError(validationResult.ErrorMessage);
-                return;
-            }
-
-            await StartNewGameAsync(playerName);
+            // US-062: Load a game from a previously saved slot
+            _viewManager.ShowScreenAsync(Screen.LoadGame).Forget();
         }
 
-        private async Task StartNewGameAsync(string playerName)
+        private void OnSettings()
         {
-            // This would normally be a more complex flow involving a dedicated game setup screen.
-            // For now, we create a default game setup.
-            try
-            {
-                await viewManager.ShowLoadingScreenAsync("Creating new game...");
-
-                // Get or create player profile
-                var profile = await playerProfileRepository.GetOrCreateProfileAsync(playerName);
-                
-                // Create default game setup options. In a full implementation, these would be gathered from the setup screen UI.
-                var gameSetup = new GameSetupOptions
-                {
-                    PlayerProfileId = profile.Id,
-                    HumanPlayerName = profile.DisplayName,
-                    HumanPlayerTokenId = "token.classic.car", // Default token
-                    AIPlayers = new System.Collections.Generic.List<AISetupOptions>
-                    {
-                        new AISetupOptions { Name = "AI-Bot 1", Difficulty = AIDifficulty.Medium }
-                    }
-                };
-                
-                await gameSessionService.StartNewGameAsync(gameSetup);
-
-                await viewManager.LoadSceneAsync("GameBoardScene");
-            }
-            catch (Exception ex)
-            {
-                // In a real scenario, we would show a specific error dialog
-                Debug.LogError($"Failed to start new game: {ex.Message}");
-                await viewManager.ShowErrorDialogAsync("Failed to Start Game", "An unexpected error occurred while creating the new game. Please check the logs for more details.");
-            }
-            finally
-            {
-                await viewManager.HideLoadingScreenAsync();
-            }
+            _viewManager.ShowScreenAsync(Screen.Settings).Forget();
         }
 
-        private async void HandleLoadGameClicked()
+        private void OnQuit()
         {
-            await viewManager.ShowViewAsync<LoadGamePresenter>("LoadGameView");
-        }
-
-        private async void HandleSettingsClicked()
-        {
-            await viewManager.ShowViewAsync<object>("SettingsView"); // Assuming a generic view for settings
-        }
-
-        private void HandleQuitClicked()
-        {
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
-            #else
+#else
             Application.Quit();
-            #endif
+#endif
         }
 
         public void Dispose()
         {
-            view.OnNewGameClicked -= HandleNewGameClicked;
-            view.OnLoadGameClicked -= HandleLoadGameClicked;
-            view.OnSettingsClicked -= HandleSettingsClicked;
-            view.OnQuitClicked -= HandleQuitClicked;
-            view.OnPlayerNameChanged -= HandlePlayerNameChanged;
+            _disposables.Dispose();
         }
     }
 }

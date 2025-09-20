@@ -1,0 +1,41 @@
+sequenceDiagram
+    actor User
+    participant PresentationLayer as "Presentation Layer (Unity UI)"
+    participant AppServices as "Application Services Layer"
+    participant DomainLayer as "Domain Layer"
+    participant InfraLayer as "Infrastructure Layer"
+
+    User->>PresentationLayer: 1. Enters profile name, selects token, configures AIs
+    User->>PresentationLayer: 2. Clicks 'Start Game'
+
+    activate PresentationLayer
+    PresentationLayer->>PresentationLayer: 3. Validate user input (name, selections)
+
+    alt Input is Valid
+        PresentationLayer->>AppServices: 4. StartNewGameAsync(GameSetupDTO)
+        activate AppServices
+
+        AppServices->>InfraLayer: 5. GetOrCreateProfileAsync(playerName)
+        activate InfraLayer
+        InfraLayer->>InfraLayer: 5.1 Access SQLite DB to find or create profile
+        InfraLayer-->>AppServices: 5.2 Returns PlayerProfile object
+        deactivate InfraLayer
+
+        AppServices->>DomainLayer: 6. GameStateFactory.Create(gameSetup, playerProfile)
+        activate DomainLayer
+        DomainLayer->>DomainLayer: 6.1 Initialize game state (players, cash, decks, board)
+        DomainLayer-->>AppServices: 6.2 Returns new GameState instance
+        deactivate DomainLayer
+
+        AppServices->>AppServices: 7. SetCurrentSession(gameState)
+        AppServices-->>PresentationLayer: 8. Returns SuccessResult
+        deactivate AppServices
+
+        PresentationLayer->>PresentationLayer: 9. Transition to Game Board Scene
+
+    else Input is Invalid
+        PresentationLayer->>User: Show validation error message
+    end
+    deactivate PresentationLayer
+
+    note over AppServices, InfraLayer: The Application Service orchestrates the creation process, decoupling the Presentation Layer from the data and business logic layers. It uses the Infrastructure Layer to handle data persistence for the player's profile.

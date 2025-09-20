@@ -1,0 +1,50 @@
+graph TD
+    subgraph User
+        Player["<fa:fa-user> Human Player"];
+    end
+
+    subgraph "Presentation Layer (Unity)"
+        UI["Game View (3D Board)<br/>HUD, Modals & Menus<br/>Input Handlers"];
+    end
+
+    subgraph "Application Services Layer"
+        Services["GameSessionService<br/>TurnManagementService<br/>PropertyActionService"];
+    end
+
+    subgraph "Domain Logic Layer (Core Rules)"
+        Domain["<b>RuleEngine</b><br/>GameState & PlayerState<br/>AI Behavior Tree"];
+    end
+
+    subgraph "Infrastructure Layer"
+        Infra["Repositories (SaveGame, Statistics)<br/>LoggingService (Serilog)<br/>Configuration Readers (JSON)"];
+    end
+    
+    subgraph "Data & External Systems (Local)"
+        Data["<fa:fa-database> SQLite Database<br/><fa:fa-file-code> JSON Files<br/><fa:fa-file-alt> Log Files"];
+    end
+
+    %% --- Control Flow --- %% 
+    Player -- "User Input" --> UI;
+    UI -- "Sends Commands<br/>(e.g., BuildHouseRequest)" --> Services;
+    Services -- "Uses Core Logic &<br/>Mutates State" --> Domain;
+    Services -- "Requests Persistence" --> Infra;
+    
+    %% --- Data Flow --- %%
+    Domain -- "Publishes Events" --> Services
+    Services -- "Publishes ViewModels/Events" --> UI
+    Infra -- "Reads/Writes Data" --> Data;
+
+    %% --- Styling --- %%
+    classDef user fill:#E6F0F6,stroke:#0C537F,color:#063A5B;
+    classDef presentation fill:#BEDAED,stroke:#0C537F,color:#063A5B;
+    classDef application fill:#94C3E3,stroke:#0C537F,color:#063A5B;
+    classDef domain fill:#1987C7,stroke:#063A5B,color:white;
+    classDef infrastructure fill:#126DA3,stroke:#063A5B,color:white;
+    classDef data fill:#E8E5E1,stroke:#7D7871,color:#1C1A17;
+
+    class Player user;
+    class UI presentation;
+    class Services application;
+    class Domain domain;
+    class Infra infrastructure;
+    class Data data;

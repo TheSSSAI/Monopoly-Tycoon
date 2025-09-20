@@ -1,0 +1,28 @@
+{
+  "AIOpponents": {
+    "Easy": {
+      "PropertyAcquisitionWeight": 0.4,
+      "MonopolyCompletionWeight": 0.2,
+      "CashReserveLevel": 500,
+      "TradeAcceptanceThreshold": -0.3,
+      "RiskAversion": 0.8,
+      "HouseBuildingThreshold": 1000
+    },
+    "Medium": {
+      "PropertyAcquisitionWeight": 0.7,
+      "MonopolyCompletionWeight": 0.6,
+      "CashReserveLevel": 300,
+      "TradeAcceptanceThreshold": 0.1,
+      "RiskAversion": 0.5,
+      "HouseBuildingThreshold": 500
+    },
+    "Hard": {
+      "PropertyAcquisitionWeight": 0.9,
+      "MonopolyCompletionWeight": 1.0,
+      "CashReserveLevel": 150,
+      "TradeAcceptanceThreshold": 0.4,
+      "RiskAversion": 0.2,
+      "HouseBuildingThreshold": 250
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "rules": [
+    {
+      "title": "Object of the Game",
+      "content": "The object of the game is to become the wealthiest player through buying, renting and selling property. The game ends when only one player remains who is not bankrupt."
+    },
+    {
+      "title": "Equipment & Preparation",
+      "content": "The equipment consists of a board, 2 dice, tokens, 32 houses, 12 hotels, Chance and Community Chest cards, Title Deed cards for each property, and money. To prepare, place the board on a table. Place the Chance and Community Chest cards face down on their allotted spaces on the board. Each player chooses one token to represent them on their trip around the board. Each player is given $1500 divided as follows: two each of $500s, $100s and $50s; six $20s; five each of $10s, $5s and $1s."
+    },
+    {
+      "title": "The Bank",
+      "content": "The Bank holds all Title Deed cards, houses and hotels prior to purchase. The Bank pays salaries and bonuses. It sells and auctions properties and hands out the proper Title Deed cards; it sells houses and hotels to the players and loans money when required on mortgages. The Bank collects all taxes, fines, loans and interest, and the price of all properties which it sells and auctions. The Bank never 'goes broke'. If the Bank runs out of money, the Banker may issue as much more as may be needed by writing on any ordinary paper."
+    },
+    {
+      "title": "Gameplay",
+      "content": "Starting with the Banker, each player in turn throws the dice. The player with the highest total starts the play. They place their token on the corner marked 'GO', throw the two dice and move their token in the direction of the arrow the number of spaces indicated by the dice. After they have completed their play, the turn passes to the left. The tokens remain on the spaces occupied and proceed from that point on the player's next turn. Two or more tokens may rest on the same space at the same time."
+    },
+    {
+      "title": "Passing 'GO'",
+      "content": "Each time a player's token lands on or passes over 'GO', whether by a throw of the dice or by drawing a card, the Banker pays them a $200 salary. A player does not collect $200 if they are sent to Jail."
+    },
+    {
+      "title": "Buying Property",
+      "content": "Whenever a player lands on an unowned property they may buy that property from the Bank at its printed price. They receive the Title Deed card showing ownership. If they do not wish to buy the property, the Bank sells it at auction to the highest bidder. Any player, including the one who declined the option to buy it at the printed price, may bid. Bidding may start at any price."
+    },
+
+    {
+      "title": "Paying Rent",
+      "content": "When a player lands on property owned by another player, the owner collects rent from them in accordance with the list printed on its Title Deed card. If the property is mortgaged, no rent can be collected. It is an advantage to hold all the Title Deed cards in a color group (a monopoly) because the owner may then charge double rent for undeveloped properties in that color group."
+    },
+    {
+      "title": "Jail",
+      "content": "A player is sent to Jail if: (1) Their token lands on the space marked 'Go to Jail'; (2) They draw a card marked 'Go to Jail'; (3) They throw doubles three times in succession.\n\nA player gets out of Jail by: (1) Throwing doubles on any of their next three turns; (2) Using a 'Get Out of Jail Free' card; (3) Paying a $50 fine before they throw the dice on either of their next two turns. If a player does not throw doubles on their third turn, they must pay the $50 fine. They then get out of Jail and immediately move forward the number of spaces shown by their throw."
+    },
+    {
+      "title": "Houses & Hotels",
+      "content": "When a player owns all the properties in a color group, they may buy houses from the Bank. A player must build evenly: they cannot erect a second house on any one property of a color group until they have erected one house on every property of that group. A player may then build a hotel on any property of a complete color-group once it has four houses. They return the four houses to the Bank and pay the price for the hotel as shown on the Title Deed. Only one hotel may be erected on any one property."
+    },
+    {
+      "title": "Building Shortages",
+      "content": "The Bank has a limited supply of 32 houses and 12 hotels. If the buildings are all sold, no more can be built until other players sell theirs back. If multiple players wish to buy the last available building(s), they must be sold at auction to the highest bidder."
+    },
+    {
+      "title": "Mortgages",
+      "content": "Undeveloped properties can be mortgaged through the Bank at any time. The mortgage value is printed on each Title Deed card. No rent can be collected on mortgaged properties. In order to lift the mortgage, the owner must pay the Bank the amount of the mortgage plus 10% interest."
+    },
+    {
+      "title": "Bankruptcy",
+      "content": "A player is bankrupt if they owe more than they can pay either to another player or to the Bank. If their debt is to another player, they must turn over all that they have of value to that player and retire from the game. If bankrupt to the Bank, the player must turn over all assets to the Bank. The Bank then immediately sells by auction all property so taken, except for buildings. A bankrupt player must immediately retire from the game."
+    }
+  ]
+}

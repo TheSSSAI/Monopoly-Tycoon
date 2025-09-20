@@ -2,10 +2,10 @@
   "version": "1.0",
   "components": [
     "Microsoft.VisualStudio.Component.CoreEditor",
-    "Microsoft.VisualStudio.Workload.NetDesktop",
-    "Microsoft.VisualStudio.Component.ManagedDesktop.Core",
-    "Microsoft.Net.Component.8.0.SDK",
+    "Microsoft.VisualStudio.Workload.ManagedDesktop",
+    "Microsoft.VisualStudio.Workload.NetCoreTools",
     "Microsoft.VisualStudio.Component.Git",
+    "Microsoft.NetCore.Component.SDK",
     "Microsoft.VisualStudio.Component.Unity"
   ]
 }

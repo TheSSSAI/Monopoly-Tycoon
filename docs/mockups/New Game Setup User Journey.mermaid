@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph "Application Start"
+        Start[Launch Monopoly Tycoon] --> MainMenu[Main Menu Screen]
+    end
+
+    MainMenu -->|User clicks 'New Game'| SetupScreen
+
+    subgraph "Game Setup Screen"
+        SetupScreen[Start] --> EnterName(1. Enter Profile Name)
+        EnterName --> ValidateName{Is Name Valid?
+(3-16 chars, no special chars)}
+        ValidateName -->|No| ShowError[Display Validation Error]
+        ShowError --> EnterName
+        ValidateName -->|Yes| SelectToken(2. Select Player Token)
+        SelectToken --> SelectAICount(3. Configure Number of AI Opponents)
+        SelectAICount --> SetAIDifficulty(4. Set Difficulty for each AI)
+        SetAIDifficulty --> StartGameBtn(5. User clicks 'Start Game')
+    end
+
+    StartGameBtn --> CreateSession[System Initializes GameState]
+    CreateSession --> LoadScene[Load Game Board Scene]
+    LoadScene --> GameStart((Game Starts))
+
+    %% Styling
+    style Start fill:#e8f5e8,stroke:#4caf50,color:#000
+    style GameStart fill:#e8f5e8,stroke:#4caf50,color:#000
+    classDef processNode fill:#e3f2fd,stroke:#2196f3,color:#000
+    classDef decisionNode fill:#fff9c4,stroke:#fbc02d,color:#000
+    classDef errorNode fill:#ffebee,stroke:#d32f2f,color:#000
+
+    class MainMenu,EnterName,SelectToken,SelectAICount,SetAIDifficulty,StartGameBtn,CreateSession,LoadScene processNode
+    class ValidateName decisionNode
+    class ShowError errorNode

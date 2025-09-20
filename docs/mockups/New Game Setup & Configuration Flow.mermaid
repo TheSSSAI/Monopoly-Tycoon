@@ -1,0 +1,42 @@
+flowchart TD
+    subgraph "User Journey"
+        A[User on Main Menu] --> B["Clicks 'New Game' button"] 
+        B --> C(Game Setup Screen)
+
+        subgraph "Player Configuration (on Setup Screen)"
+            C --> C1[1. Enter Profile Name]
+            C1 --> C2{Validate Name<br/>(REQ-1-032)}
+            C2 -- Invalid --> C3[Show Validation Error] --> C1
+            C2 -- Valid --> C4[2. Select 1-3 AI Opponents<br/>(REQ-1-029)]
+            C4 --> C5[3. Set Difficulty for each AI<br/>(Easy/Medium/Hard) (REQ-1-030)]
+            C5 --> C6[4. Select Player Token<br/>(REQ-1-035)]
+        end
+
+        C6 --> D["Clicks 'Start Game' button"]
+    end
+
+    subgraph "System Process"
+        D --> E{Is Configuration Valid?}
+        E -- No --> F[Display Error Message] --> C
+
+        E -- Yes --> G[Initiate Game Session]
+        G --> G1["Get/Create Player Profile (SQLite DB)<br/>REQ-1-089"]
+        G1 --> G2["Initialize GameState Object<br/>REQ-1-041"]
+        G2 --> G3["- Create PlayerState for Human & AIs<br/>- Set starting cash ($1500)<br/>- Assign unique tokens to AIs<br/>- Shuffle Card Decks"]
+        G3 --> H["Load Main Game Scene<br/>REQ-1-002"]
+    end
+
+    H --> I([Game Begins])
+
+    %% Styling
+    classDef userAction fill:#E6F0F6,stroke:#126DA3,color:#063A5B
+    classDef screenState fill:#FBE9EC,stroke:#5A0A15,color:#5A0A15,font-weight:bold
+    classDef systemProcess fill:#e8f5e8,stroke:#1E8449,color:#000
+    classDef decision fill:#fff3e0,stroke:#f57c00
+    classDef finalState fill:#1987C7,stroke:#063A5B,color:#fff,font-weight:bold
+
+    class B,D userAction
+    class C,H screenState
+    class G,G1,G2,G3 systemProcess
+    class E,C2 decision
+    class I finalState

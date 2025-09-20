@@ -1,107 +1,121 @@
-using System;
-using System.Threading.Tasks;
 using MonopolyTycoon.Application.Abstractions;
-using MonopolyTycoon.Presentation.Core;
+using MonopolyTycoon.Application.DataObjects;
 using MonopolyTycoon.Presentation.Features.MainMenu.Views;
-using VContainer;
+using System;
+using System.Linq;
+using VContainer.Unity;
 
 namespace MonopolyTycoon.Presentation.Features.MainMenu.Presenters
 {
-    public class LoadGamePresenter : IDisposable
+    public class LoadGamePresenter : IInitializable, IDisposable
     {
-        private readonly ILoadGameView view;
-        private readonly IViewManager viewManager;
-        private readonly IGameSessionService gameSessionService;
+        private readonly ILoadGameView _view;
+        private readonly IGameSessionService _gameSessionService;
+        private readonly IViewManager _viewManager;
 
-        private int selectedSlot = -1;
-
-        [Inject]
-        public LoadGamePresenter(ILoadGameView view, IViewManager viewManager, IGameSessionService gameSessionService)
+        public LoadGamePresenter(ILoadGameView view, IGameSessionService gameSessionService, IViewManager viewManager)
         {
-            this.view = view;
-            this.viewManager = viewManager;
-            this.gameSessionService = gameSessionService;
+            _view = view ?? throw new ArgumentNullException(nameof(view));
+            _gameSessionService = gameSessionService ?? throw new ArgumentNullException(nameof(gameSessionService));
+            _viewManager = viewManager ?? throw new ArgumentNullException(nameof(viewManager));
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
-            view.OnLoadClicked += HandleLoadClicked;
-            view.OnBackClicked += HandleBackClicked;
-            view.OnSlotSelected += HandleSlotSelected;
-
-            await PopulateSaveSlots();
+            _view.OnLoadGameClicked += HandleLoadGameClicked;
+            _view.OnBackClicked += HandleBackClicked;
+            PopulateSaveSlots();
         }
 
-        private async Task PopulateSaveSlots()
+        public void Dispose()
         {
+            _view.OnLoadGameClicked -= HandleLoadGameClicked;
+            _view.OnBackClicked -= HandleBackClicked;
+        }
+
+        private async void PopulateSaveSlots()
+        {
+            _view.ShowLoading(true);
             try
             {
-                view.SetLoadingState(true);
-                var saveFilesMetadata = await gameSessionService.GetSaveGameMetadataAsync();
+                var metadataList = await _gameSessionService.GetAllSaveGameMetadataAsync();
 
-                view.ClearSlots();
-                foreach (var metadata in saveFilesMetadata)
+                // US-062 AC-003: All save slots are displayed as 'Empty'
+                var viewModels = Enumerable.Range(1, 5).Select(slotNumber =>
                 {
-                    // Fulfills REQ-1-088: Check the integrity and version compatibility
-                    // The Application service handles the logic and provides a simple status.
-                    // The Presenter just translates this status to the View.
-                    view.AddSaveSlot(
-                        metadata.SlotNumber,
-                        metadata.Status.ToString(), // "Valid", "Corrupted", "Incompatible"
-                        metadata.SaveTimestamp.ToString("yyyy-MM-dd HH:mm:ss"),
-                        $"Turn: {metadata.TurnNumber}",
-                        metadata.Status == SaveGameStatus.Valid);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Error populating save slots: {e.Message}");
-                await viewManager.ShowErrorDialogAsync("Error Loading Saves", "Could not retrieve save game information.");
-            }
-            finally
-            {
-                view.SetLoadingState(false);
-                view.SetLoadButtonInteractable(false);
-            }
-        }
-        
-        private void HandleSlotSelected(int slotNumber)
-        {
-            selectedSlot = slotNumber;
-            view.SetLoadButtonInteractable(selectedSlot != -1);
-        }
+                    var data = metadataList.FirstOrDefault(m => m.SlotNumber == slotNumber);
+                    if (data == null)
+                    {
+                        return new ViewModels.SaveGameMetadata
+                        {
+                            SlotNumber = slotNumber,
+                            Status = ViewModels.SaveStatus.Empty
+                        };
+                    }
+                    
+                    // US-063 & REQ-1-088: Handle corrupted and incompatible files
+                    return new ViewModels.SaveGameMetadata
+                    {
+                        SlotNumber = data.SlotNumber,
+                        SaveTimestamp = data.SaveTimestamp.ToString("g"), // General short date/time
+                        PlayerName = data.PlayerName,
+                        TurnNumber = data.TurnNumber,
+                        Status = data.Status switch
+                        {
+                            SaveFileStatus.Valid => ViewModels.SaveStatus.Valid,
+                            SaveFileStatus.Corrupted => ViewModels.SaveStatus.Corrupted,
+                            SaveFileStatus.IncompatibleVersion => ViewModels.SaveStatus.Incompatible,
+                            _ => ViewModels.SaveStatus.Empty
+                        }
+                    };
+                }).ToList();
 
-        private async void HandleLoadClicked()
-        {
-            if (selectedSlot < 0) return;
-
-            try
-            {
-                await viewManager.ShowLoadingScreenAsync($"Loading game from slot {selectedSlot + 1}...");
-                await gameSessionService.LoadGameAsync(selectedSlot);
-                await viewManager.LoadSceneAsync("GameBoardScene");
+                _view.DisplaySaveSlots(viewModels);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to load game from slot {selectedSlot}: {ex.Message}");
-                await viewManager.ShowErrorDialogAsync("Load Failed", $"Could not load game from slot {selectedSlot + 1}. The file may be corrupt or incompatible.");
+                // In a real app, inject ILogger and log this exception
+                Debug.LogError($"Failed to populate save slots: {ex.Message}");
+                _view.ShowError("Could not retrieve save games. Please check the log for details.");
             }
             finally
             {
-                await viewManager.HideLoadingScreenAsync();
+                _view.ShowLoading(false);
+            }
+        }
+
+        private async void HandleLoadGameClicked(int slotNumber)
+        {
+            _view.ShowLoading(true);
+            try
+            {
+                var success = await _gameSessionService.LoadGameAsync(slotNumber);
+                if (success)
+                {
+                    // US-062: ...the game transitions to the main gameplay scene...
+                    await _viewManager.ShowScreen(Screen.GameBoard);
+                }
+                else
+                {
+                    _view.ShowError($"Failed to load game from slot {slotNumber}.");
+                    PopulateSaveSlots(); // Refresh the view in case status changed
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error loading game from slot {slotNumber}: {ex.Message}");
+                _view.ShowError("An unexpected error occurred while loading the game.");
+            }
+            finally
+            {
+                // This might not be reached if scene transition is immediate
+                _view.ShowLoading(false);
             }
         }
 
         private void HandleBackClicked()
         {
-            viewManager.CloseView(this);
-        }
-
-        public void Dispose()
-        {
-            view.OnLoadClicked -= HandleLoadClicked;
-            view.OnBackClicked -= HandleBackClicked;
-            view.OnSlotSelected -= HandleSlotSelected;
+            _viewManager.ShowScreen(Screen.MainMenu);
         }
     }
 }

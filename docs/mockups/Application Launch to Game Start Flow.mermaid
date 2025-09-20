@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph "Application Startup"
+        A[User launches MonopolyTycoon.exe] --> B[Splash Screen is displayed while assets load]
+    end
+
+    B --> C[Main Menu Screen is displayed]
+
+    subgraph "User Configuration"
+        C --> D["User clicks 'New Game'"]
+        D --> E[Game Setup Screen is displayed]
+        E --> E1[1. User enters profile name]
+        E1 --> E2[2. User selects player token]
+        E2 --> E3[3. User configures AI opponents and difficulties]
+        
+        E3 --> F{Is configuration valid?<br/>(e.g., name entered, token selected)}
+        F -->|No| G[Show validation error<br/>'Start Game' button disabled]
+        G --> E1
+        
+        F -->|Yes| H["User clicks 'Start Game'"]
+    end
+
+    subgraph "Game Initialization"
+        H --> I[System creates GameState object<br/>with user configuration]
+        I --> J[Transition to Game Board Scene]
+    end
+
+    J --> K([Game Session Begins])
+
+    %% Styling
+    classDef userAction fill:#E6F0F6,stroke:#126DA3,color:#063A5B
+    classDef systemProcess fill:#F7F5F2,stroke:#7D7871,color:#1C1A17
+    classDef decision fill:#FBE9EC,stroke:#D7263D,color:#5A0A15
+    classDef finalState fill:#e8f5e9,stroke:#1e8449,color:#000
+
+    class A,D,H userAction
+    class B,C,E,E1,E2,E3,G,I,J systemProcess
+    class F decision
+    class K finalState
