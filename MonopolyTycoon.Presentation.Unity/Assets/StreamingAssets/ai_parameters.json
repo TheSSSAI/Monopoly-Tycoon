@@ -1,28 +1,29 @@
 {
-  "AIOpponents": {
-    "Easy": {
-      "PropertyAcquisitionWeight": 0.4,
-      "MonopolyCompletionWeight": 0.2,
-      "CashReserveLevel": 500,
-      "TradeAcceptanceThreshold": -0.3,
-      "RiskAversion": 0.8,
-      "HouseBuildingThreshold": 1000
-    },
-    "Medium": {
-      "PropertyAcquisitionWeight": 0.7,
-      "MonopolyCompletionWeight": 0.6,
-      "CashReserveLevel": 300,
-      "TradeAcceptanceThreshold": 0.1,
-      "RiskAversion": 0.5,
-      "HouseBuildingThreshold": 500
-    },
-    "Hard": {
-      "PropertyAcquisitionWeight": 0.9,
-      "MonopolyCompletionWeight": 1.0,
-      "CashReserveLevel": 150,
-      "TradeAcceptanceThreshold": 0.4,
-      "RiskAversion": 0.2,
-      "HouseBuildingThreshold": 250
-    }
+  "Easy": {
+    "propertyAcquisitionUrgency": 0.4,
+    "monopolyFocusFactor": 1.2,
+    "tradingAcceptanceThreshold": -0.2,
+    "buildingStrategy": "Late",
+    "financialRiskAversion": 0.1,
+    "blockOpponentTradeValue": 0,
+    "jailPaymentStrategy": "RollFirst"
+  },
+  "Medium": {
+    "propertyAcquisitionUrgency": 0.75,
+    "monopolyFocusFactor": 2.0,
+    "tradingAcceptanceThreshold": 0.1,
+    "buildingStrategy": "OnMonopolyComplete",
+    "financialRiskAversion": 0.4,
+    "blockOpponentTradeValue": 50,
+    "jailPaymentStrategy": "PayIfMonopolyThreat"
+  },
+  "Hard": {
+    "propertyAcquisitionUrgency": 1.0,
+    "monopolyFocusFactor": 3.5,
+    "tradingAcceptanceThreshold": 0.3,
+    "buildingStrategy": "Aggressive",
+    "financialRiskAversion": 0.6,
+    "blockOpponentTradeValue": 150,
+    "jailPaymentStrategy": "PayImmediately"
   }
 }

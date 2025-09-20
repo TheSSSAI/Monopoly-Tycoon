@@ -1,138 +1,156 @@
-using MonopolyTycoon.Application.Abstractions;
-using MonopolyTycoon.Presentation.Shared.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MonopolyTycoon.Presentation.Shared.Events;
+using MonopolyTycoon.Application.Abstractions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VContainer;
-using VContainer.Unity;
+using MonopolyTycoon.Presentation.Shared.Views;
+using Zenject;
 
 namespace MonopolyTycoon.Presentation.Shared.Services
 {
     public class ViewManager : IViewManager
     {
-        private readonly IObjectResolver _container;
         private readonly IAssetProvider _assetProvider;
+        private readonly IInstantiator _instantiator;
+        private readonly Dictionary<Screen, GameObject> _loadedScreens = new();
+        private readonly Stack<Screen> _screenStack = new();
 
-        private readonly Dictionary<Screen, GameObject> _activeScreens = new();
-        private readonly Dictionary<string, Screen> _sceneToScreenMap = new()
+        private GameObject _activeScreen;
+        private LoadingSpinnerView _loadingSpinner;
+
+        public ViewManager(IAssetProvider assetProvider, IInstantiator instantiator)
         {
-            { "MainMenu", Screen.MainMenu },
-            { "GameBoard", Screen.GameBoard }
-        };
-
-        private Screen _currentScreen = Screen.None;
-
-        public ViewManager(IObjectResolver container, IAssetProvider assetProvider)
-        {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
             _assetProvider = assetProvider ?? throw new ArgumentNullException(nameof(assetProvider));
+            _instantiator = instantiator ?? throw new ArgumentNullException(nameof(instantiator));
         }
 
         public async Task ShowScreen(Screen screen, object payload = null)
         {
-            if (_currentScreen != Screen.None && _currentScreen != Screen.MainMenu && _activeScreens.TryGetValue(_currentScreen, out var currentView))
+            if (_activeScreen != null)
             {
-                // For now, we destroy the old view. A more complex system might use a stack.
-                GameObject.Destroy(currentView);
-                _activeScreens.Remove(_currentScreen);
-            }
-            else if (_sceneToScreenMap.ContainsValue(screen))
-            {
-                // Handle scene transitions
-                string sceneName = GetSceneNameForScreen(screen);
-                if (SceneManager.GetActiveScene().name != sceneName)
-                {
-                    await LoadSceneAsync(sceneName);
-                    _currentScreen = screen;
-                    return;
-                }
+                _activeScreen.SetActive(false);
             }
 
-            string assetKey = GetAssetKeyForScreen(screen);
-            var viewPrefab = await _assetProvider.LoadAssetAsync<GameObject>(assetKey);
-            
-            if (viewPrefab == null)
+            if (!_loadedScreens.TryGetValue(screen, out var screenInstance))
             {
-                Debug.LogError($"[ViewManager] Could not load prefab for screen: {screen} with key: {assetKey}");
+                var screenPrefab = await _assetProvider.LoadAssetAsync<GameObject>(screen.ToString());
+                if (screenPrefab == null)
+                {
+                    Debug.LogError($"[ViewManager] Failed to load prefab for screen: {screen}");
+                    // Potentially show an error dialog here
+                    return;
+                }
+                screenInstance = _instantiator.InstantiatePrefab(screenPrefab);
+                _loadedScreens[screen] = screenInstance;
+            }
+
+            _activeScreen = screenInstance;
+            _activeScreen.SetActive(true);
+
+            // This is a simplified navigation stack. A more robust implementation might be needed.
+            if (_screenStack.Count == 0 || _screenStack.Peek() != screen)
+            {
+                _screenStack.Push(screen);
+            }
+        }
+
+        public async Task ShowDialog(DialogDefinition definition)
+        {
+            var dialogPrefab = await _assetProvider.LoadAssetAsync<GameObject>("ModalDialogView");
+            if (dialogPrefab == null)
+            {
+                Debug.LogError("[ViewManager] ModalDialogView prefab not found!");
                 return;
             }
 
-            var viewInstance = _container.Instantiate(viewPrefab);
-            _activeScreens[screen] = viewInstance;
-            _currentScreen = screen;
+            var dialogInstance = _instantiator.InstantiatePrefabForComponent<ModalDialogView>(dialogPrefab);
+            
+            var tcs = new TaskCompletionSource<bool>();
+
+            Action onConfirm = () =>
+            {
+                if (!tcs.Task.IsCompleted) tcs.SetResult(true);
+                GameObject.Destroy(dialogInstance.gameObject);
+            };
+            
+            Action onCancel = () =>
+            {
+                if (!tcs.Task.IsCompleted) tcs.SetResult(false);
+                GameObject.Destroy(dialogInstance.gameObject);
+            };
+
+            dialogInstance.Configure(definition, onConfirm, onCancel);
+            
+            await tcs.Task;
         }
 
-        public void HideScreen(Screen screen)
+        public async Task ShowLoadingSpinner()
         {
-            if (_activeScreens.TryGetValue(screen, out var viewInstance))
+            if (_loadingSpinner != null)
             {
-                GameObject.Destroy(viewInstance);
-                _activeScreens.Remove(screen);
-                // In a stack-based system, we would show the previous screen here.
+                _loadingSpinner.Show();
+                return;
+            }
+
+            var spinnerPrefab = await _assetProvider.LoadAssetAsync<GameObject>("LoadingSpinnerView");
+            if (spinnerPrefab == null)
+            {
+                Debug.LogError("[ViewManager] LoadingSpinnerView prefab not found!");
+                return;
+            }
+
+            _loadingSpinner = _instantiator.InstantiatePrefabForComponent<LoadingSpinnerView>(spinnerPrefab);
+            _loadingSpinner.Show();
+        }
+
+        public void HideLoadingSpinner()
+        {
+            if (_loadingSpinner != null)
+            {
+                _loadingSpinner.Hide();
             }
         }
 
-        public async Task<DialogResult> ShowDialog(DialogDefinition definition, Action<DialogResult> callback = null)
+        public async Task GoBack()
         {
-            var tcs = new TaskCompletionSource<DialogResult>();
-
-            Action<DialogResult> internalCallback = result =>
+            if (_screenStack.Count > 1)
             {
-                callback?.Invoke(result);
-                tcs.SetResult(result);
-            };
-
-            var dialogPrefab = await _assetProvider.LoadAssetAsync<GameObject>("ModalDialogView");
-            var dialogInstance = _container.Instantiate(dialogPrefab);
-            var dialogView = dialogInstance.GetComponent<IModalDialogView>();
-
-            if (dialogView != null)
-            {
-                dialogView.Configure(definition, 
-                    () => internalCallback(DialogResult.Confirmed),
-                    () => internalCallback(DialogResult.Cancelled));
+                // Pop current screen
+                _screenStack.Pop();
+                // Get previous screen
+                var previousScreen = _screenStack.Peek();
+                // Show it without pushing to the stack again
+                await ShowScreenInternal(previousScreen);
             }
             else
             {
-                Debug.LogError("[ViewManager] Dialog prefab is missing IModalDialogView component.");
-                internalCallback(DialogResult.Cancelled); // Fail gracefully
-            }
-            
-            return await tcs.Task;
-        }
-
-        private async Task LoadSceneAsync(string sceneName)
-        {
-            var asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-            while (!asyncLoad.isDone)
-            {
-                await Task.Yield();
+                Debug.LogWarning("[ViewManager] No screen to go back to.");
             }
         }
-        
-        private string GetSceneNameForScreen(Screen screen)
-        {
-            return screen switch
-            {
-                Screen.MainMenu => "MainMenu",
-                Screen.GameBoard => "GameBoard",
-                _ => throw new ArgumentOutOfRangeException(nameof(screen), $"No scene is mapped for screen '{screen}'")
-            };
-        }
 
-        private string GetAssetKeyForScreen(Screen screen)
+        private async Task ShowScreenInternal(Screen screen)
         {
-            // These keys would match Addressable asset keys
-            return screen switch
+             if (_activeScreen != null)
             {
-                Screen.GameSetup => "GameSetupView",
-                Screen.LoadGame => "LoadGameView",
-                Screen.Settings => "SettingsView",
-                Screen.PropertyManagement => "PropertyManagementView",
-                _ => throw new ArgumentOutOfRangeException(nameof(screen), $"No asset key is mapped for screen '{screen}'")
-            };
+                _activeScreen.SetActive(false);
+            }
+
+            if (!_loadedScreens.TryGetValue(screen, out var screenInstance))
+            {
+                var screenPrefab = await _assetProvider.LoadAssetAsync<GameObject>(screen.ToString());
+                if (screenPrefab == null)
+                {
+                    Debug.LogError($"[ViewManager] Failed to load prefab for screen: {screen}");
+                    return;
+                }
+                screenInstance = _instantiator.InstantiatePrefab(screenPrefab);
+                _loadedScreens[screen] = screenInstance;
+            }
+
+            _activeScreen = screenInstance;
+            _activeScreen.SetActive(true);
         }
     }
 }

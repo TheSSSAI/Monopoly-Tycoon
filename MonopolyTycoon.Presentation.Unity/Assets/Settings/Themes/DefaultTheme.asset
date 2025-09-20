@@ -9,36 +9,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02a3a1f2b3c4d5e6f7a8b9c0d1e2f3a4, type: 3}
+  m_Script: {fileID: 11500000, guid: d2b3f1a0e1c2d3e4f5a6b7c8d9e0f1a2, type: 3}
   m_Name: DefaultTheme
-  m_EditorClassIdentifier: 
-  themeName: Default
+  themeName: Classic
   boardAssets:
-    gameBoardPrefabKey: Assets/App/Presentation/Features/GameBoard/Prefabs/GameBoard.prefab
+    gameBoardPrefabKey: "Assets/App/Presentation/Features/GameBoard/Prefabs/GameBoard.prefab"
     playerTokenPrefabKeys:
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/TopHatToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/CarToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/BattleshipToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/ThimbleToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/ScottishDogToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/WheelbarrowToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/ShoeToken.prefab
-    - Assets/App/Presentation/Features/GameBoard/Prefabs/Tokens/CatToken.prefab
-    houseModelKey: Assets/App/Presentation/Features/GameBoard/Models/House.fbx
-    hotelModelKey: Assets/App/Presentation/Features/GameBoard/Models/Hotel.fbx
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_TopHat.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_Car.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_Thimble.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_Boot.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_Battleship.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_Iron.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_ScottieDog.prefab"
+    - "Assets/App/Presentation/Features/GameBoard/Prefabs/PlayerToken_Wheelbarrow.prefab"
   uiAssets:
-    hudPrefabKey: Assets/App/Presentation/Features/HUD/Prefabs/HUDCanvas.prefab
-    mainMenuPrefabKey: Assets/App/Presentation/Features/MainMenu/Prefabs/MainMenuScreen.prefab
-    propertyManagementPrefabKey: Assets/App/Presentation/Features/PropertyManagement/Prefabs/PropertyManagementScreen.prefab
-    tradeUIPrefabKey: Assets/App/Presentation/Features/Trading/Prefabs/TradeScreen.prefab
-    modalDialogPrefabKey: Assets/App/Presentation/Shared/Prefabs/ModalDialog.prefab
+    hudPrefabKey: "Assets/App/Presentation/Features/HUD/Prefabs/HUDCanvas.prefab"
+    uiFontKey: "Fonts/DefaultFont.ttf"
   audioAssets:
-    mainMenuMusicKey: Assets/App/Presentation/Audio/Music/MainMenuTheme.mp3
-    gameplayMusicKey: Assets/App/Presentation/Audio/Music/GameplayTheme.mp3
-    diceRollSfxKey: Assets/App/Presentation/Audio/SFX/DiceRoll.wav
-    tokenMoveSfxKey: Assets/App/Presentation/Audio/SFX/TokenMove.wav
-    purchaseSfxKey: Assets/App/Presentation/Audio/SFX/Purchase.wav
-    rentPaidSfxKey: Assets/App/Presentation/Audio/SFX/RentPaid.wav
-    uiClickSfxKey: Assets/App/Presentation/Audio/SFX/UIClick.wav
-    winFanfareKey: Assets/App/Presentation/Audio/Music/WinFanfare.mp3
-    loseStingerKey: Assets/App/Presentation/Audio/Music/LoseStinger.mp3
+    mainMenuMusicKey: "Audio/Music/MainMenu_Classic.mp3"
+    gameplayMusicKey: "Audio/Music/Gameplay_Classic.mp3"
+    diceRollSfxKey: "Audio/SFX/DiceRoll.wav"
+    tokenMoveSfxKey: "Audio/SFX/TokenMove.wav"
+    purchaseSfxKey: "Audio/SFX/Purchase.wav"
+    rentPaidSfxKey: "Audio/SFX/RentPaid.wav"

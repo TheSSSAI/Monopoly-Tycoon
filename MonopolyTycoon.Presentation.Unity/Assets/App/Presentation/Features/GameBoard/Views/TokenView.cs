@@ -3,21 +3,32 @@ using UnityEngine;
 namespace MonopolyTycoon.Presentation.Features.GameBoard.Views
 {
     /// <summary>
-    /// A MonoBehaviour component attached to a player token prefab.
-    /// It holds identifying information and can be used to control
-    /// token-specific visual effects or animations.
+    /// Represents the visual game piece for a player on the board.
+    /// This component is attached to the token prefab.
     /// </summary>
     public class TokenView : MonoBehaviour
     {
-        [SerializeField]
-        private string _playerId;
+        /// <summary>
+        /// The unique identifier of the player this token represents.
+        /// </summary>
+        public string PlayerId { get; private set; }
 
-        public string PlayerId => _playerId;
+        private bool _isInitialized = false;
 
+        /// <summary>
+        /// Initializes the token with the player's ID.
+        /// </summary>
+        /// <param name="playerId">The unique ID of the player.</param>
         public void Initialize(string playerId)
         {
-            _playerId = playerId;
-            gameObject.name = $"Token_{playerId}";
+            if (_isInitialized)
+            {
+                Debug.LogWarning($"[TokenView] Token for player {PlayerId} is already initialized. Re-initializing for {playerId}.");
+            }
+            
+            PlayerId = playerId;
+            gameObject.name = $"Token_{PlayerId}";
+            _isInitialized = true;
         }
     }
 }

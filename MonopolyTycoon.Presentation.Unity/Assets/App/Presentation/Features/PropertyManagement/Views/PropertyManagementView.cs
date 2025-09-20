@@ -1,93 +1,132 @@
-using System;
+using MonopolyTycoon.Presentation.Features.PropertyManagement.Views;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using MonopolyTycoon.Presentation.Features.PropertyManagement.ViewModels;
-using MonopolyTycoon.Presentation.Features.PropertyManagement.Views;
 
-namespace MonopolyTycoon.Presentation.Features.PropertyManagement.Views
+namespace MonopolyTycoon.Presentation.Features.PropertyManagement
 {
     public class PropertyManagementView : MonoBehaviour, IPropertyManagementView
     {
         [Header("UI References")]
-        [SerializeField] private TextMeshProUGUI _playerCashText;
-        [SerializeField] private Button _closeButton;
-        [SerializeField] private Transform _propertyCardContainer;
-        [SerializeField] private GameObject _propertyCardPrefab;
-        [SerializeField] private TextMeshProUGUI _noPropertiesText;
+        [SerializeField]
+        private TextMeshProUGUI playerCashText;
 
-        private List<PropertyCardView> _propertyCards = new();
+        [SerializeField]
+        private GameObject propertyCardPrefab; // Prefab for displaying a single property
 
-        public event Action<string> OnBuildHouseRequested;
-        public event Action<string> OnSellHouseRequested;
-        public event Action<string> OnMortgageRequested;
-        public event Action<string> OnUnmortgageRequested;
-        public event Action OnClose;
+        [SerializeField]
+        private Transform propertyListContainer;
+
+        [SerializeField]
+        private Button closeButton;
+
+        public event System.Action<string> OnBuildHouseRequested;
+        public event System.Action<string> OnSellHouseRequested;
+        public event System.Action<string> OnMortgageRequested;
+        public event System.Action<string> OnUnmortgageRequested;
+        public event System.Action OnCloseRequested;
         
         private void Awake()
         {
-            _closeButton.onClick.AddListener(() => OnClose?.Invoke());
+            closeButton.onClick.AddListener(() => OnCloseRequested?.Invoke());
+        }
+        
+        private void OnDestroy()
+        {
+            closeButton.onClick.RemoveAllListeners();
         }
 
         public void DisplayAssets(PlayerAssetViewModel viewModel)
         {
-            if (viewModel == null) return;
-            
-            _playerCashText.text = viewModel.PlayerCashFormatted;
+            playerCashText.text = viewModel.PlayerCash;
 
-            bool hasProperties = viewModel.PropertiesByGroup.Count > 0;
-            _noPropertiesText.gameObject.SetActive(!hasProperties);
-            _propertyCardContainer.gameObject.SetActive(hasProperties);
-
-            // This is a simple pooling mechanism. A more robust solution might be better.
-            // Ensure we have enough card views, creating more if needed.
-            int requiredCards = 0;
-            foreach (var group in viewModel.PropertiesByGroup.Values) requiredCards += group.Count;
-
-            while (_propertyCards.Count < requiredCards)
+            // Simple clear and rebuild - pooling would be better for performance
+            foreach (Transform child in propertyListContainer)
             {
-                var cardInstance = Instantiate(_propertyCardPrefab, _propertyCardContainer);
-                var cardView = cardInstance.GetComponent<PropertyCardView>();
-                _propertyCards.Add(cardView);
+                Destroy(child.gameObject);
             }
 
-            // Hide unused cards
-            for (int i = requiredCards; i < _propertyCards.Count; i++)
+            if (viewModel.Properties.Count == 0)
             {
-                _propertyCards[i].gameObject.SetActive(false);
+                // Display "No properties owned" message
+                // This would be another UI element to enable.
             }
-            
-            // Populate and show used cards
-            int cardIndex = 0;
-            foreach (var group in viewModel.PropertiesByGroup)
+            else
             {
-                foreach (var property in group.Value)
+                foreach (var propertyVm in viewModel.Properties)
                 {
-                    var cardView = _propertyCards[cardIndex];
-                    cardView.gameObject.SetActive(true);
-                    cardView.Populate(property);
-                    
-                    // Wire up events from the card view to the main view's events
-                    // This avoids the Presenter needing to know about individual cards
-                    cardView.OnBuildHouse.RemoveAllListeners();
-                    cardView.OnBuildHouse.AddListener(() => OnBuildHouseRequested?.Invoke(property.PropertyId));
-                    // ... wire up other events similarly for Sell, Mortgage, Unmortgage
-                    
-                    cardIndex++;
+                    var cardInstance = Instantiate(propertyCardPrefab, propertyListContainer);
+                    var cardView = cardInstance.GetComponent<PropertyCardView>();
+                    if (cardView != null)
+                    {
+                        cardView.Populate(propertyVm);
+                        
+                        // Wire up events from the card view to this view's main events
+                        cardView.OnBuildHouseClicked += () => OnBuildHouseRequested?.Invoke(propertyVm.PropertyId);
+                        cardView.OnSellHouseClicked += () => OnSellHouseRequested?.Invoke(propertyVm.PropertyId);
+                        cardView.OnMortgageClicked += () => OnMortgageRequested?.Invoke(propertyVm.PropertyId);
+                        cardView.OnUnmortgageClicked += () => OnUnmortgageRequested?.Invoke(propertyVm.PropertyId);
+                    }
                 }
             }
         }
-
+        
         public void ShowError(string message)
         {
-            // In a real project, this would trigger a non-intrusive toast/notification
-            Debug.LogWarning($"[PropertyManagementView] Error: {message}");
+            // In a real implementation, this would trigger a non-intrusive toast notification
+            Debug.Log($"[PropertyManagementView] Error: {message}");
         }
 
-        private void OnDestroy()
+        public void Show()
         {
-            _closeButton.onClick.RemoveAllListeners();
+            gameObject.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        // A nested or separate component for the property card UI element
+        // This is a simplified example.
+        public class PropertyCardView : MonoBehaviour
+        {
+            // References to UI elements on the prefab
+            public TextMeshProUGUI PropertyNameText;
+            public Image PropertyColorStripe;
+            public Button BuildHouseButton;
+            public Button SellHouseButton;
+            public Button MortgageButton;
+            public Button UnmortgageButton;
+            public TextMeshProUGUI HouseCountText;
+            public Image MortgagedOverlay;
+            
+            public event System.Action OnBuildHouseClicked;
+            public event System.Action OnSellHouseClicked;
+            public event System.Action OnMortgageClicked;
+            public event System.Action OnUnmortgageClicked;
+            
+            private void Awake()
+            {
+                BuildHouseButton.onClick.AddListener(() => OnBuildHouseClicked?.Invoke());
+                SellHouseButton.onClick.AddListener(() => OnSellHouseClicked?.Invoke());
+                MortgageButton.onClick.AddListener(() => OnMortgageClicked?.Invoke());
+                UnmortgageButton.onClick.AddListener(() => OnUnmortgageClicked?.Invoke());
+            }
+
+            public void Populate(PropertyViewModel vm)
+            {
+                PropertyNameText.text = vm.PropertyName;
+                PropertyColorStripe.color = vm.ColorGroup;
+                HouseCountText.text = $"Houses: {vm.HouseCount}";
+                MortgagedOverlay.enabled = vm.IsMortgaged;
+                
+                BuildHouseButton.interactable = vm.CanBuild;
+                SellHouseButton.interactable = vm.CanSell;
+                MortgageButton.interactable = vm.CanMortgage;
+                UnmortgageButton.interactable = vm.CanUnmortgage;
+            }
         }
     }
 }

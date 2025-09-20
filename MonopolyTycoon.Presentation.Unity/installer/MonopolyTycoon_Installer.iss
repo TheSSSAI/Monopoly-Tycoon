@@ -1,18 +1,16 @@
-; Monopoly Tycoon Installer Script for Inno Setup
-; Fulfills requirements: REQ-1-012, REQ-1-100
-; Fulfills user stories: US-001, US-002, US-003, US-006, US-007
+; Monopoly Tycoon Inno Setup Script
+; Fulfills REQ-1-012, US-001, US-002, US-003, US-006, US-007
 
 #define MyAppName "Monopoly Tycoon"
 #define MyAppVersion "1.0.0"
-#define MyAppPublisher "Monopoly Tycoon Dev Team"
-#define MyAppURL "https://www.example.com"
+#define MyAppPublisher "Tycoon Games"
+#define MyAppURL "https://www.tycoongames.com/monopolytycoon"
 #define MyAppExeName "MonopolyTycoon.exe"
-#define UserDataPath "MonopolyTycoon"
+#define MyAppId "{{C1A2B3D4-E5F6-7890-1234-567890ABCDEF}}"
+#define MinRequiredWindowsVersion "10.0.17763" ; Windows 10 (1809)
 
 [Setup]
-; NOTE: The AppId is a unique identifier for your application.
-; It must be different for every application you create.
-AppId={{C6E0A4E1-2D29-4A7B-9D09-0C343D1A2F16}
+AppId={#MyAppId}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -21,18 +19,18 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-DisableProgramGroupPage=yes
-LicenseFile=license.txt
-; Required for checking if the app is running
-AppMutex=MonopolyTycoonGameMutex
+AllowNoIcons=yes
+LicenseFile=.\EULA.txt
+OutputDir=.\Builds
 OutputBaseFilename=MonopolyTycoon_Setup_v{#MyAppVersion}
-OutputDir=Output
-Compression=lzma
+Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
-SignTool=signtool
-SignedUninstaller=yes
-MinVersion=10.0.17763
+VISTAFIED
+MinVersion=0,6.1.7601
+PrivilegesRequired=admin
+WizardImageFile=.\wizard-image.bmp
+WizardSmallImageFile=.\wizard-small-image.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -41,9 +39,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkablealone
 
 [Files]
-Source: "build\windows\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "..\Builds\Windows\MonopolyTycoon.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Builds\Windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; NOTE: ..\Builds\Windows\ is the assumed output directory of the Unity build.
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -55,73 +53,74 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
-Type: dirifempty; Name: "{userappdata}\{#UserDataPath}"
+Type: dirifempty; Name: "{userappdata}\MonopolyTycoon"
 
 [Code]
 var
+  UserDataPath: String;
   DeleteUserData: Boolean;
 
-// This function is called when the uninstaller starts.
+function IsGameRunning(): Boolean;
+begin
+  Result := FindWindowByClassName('UnityWndClass') <> 0;
+end;
+
+procedure InitializeWizard();
+begin
+  UserDataPath := ExpandConstant('{userappdata}\MonopolyTycoon');
+  DeleteUserData := False;
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+  if IsGameRunning() then
+  begin
+    MsgBox('The game is currently running. Please close Monopoly Tycoon before uninstalling.', mbError, MB_OK);
+    Result := False;
+  end
+  else
+  begin
+    Result := True;
+  end;
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-  if CurUninstallStep = usUninstall then
+  if (CurUninstallStep = usUninstall) then
   begin
-    // Check if the user data directory exists
-    if DirExists(ExpandConstant('{userappdata}\{#UserDataPath}')) then
+    if DirExists(UserDataPath) then
     begin
-      // Prompt the user to keep or delete their data
-      if MsgBox('Do you want to remove all your personal data, including save games, player profiles, and statistics?' + #13#10 + #13#10 + 'If you plan to reinstall Monopoly Tycoon later, you should choose No.', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+      if MsgBox('Do you want to remove all your personal data, including save games, player profiles, and statistics?'#13#10#13#10'If you plan to reinstall Monopoly Tycoon later, you should choose No.', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
       begin
         DeleteUserData := True;
-      end
-      else
-      begin
-        DeleteUserData := False;
       end;
-    end
-    else
-    begin
-      // No data directory found, so no need to ask or delete
-      DeleteUserData := False;
     end;
   end;
 end;
 
-// This function is called after the main uninstallation is complete
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  SpaceRequired, FreeSpace: Int64;
 begin
-  if (CurStep = ssPostUninstall) and (DeleteUserData) then
+  if CurStep = ssInstall then
   begin
-    Log('User chose to delete personal data. Removing directory: ' + ExpandConstant('{userappdata}\{#UserDataPath}'));
-    DelTree(ExpandConstant('{userappdata}\{#UserDataPath}'), True, True, True);
+    // Check for min required Windows version (REQ-1-013)
+    if not IsWindowsVersionOrGreater(10, 0, 17763) then
+    begin
+      MsgBox('This game requires Windows 10 (version 1809) or later.', mbError, MB_OK);
+      WizardForm.Close;
+    end;
   end;
 end;
 
-// Function to check disk space and prevent installation if insufficient
-function GetSpaceRequired(const Path: String): Int64;
-var
-  Space: Int64;
+procedure DeinitializeUninstall();
 begin
-  Space := 2 * 1024 * 1024 * 1024; // 2 GB as per REQ-1-013
-  Result := Space;
-end;
-
-function NextButtonClick(CurPageID: Integer): Boolean;
-var
-  FreeSpace, RequiredSpace: Int64;
-begin
-  Result := True;
-  if CurPageID = wpSelectDir then
+  if DeleteUserData then
   begin
-    RequiredSpace := GetSpaceRequired(WizardDirValue);
-    FreeSpace := GetSpaceOnDisk(WizardDirValue);
-    if FreeSpace < RequiredSpace then
+    if DirExists(UserDataPath) then
     begin
-      MsgBox('Insufficient disk space on the selected drive.' + #13#10 +
-        'Required: ' + IntToStr(RequiredSpace div (1024*1024)) + ' MB' + #13#10 +
-        'Available: ' + IntToStr(FreeSpace div (1024*1024)) + ' MB',
-        mbError, MB_OK);
-      Result := False;
+      Log(Format('User opted to delete personal data. Removing directory: %s', [UserDataPath]));
+      DelTree(UserDataPath, True, True, True);
     end;
   end;
 end;

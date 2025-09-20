@@ -1,105 +1,109 @@
-using MonopolyTycoon.Presentation.Events;
-using MonopolyTycoon.Presentation.Features.CommonUI.Presenters;
+using MonopolyTycoon.Presentation.Core;
 using MonopolyTycoon.Presentation.Features.GameBoard.Presenters;
 using MonopolyTycoon.Presentation.Features.HUD.Presenters;
 using MonopolyTycoon.Presentation.Features.MainMenu.Presenters;
 using MonopolyTycoon.Presentation.Features.PropertyManagement.Presenters;
+using MonopolyTycoon.Presentation.Features.Trading.Presenters;
 using MonopolyTycoon.Presentation.Shared.Services;
 using Zenject;
 
 namespace MonopolyTycoon.Presentation.Core
 {
     /// <summary>
-    /// The PresentationInstaller is responsible for binding all the presentation-layer services,
-    /// presenters, and other components into the dependency injection container. This is a core
-    /// part of the Composition Root, ensuring that all dependencies within the Presentation layer
-    /// are correctly resolved at runtime.
-    /// This installer is executed by the AppStartup process.
+    /// Zenject installer for the Presentation layer.
+    /// This class is responsible for binding all the presentation-layer services,
+    /// presenters, and controllers into the Dependency Injection container.
+    /// It is executed by a Zenject SceneContext or ProjectContext at application startup.
     /// </summary>
     public class PresentationInstaller : Installer<PresentationInstaller>
     {
         public override void InstallBindings()
         {
-            InstallCoreServices();
-            InstallGlobalComponents();
-            InstallFeaturePresenters();
+            // The bindings in this installer set up the contracts and implementations for the
+            // entire Presentation layer, following the Model-View-Presenter (MVP) pattern and
+            // Clean Architecture principles. It ensures that components are decoupled and
+            // can be resolved at runtime.
+
+            BindSharedServices();
+            BindGlobalHandlersAndControllers();
+            BindFeaturePresenters();
         }
 
         /// <summary>
-        /// Binds core, application-wide services that are essential for the Presentation layer to function.
-        /// These services are typically singletons, maintaining their state across the entire application lifecycle.
+        /// Binds shared services that are used across multiple presentation features.
+        /// These are typically long-lived, global services.
         /// </summary>
-        private void InstallCoreServices()
+        private void BindSharedServices()
         {
-            // The EventBus is the central messaging system for decoupled communication between components.
-            // It's a singleton to ensure a single, consistent communication channel.
-            // Fulfills integration pattern seen in Sequence Diagrams 181, 184, 186.
-            Container.Bind<IEventBus>().To<EventBus>().AsSingle();
-
-            // The ViewManager handles the loading, showing, and hiding of UI screens and modals.
-            // It's a singleton to manage the global UI state and navigation stack.
-            // Fulfills REQ-1-071 and is a key component in REQ-1-023 (error dialog).
+            // IViewManager is responsible for orchestrating the display of different UI screens.
+            // It's a singleton because there should only be one manager controlling the UI state
+            // for the entire application lifecycle.
+            // REQ-1-071: Manages all UI elements.
             Container.Bind<IViewManager>().To<ViewManager>().AsSingle();
 
-            // The AddressableAssetProvider handles dynamic loading of assets (prefabs, themes, etc.).
+            // IAssetProvider abstracts the asset loading mechanism. Using Addressables allows
+            // for dynamic, theme-based asset loading without hardcoding references.
             // It's a singleton to manage asset caching and prevent redundant loading.
-            // Fulfills REQ-1-093 (Theme System).
+            // REQ-1-093: Supports the theme system by providing addressable assets.
             Container.Bind<IAssetProvider>().To<AddressableAssetProvider>().AsSingle();
-
-            // The AudioService manages playback of music and sound effects throughout the application.
-            // It's a singleton to provide consistent audio control and state (e.g., volume levels).
-            // Fulfills REQ-1-094 and settings requirement REQ-1-079.
-            Container.Bind<IAudioService>().To<AudioService>().AsSingle();
         }
 
         /// <summary>
-        /// Binds global components that are always active, such as the exception handler and input controller.
+        /// Binds global handlers and controllers that manage application-wide concerns
+        /// like input and exception handling.
         /// </summary>
-        private void InstallGlobalComponents()
+        private void BindGlobalHandlersAndControllers()
         {
-            // The GlobalExceptionHandler catches all unhandled exceptions to prevent crashes.
-            // It's a singleton to ensure it's registered once at startup and remains active.
-            // Fulfills REQ-1-023 as detailed in Sequence Diagram 192.
+            // GlobalExceptionHandler catches any unhandled exceptions to prevent the application
+            // from crashing, instead displaying a user-friendly error dialog.
+            // It's a singleton to ensure it's registered once at startup and persists.
+            // REQ-1-023: Implements the modal error dialog display on unhandled exceptions.
             Container.Bind<GlobalExceptionHandler>().AsSingle();
 
-            // The InputController translates raw hardware input into application-level events.
-            // It is bound from a component in the scene to integrate with Unity's Input System.
-            // This is a singleton-like pattern for a MonoBehaviour.
+            // InputController centralizes user input from Unity's Input System.
+            // It's bound FromComponentInHierarchy because it's a MonoBehaviour that must
+            // exist in the scene to receive Unity's input events. It's a singleton
+            // ensuring a single source of input translation for the application.
+            // Note: This requires an InputController component to be present on a GameObject
+            // within the Zenject scene context.
             Container.Bind<InputController>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary>
-        /// Binds the presenters for each specific UI feature/screen.
-        /// Presenters are typically bound as transient, meaning a new instance is created
-        /// each time it's needed. This ensures they don't hold stale state between
-        /// different instances of their associated views.
+        /// Binds all feature-specific presenters.
+        /// Presenters contain the presentation logic that drives the views. They are bound
+        /// as Transient because their lifecycle is typically tied to the view they manage.
+        /// A new presenter is created each time a view is shown or needs a presenter.
         /// </summary>
-        private void InstallFeaturePresenters()
+        private void BindFeaturePresenters()
         {
-            // Presenter for the main menu, handling navigation to other screens.
-            // Directly supports US-008.
-            Container.Bind<MainMenuPresenter>().AsTransient();
+            // GameBoardPresenter manages the 3D game board visuals, including token movement and property markers.
+            // Fulfills REQ-1-005, REQ-1-017, REQ-1-050.
+            Container.BindInterfacesAndSelfTo<GameBoardPresenter>().AsTransient();
 
-            // Presenter for the load game screen, handling display of save slots.
-            // Supports US-062 and graceful error handling in US-063, as shown in Sequence Diagram 185.
-            Container.Bind<LoadGamePresenter>().AsTransient();
+            // HUDPresenter manages the Heads-Up Display, showing player cash, turn indicators, etc.
+            // Fulfills REQ-1-071.
+            Container.BindInterfacesAndSelfTo<HUDPresenter>().AsTransient();
 
-            // Presenter for the main game board, orchestrating token animations and property visuals.
-            // Fulfills REQ-1-005 and REQ-1-017.
-            Container.Bind<GameBoardPresenter>().AsTransient();
-            
-            // Presenter for the Heads-Up Display, showing real-time player stats.
-            // Fulfills REQ-1-071 and US-049.
-            Container.Bind<HUDPresenter>().AsTransient();
+            // PropertyManagementPresenter handles the logic for the property management screen (building, mortgaging).
+            // Fulfills requirements related to US-052, US-033, US-038.
+            Container.BindInterfacesAndSelfTo<PropertyManagementPresenter>().AsTransient();
 
-            // Presenter for the property management screen, handling build/mortgage actions.
-            // Supports user stories US-033, US-038, US-052 and Sequence Diagrams 179, 180.
-            Container.Bind<PropertyManagementPresenter>().AsTransient();
+            // TradePresenter orchestrates the trade UI and interactions between the player and AI.
+            // Fulfills requirements related to US-040, US-041, US-042, US-053.
+            Container.BindInterfacesAndSelfTo<TradePresenter>().AsTransient();
 
-            // Presenter for the reusable error dialog.
-            // Though simple, binding it allows for easier testing and management.
-            // Supports REQ-1-023.
-            Container.Bind<ErrorDialogPresenter>().AsTransient();
+            // GameSetupPresenter manages the configuration of a new game.
+            // Fulfills requirements related to US-009, US-010, US-011, US-014.
+            Container.BindInterfacesAndSelfTo<GameSetupPresenter>().AsTransient();
+
+            // LoadGamePresenter handles the logic for the load game screen, including displaying save metadata.
+            // Fulfills requirements related to US-062, US-063.
+            Container.BindInterfacesAndSelfTo<LoadGamePresenter>().AsTransient();
+
+            // MainMenuPresenter handles the navigation logic for the main menu screen.
+            // Fulfills requirements related to US-008.
+            Container.BindInterfacesAndSelfTo<MainMenuPresenter>().AsTransient();
         }
     }
 }

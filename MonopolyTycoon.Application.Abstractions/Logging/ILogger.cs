@@ -1,34 +1,51 @@
+using System;
+
 namespace MonopolyTycoon.Application.Abstractions.Logging
 {
     /// <summary>
-    /// Defines a generic contract for a logging service, abstracting the underlying logging framework.
-    /// This allows for consistent logging practices across the application and simplifies dependency injection and testing.
+    /// Defines a generic contract for a logging service, abstracting the underlying
+    /// logging framework (e.g., Serilog). This allows for consistent logging
+    /// practices throughout the application and decouples the core logic from
+    /// a specific logging implementation.
+    /// Fulfills requirements: REQ-1-018, REQ-1-028, REQ-1-023.
     /// </summary>
     public interface ILogger
     {
         /// <summary>
-        /// Logs an informational message. These are typically used for tracking key application events,
-        /// such as starting a new game, completing a transaction, or an AI making a significant decision.
+        /// Logs a message at the Information level. This level is for general
+        /// operational entries of the application, such as key game events or
+        /// successful transactions.
         /// </summary>
-        /// <param name="messageTemplate">The message template, which can include placeholders for structured logging (e.g., "Player {PlayerId} passed Go").</param>
-        /// <param name="propertyValues">The values corresponding to the placeholders in the message template.</param>
+        /// <param name="messageTemplate">The message template, which may contain placeholders.</param>
+        /// <param name="propertyValues">Optional arguments for the message template.</param>
         void Information(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
-        /// Logs a warning message. Warnings indicate potential issues that are not critical errors but should be noted,
-        /// such as failing to restore a backup or encountering a recoverable error.
+        /// Logs a message at the Warning level. This level is for non-critical issues
+        /// that are recoverable or do not prevent the application from continuing,
+        /// but should be noted.
         /// </summary>
-        /// <param name="messageTemplate">The message template for the warning.</param>
-        /// <param name="propertyValues">The values for structured logging placeholders.</param>
+        /// <param name="messageTemplate">The message template, which may contain placeholders.</param>
+        /// <param name="propertyValues">Optional arguments for the message template.</param>
         void Warning(string messageTemplate, params object[] propertyValues);
+        
+        /// <summary>
+        /// Logs a message at the Debug level. This level is for detailed diagnostic
+        /// information, typically used during development or for tracing complex
+        /// processes like AI decision-making.
+        /// </summary>
+        /// <param name="messageTemplate">The message template, which may contain placeholders.</param>
+        /// <param name="propertyValues">Optional arguments for the message template.</param>
+        void Debug(string messageTemplate, params object[] propertyValues);
 
         /// <summary>
-        /// Logs an error message, typically accompanied by an exception. This is used for critical failures,
-        /// unhandled exceptions, or operations that result in a failure state (e.g., file I/O errors, database corruption).
+        /// Logs a message at the Error level. This level is for critical failures,
+        /// exceptions, and faults that prevent a specific operation from completing
+        /// or may impact application stability.
         /// </summary>
-        /// <param name="ex">The exception that occurred.</param>
-        /// <param name="messageTemplate">The message template describing the context of the error.</param>
-        /// <param name="propertyValues">The values for structured logging placeholders.</param>
+        /// <param name="ex">The exception associated with the error.</param>
+        /// <param name="messageTemplate">The message template, which may contain placeholders.</param>
+        /// <param name="propertyValues">Optional arguments for the message template.</param>
         void Error(Exception ex, string messageTemplate, params object[] propertyValues);
     }
 }

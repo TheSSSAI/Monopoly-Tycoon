@@ -2,9 +2,9 @@
     "name": "MonopolyTycoon.Presentation.Features.GameBoard",
     "rootNamespace": "MonopolyTycoon.Presentation.Features.GameBoard",
     "references": [
-        "GUID:560b04d44f506044086e601052060144",
-        "GUID:9c2091054359675408544e7c65f29a28",
-        "GUID:d7b738327c0c7da4f944b0213a5a8742"
+        "GUID:9e2a510519154d89a244081c73a1103c",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

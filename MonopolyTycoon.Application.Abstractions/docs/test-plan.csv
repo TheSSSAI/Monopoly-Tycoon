@@ -1,91 +1,120 @@
 test_id,feature_area,test_type,test_level,priority,automation_candidate,test_description,preconditions,test_steps,expected_result,test_data_needs,tools_required,estimated_effort,dependencies
-TC-CORE-111-001,Player & AI Systems,Functional,Unit,Critical,High,"Verify PlayerState class initializes with correct default values.","NUnit test environment is set up.","1. Instantiate a new `PlayerState` object using the default constructor.
-2. Assert that `cash` is 0.
-3. Assert that `is_human` is false.
-4. Assert that `properties_owned` is an empty, non-null list.
-5. Assert `status` is `Active`.","All properties of the newly created `PlayerState` object match their expected default values.",N/A,NUnit,0.5,TASK-01-111-01
-TC-CORE-112-001,Core Engine & Game State,Functional,Unit,Critical,High,"Verify GameState class initializes correctly for a 4-player game.","NUnit test environment is set up. `PlayerState` class is defined.","1. Instantiate a new `GameState` object, passing a configuration for 1 human and 3 AI players.
-2. Assert that the `playerStates` list contains exactly 4 `PlayerState` objects.
-3. Assert that `BoardState`, `BankState`, and `DeckStates` are not null.
-4. Assert that `currentTurnNumber` is 1 and `activePlayerIndex` is 0.","The `GameState` object is initialized correctly, with a list of 4 players and all sub-state objects properly instantiated.",Mock `PlayerState` objects.,NUnit,1,TASK-01-112-01
-TC-CORE-121-001,Core Engine & Game State,Functional,Unit,Critical,High,"Verify the DiceService generates two numbers, each within the range [1, 6].","NUnit test environment is set up.","1. Instantiate the `DiceService`.
-2. Call the `Roll()` method.
-3. Assert that the first die result is >= 1 and <= 6.
-4. Assert that the second die result is >= 1 and <= 6.","The `Roll()` method returns a result object where both dice values are within the valid 1-6 range.",N/A,NUnit,0.5,TASK-01-121-01
-TC-CORE-121-002,Core Engine & Game State,Non-Functional,Unit,High,High,"Verify the statistical distribution of the secure RNG DiceService over a large number of rolls.","NUnit test environment is set up.","1. Instantiate the `DiceService`.
-2. Call the `Roll()` method 1,000,000 times, storing the frequency of each number (1-6) for each die.
-3. Calculate the expected frequency for each number (approx. 166,667).
-4. Assert that the actual frequency for each number is within a reasonable tolerance (e.g., +/- 5%) of the expected frequency.","The distribution of dice roll results is uniform, confirming the RNG is fair and not biased.",N/A,NUnit,2,TASK-01-121-01
-TC-CORE-121-003,Game Flow & Turn Management,Functional,Integration,Critical,High,"Verify that rolling a single double correctly grants the player an extra turn.","A game is in progress. It is the active player's turn.","1. Mock the `DiceService` to return a double (e.g., 4, 4).
-2. Execute the player's turn.
-3. After the token moves and the landing action is complete, check the active player index in the `GameState`.","The active player index remains the same, and the consecutive doubles counter for that player is set to 1. The game awaits another roll from the same player.",Mock `DiceService`.,NUnit, Unity Test Framework,1.5,TASK-01-121-02
-TC-CORE-121-004,Game Flow & Turn Management,Functional,Integration,Critical,High,"Verify that rolling three consecutive doubles sends the player to jail.","A game is in progress. The active player has already rolled doubles twice in their current turn sequence.","1. Mock the `DiceService` to return a third double.
-2. Execute the player's turn.
-3. Observe the resulting player state.","The player's token is NOT moved according to the dice sum. The player's `status` is set to `InJail`, their `position` is set to the Jail space index, and the turn passes to the next player.",Mock `DiceService`.,NUnit, Unity Test Framework,1.5,TASK-01-121-02
-TC-CORE-122-001,Core Engine & Game State,Functional,Integration,Critical,High,"Verify the three methods for getting out of jail (Pay, Card, Roll) correctly update the player's state.","A game state is loaded where the active player is in jail.","1. **Pay Fine**: Call the 'Pay Fine' method. Assert cash is reduced by $50 and status is `Active`.
-2. **Use Card**: Call the 'Use Card' method. Assert card count is reduced by 1, status is `Active`, and card is returned to deck.
-3. **Roll Doubles**: Mock a doubles roll. Call the 'Roll' method. Assert status is `Active`, token moves, and NO extra turn is granted.","Each exit method correctly modifies the `PlayerState` (status, cash/card count) and allows the turn to proceed or end as per the rules.",Pre-configured `GameState` with a jailed player who has cash and a GOOJFC.,NUnit, Unity Test Framework,3,TASK-01-122-02
-TC-CORE-122-002,Game Flow & Turn Management,Functional,Integration,Critical,High,"Verify the forced payment rule on the third turn in jail.","A game state is loaded where the active player is in jail with `jail_turns_remaining` = 1.","1. Mock a non-doubles roll from the `DiceService`.
-2. Execute the jail turn logic.
-3. Assert that the player's cash is reduced by $50.
-4. Assert the player's status is `Active`.
-5. Assert the player's token moves the distance of the non-doubles roll.","The player is forced to pay the fine and then moves, correctly following the third-turn jail rule.",Pre-configured `GameState` for 3rd turn in jail.,NUnit, Unity Test Framework,2,TASK-01-122-04
-TC-SYS-122-003,User Interface (UI) & Visual Experience (VX),Functional,System,High,Medium,"Verify the Jail Options UI modal functions correctly.","A game is running, and the human player's token is in the 'In Jail' state.","1. Start the human player's turn.
-2. Observe that the 'Jail Options' modal appears.
-3. Verify that the 'Pay Fine' button is disabled if cash < $50.
-4. Verify that the 'Use Card' button is disabled if the card count is 0.
-5. Click the 'Roll for Doubles' button.","The Jail Options modal appears correctly, and its buttons are conditionally enabled based on the player's state. Clicking an option triggers the correct backend logic.",Save file with a jailed player having various cash/card states.,Unity Test Framework,2.5,TASK-01-122-03
-TC-CORE-123-001,Core Engine & Game State,Functional,Unit,Critical,High,"Verify the 'Even Building' rule logic prevents uneven purchasing and selling of houses.","A `GameState` is mocked where a player owns a 3-property monopoly (e.g., Light Blue).","1. **Build Test**: Set house counts to (1, 0, 0). Attempt to build on the first property. Assert the `RuleEngine` returns false.
-2. **Build Test 2**: Set house counts to (1, 1, 0). Attempt to build on the first property. Assert the `RuleEngine` returns false.
-3. **Sell Test**: Set house counts to (2, 1, 1). Attempt to sell from the second property. Assert the `RuleEngine` returns false.","The `RuleEngine` correctly validates all 'even building' and 'even selling' scenarios, returning true for valid actions and false for invalid ones.",Mock `GameState` with various property/house configurations.,NUnit,4,TASK-01-123-03
-TC-SYS-123-002,User Interface (UI) & Visual Experience (VX),Usability,System,High,Manual Only,"Verify the Property Management UI provides clear feedback for the Even Building rule.","A game is running where the player owns a monopoly with unevenly developed properties.","1. Open the Property Management UI.
-2. Select the property with the most houses.
-3. Observe that the 'Build House' button is disabled.
-4. Hover over the disabled button.
-5. Observe the tooltip message.","The UI correctly disables the build button for properties that would violate the even-building rule and provides a clear tooltip explaining why.",Save file with an unevenly developed monopoly.,Manual Testing,1.5,TASK-04-423-01
-TC-CORE-125-001,Core Engine & Game State,Functional,Integration,Critical,High,"Verify the bankruptcy process when a player is bankrupted by another player.","A `GameState` is configured where Player B owes a debt to Player A that they cannot pay, even after liquidating all assets.","1. Trigger the bankruptcy of Player B to Player A.
-2. Inspect the `PlayerState` of Player A after the transaction.
-3. Inspect the `PlayerState` of Player B after the transaction.","All of Player B's assets (cash, properties, cards) are transferred to Player A. Mortgaged properties remain mortgaged. Player B's status is set to `Bankrupt`.",Pre-configured `GameState` on the verge of bankruptcy.,Unity Test Framework,3,TASK-01-125-02
-TC-CORE-125-002,Core Engine & Game State,Functional,Integration,Critical,High,"Verify the bankruptcy process when a player is bankrupted by the Bank.","A `GameState` is configured where a player owes a debt to the Bank that they cannot pay.","1. Trigger the player's bankruptcy to the Bank.
-2. Observe the subsequent game events.","All of the bankrupt player's properties are returned to the Bank. The `AuctionManager` is then triggered to auction off each of those properties sequentially to the remaining players.",Pre-configured `GameState` for bankruptcy to the bank.,Unity Test Framework,3,TASK-01-125-03
-TC-SYS-125-003,User Interface (UI) & Visual Experience (VX),Functional,System,Critical,Medium,"Verify the debt resolution flow for a human player with insufficient cash.","A human player lands on a space and owes a debt (e.g., rent) they cannot immediately pay from their cash balance.","1. Trigger the debt condition.
-2. Observe the UI transition.
-3. Attempt to sell buildings/mortgage properties to cover the debt.
-4. Confirm the debt payment and resume the turn.","The game pauses and forces the player into the Property Management UI. The player can only perform actions that generate cash. Once the debt is covered, the payment is made automatically, and the game resumes.",Save file with a player having low cash and high-value assets.,Unity Test Framework,2.5,TASK-01-125-04
-TC-DATA-512-001,Data Persistence & Management,Functional,System,Critical,High,"Perform an End-to-End Save/Load cycle and verify data integrity.","A game is in a complex state (e.g., mid-game, properties developed, one player in jail).","1. Take a snapshot or manually record all key `GameState` variables (all player cash, properties, house counts, bank inventory, card deck order, current turn).
-2. Save the game to a slot.
-3. Return to the main menu and load the game from that slot.
-4. Compare the restored `GameState` with the original snapshot.","The restored `GameState` is identical in every aspect to the state at the moment of saving.",A complex mid-game save file.,Manual Testing, Unity Test Framework,4,WI-511
-TC-DATA-512-002,Data Persistence & Management,Functional,System,Critical,Medium,"Verify the system gracefully handles a corrupted save file.","A valid save file exists in the save directory.","1. Manually edit the save file's content to invalidate its checksum.
-2. Launch the game and navigate to the 'Load Game' screen.
-3. Observe the UI for the slot corresponding to the edited file.","The save slot is visually marked as 'Corrupted' or 'Unusable'. The 'Load' button for this slot is disabled, preventing the user from attempting to load it. The application remains stable.",A valid save file.,Manual Testing,1.5,WI-512
-TC-DATA-513-001,Data Persistence & Management,Functional,Integration,High,Medium,"Verify the data migration system successfully upgrades an older (but compatible) save file.","An older version of a valid save file is placed in the save directory.","1. Launch the new version of the game.
-2. Navigate to the 'Load Game' screen.
-3. Select the slot with the old version and click 'Load'.","The system detects the old version, runs the migration logic in the background, successfully loads the game with the migrated data, and overwrites the old save file with the new format.",A save file from a previous, compatible version of the game.,Unity Test Framework,3,WI-513
-TC-DATA-522-001,Data Persistence & Management,Functional,System,High,Medium,"Verify the automatic recovery of a corrupted statistics database from a backup.","A valid SQLite statistics database and at least one valid backup file exist.","1. Corrupt or delete the primary `statistics.db` file.
-2. Launch the application.
-3. The application should start without a user-facing error.
-4. Check the `Player Statistics` screen.
-5. Check the `%APPDATA%` directory.","The system detects the corruption, restores the database from the most recent backup, and loads the statistics correctly. The application is fully functional.",A valid statistics DB file and its backup files.,Manual Testing,2,WI-522
-TC-UI-425-001,User Interface (UI) & Visual Experience (VX),Non-Functional,System,High,Manual Only,"Verify UI layout integrity on a 21:9 ultrawide aspect ratio.","The game is running.","1. Set the game's resolution to 2560x1080 or a similar 21:9 ratio.
-2. Navigate to every screen in the game (Main Menu, Setup, Game Board/HUD, All Modals, Pause Menu, Summary Screen).
-3. Check for any visual bugs.","All UI elements are correctly anchored, scaled, and fully visible. There are no overlapping elements, and all text is legible. The game is fully playable.",N/A,Manual Testing,4,WI-425
-TC-PERF-411-001,Performance Testing,Non-Functional,Performance,High,Medium,"Verify the game maintains the required frame rate on recommended hardware.","The game is running on a machine that meets the recommended hardware specifications.","1. Start a 4-player game with all AI set to 'Hard'.
-2. Play the game until the board is heavily populated with houses and hotels.
-3. During a turn with multiple animations (token movement, dice roll, UI updates), monitor the frame rate.","The average frame rate remains at or above 60 FPS, and it does not drop below 45 FPS at any point during the test.",A late-game save file with a highly developed board.,Unity Profiler, FRAPS,4,WI-411
-TC-PERF-512-002,Performance Testing,Non-Functional,Performance,High,Medium,"Verify that game loading time meets the specified requirement.","The game is running on a machine that meets the recommended hardware specs, including an SSD.","1. From the main menu, select a complex, late-game save file to load.
-2. Start a timer the moment the 'Load' button is clicked.
+TEST-FOUND-001,Project Foundation & Core Systems,Functional,System,Critical,Manual Only,"Verify Git repository is correctly initialized with a .gitignore file.","Access to the version control platform.","1. Clone the repository.
+2. Check for the existence of a `.gitignore` file.
+3. Add a temporary file typically ignored by Unity (e.g., `Project/Library/test.meta`).
+4. Run `git status`.","A `.gitignore` file is present. The `git status` command does not show the temporary file, confirming it is being ignored.",N/A,"Git Client",0.5,""
+TEST-FOUND-002,Project Foundation & Core Systems,Functional,System,Critical,Manual Only,"Verify the Visual Studio solution and project structure are created correctly as per architectural design.","Visual Studio 2022 is installed.","1. Open the created `.sln` file in Visual Studio.
+2. Verify the solution contains the specified projects: Unity Project, DomainLogic, AI, Infrastructure, Testing.
+3. Check project references to ensure they are correctly configured.","The solution opens without errors and all specified projects are present and correctly referenced.",N/A,"Visual Studio 2022",0.5,TASK-FOUND-002
+TEST-FOUND-003,Project Foundation & Core Systems,Functional,System,High,Medium,"Verify that coding standards are enforced by the IDE.","The solution is open in Visual Studio. An `.editorconfig` file is present.","1. Intentionally write a piece of C# code that violates a Microsoft C# Coding Convention (e.g., `private int my_variable;`).
+2. Observe the code editor.","The IDE should flag the violation with a warning or error, suggesting a fix (e.g., renaming to `_myVariable` or `myVariable`), confirming the Roslyn analyzers are active.",N/A,"Visual Studio 2022",0.5,TASK-FOUND-003
+TEST-LOG-001,Project Foundation & Core Systems,Functional,Unit,Critical,High,"Verify the LoggingService correctly writes a structured JSON message to the configured sink.","A unit test project is set up with Serilog. A mock sink (e.g., a text writer) is used.","1. Instantiate the `LoggingService`.
+2. Call the logger with a sample message and properties (e.g., `logger.Information(""Test event occurred"", { PlayerId: 123 })`).
+3. Read the output from the mock sink.
+4. Deserialize the JSON output.","The output is a valid JSON string. The deserialized object contains the correct message, level, and custom properties (PlayerId: 123).",N/A,"NUnit, Moq",1.5,TASK-LOG-001
+TEST-LOG-002,Project Foundation & Core Systems,Non-Functional,System,Critical,Medium,"Verify the rolling file and retention policies for logs are working as specified in REQ-1-021.","The game is installed. The logger is configured to use the rolling file sink.","1. Run a script that generates more than 50 MB of log data.
+2. Check the `'%APPDATA%/MonopolyTycoon/logs'` directory.
+3. Modify the system clock to be 8 days in the future and generate one more log entry.
+4. Check the directory again.","After Step 2, the total size of log files should not exceed 50 MB (plus a small margin), and the oldest files should be deleted. After Step 4, only the log file from the ""current"" day should remain.",Test script to generate large volumes of logs,"Manual File System Check",4,TASK-LOG-002
+TEST-LOG-003,Project Foundation & Core Systems,Security,Unit,High,High,"Verify the PII sanitization filter correctly removes sensitive information from log events.","The Serilog pipeline is configured with the custom PII sanitization enricher.","1. Create a log event object containing both permitted PII (profile name) and forbidden PII (e.g., email address, IP address).
+2. Pass the event through the enricher/filter.
+3. Assert the properties on the output log event.","The output log event must still contain the profile name property but must not contain the email or IP address properties.",Mock log event with PII data,"NUnit",1.5,TASK-LOG-003
+TEST-ERR-001,Project Foundation & Core Systems,Functional,System,Critical,High,"Verify the global exception handler catches unhandled exceptions from the main Unity thread and displays the modal error dialog.","The game is running. The test harness for throwing exceptions is implemented.","1. Use the test harness to throw an unhandled exception on the main thread.
+2. Observe the application's behavior.","The application does not crash to desktop. Instead, a modal error dialog appears, pausing the game in the background. The dialog displays a message, a unique error ID, and the path to the log files.",Test harness in a development build,"Unity",2,TASK-ERR-004
+TEST-ERR-002,Project Foundation & Core Systems,Functional,Integration,Critical,High,"Verify the caught exception is correctly logged with a correlating error ID that matches the one shown in the UI.","An unhandled exception has been triggered and the error dialog is displayed.","1. Note the Error ID displayed in the modal dialog.
+2. Navigate to the log directory specified in the dialog.
+3. Open the latest log file.
+4. Search for an ERROR level entry.","An ERROR log entry exists. It contains the full stack trace of the exception. It also contains a property for the error ID which is an exact match to the ID shown in the UI.",N/A,"Text Editor/Log Viewer",1,TASK-ERR-003
+TEST-DOM-001,Domain Model & Rule Engine,Functional,Unit,Critical,High,"Verify the PlayerState class can be instantiated and its properties can be set and retrieved correctly.","The `PlayerState.cs` file is defined in the DomainLogic project.","1. Create an instance of the `PlayerState` class in a unit test.
+2. Set various properties (e.g., `cash = 1500`, `status = PlayerStatus.Active`).
+3. Assert that the retrieved properties match the values that were set.","All assertions pass, confirming the properties of the class are working as expected.",N/A,"NUnit",1,TASK-DOM-001
+TEST-DOM-002,Domain Model & Rule Engine,Non-Functional,Unit,High,High,"Verify the GameState object can be successfully serialized to JSON and deserialized back to an identical object.","The `GameState.cs` class is defined. A mock `GameState` instance is created with nested data (multiple players, properties).","1. Create a complex `GameState` object in a unit test.
+2. Serialize the object to a JSON string using `System.Text.Json`.
+3. Deserialize the string back into a new `GameState` object.
+4. Perform a deep comparison assertion between the original and deserialized objects.","The assertion passes, confirming that the deserialized object is a perfect replica of the original. The test should handle nested lists and complex properties.",Complex mock GameState object,"NUnit, System.Text.Json",2,TASK-DOM-005
+TEST-INSTALL-001,Build & Distribution,Functional,System,Critical,Manual Only,"Verify the game can be installed successfully using the Inno Setup installer with default options.","A compiled installer executable is available. The test machine meets minimum system requirements.","1. Run the installer executable.
+2. Click 'Next' through all wizard pages, accepting the EULA and default settings.
+3. Check the 'Create a desktop shortcut' and 'Launch game' options.
+4. Click 'Finish'.","The installation completes without errors. Game files are located in the default Program Files directory. A desktop shortcut is created. The game is listed in 'Add or Remove Programs'. The game launches successfully from the installer.",N/A,"Windows VM, Inno Setup Installer",2,TASK-BUILD-001
+TEST-INSTALL-002,Build & Distribution,Functional,System,High,Manual Only,"Verify the installer allows for custom installation directory and desktop shortcut selection (US-002, US-003).","A compiled installer executable is available.","1. Run the installer.
+2. On the directory selection page, choose a custom path (e.g., `D:\Games\Monopoly`).
+3. On the additional tasks page, uncheck 'Create a desktop shortcut'.
+4. Complete the installation.","The game is installed to the custom directory. No desktop shortcut is created. The installed game launches correctly from the installation directory.",N/A,"Windows VM, Inno Setup Installer",1.5,TASK-BUILD-001
+TEST-INSTALL-003,Build & Distribution,Functional,System,Medium,Manual Only,"Verify the uninstaller provides the option to keep or delete user data and functions correctly (US-006, US-007).","The game is installed. The player has started a game to create save files in `%APPDATA%/MonopolyTycoon`.","1. Run the uninstaller from 'Add or Remove Programs'.
+2. When prompted, choose 'No' to keep user data.
+3. Verify application files are gone but AppData folder remains.
+4. Re-install the game.
+5. Run the uninstaller again.
+6. When prompted, choose 'Yes' to delete user data.","After step 3, only user data remains. After step 6, both application files and the AppData folder are completely removed.",Mock save/profile data,"Windows VM",2.5,TASK-BUILD-002
+TEST-SETUP-001,Main Menu & Game Setup Flow,Functional,System,Critical,Manual Only,"Verify the 'New Game' flow from the main menu to the game setup screen.","The application is launched and on the main menu.","1. Click the 'New Game' button.
+2. Observe the screen transition.","The application smoothly transitions to the Game Setup screen. The main menu is no longer visible.",N/A,"Development Build",0.5,TASK-UI-002
+TEST-SETUP-002,Main Menu & Game Setup Flow,Functional,System,Critical,Manual Only,"Verify profile name input and validation logic works as expected (US-011, US-012).","On the Game Setup screen.","1. Enter a name that is too short ('A').
+2. Enter a name with invalid characters ('!@#').
+3. Enter a valid name ('Player1').
+4. Clear the name field.","For step 1 and 2, a specific error message appears and the 'Start Game' button is disabled. For step 3, the error message disappears and the button is enabled. For step 4, the button is disabled.",N/A,"Development Build",1,TASK-SETUP-001
+TEST-SETUP-003,Main Menu & Game Setup Flow,Functional,System,Critical,Manual Only,"Verify the full game setup configuration and successful game start (US-009, US-010, US-014).","On the Game Setup screen with a valid player name.","1. Select 3 AI opponents.
+2. Set their difficulties to Easy, Medium, and Hard.
+3. Select the 'Top Hat' token.
+4. Click 'Start Game'.","The game transitions to the GameBoard scene. The HUD displays 4 players. The human player has the Top Hat. Debug logs or an in-game view confirm the AIs have unique, remaining tokens and the correct difficulty settings.",N/A,"Development Build",2,TASK-SETUP-004
+TEST-PERF-001,Core Gameplay Loop & Presentation,Non-Functional,Performance,High,Medium,"Verify the application maintains a sustained average of 60 FPS during typical gameplay on recommended hardware (REQ-1-014).","The game is running on a PC that meets the 'Recommended' hardware specifications. The resolution is set to 1920x1080.","1. Play through 10 full turns of a 4-player game.
+2. Monitor the frame rate throughout the session, paying close attention to token movement animations, UI popups, and dice rolls.","The average frame rate over the session is >= 60 FPS. The frame rate never drops below 45 FPS during any animation or UI event.",A saved game file in a mid-game state,"Performance Profiling Tool (e.g., Unity Profiler, MSI Afterburner)",4,"TASK-3D-002"
+TEST-PERF-002,Game State Persistence,Non-Functional,Performance,High,Medium,"Verify that loading a game from the main menu takes no more than 10 seconds on recommended hardware with an SSD (REQ-1-015).","The game is on the main menu on a PC that meets 'Recommended' specs with an SSD. A complex, late-game save file exists.","1. Start a timer.
+2. Click 'Load Game', select the late-game save file, and confirm.
 3. Stop the timer the moment the game board is fully rendered and interactive.
-4. Repeat 5 times and average the result.","The time elapsed from initiating the 'Load Game' action to the game being playable does not exceed 10 seconds.",A late-game save file.,Stopwatch, Unity Profiler,1.5,WI-512
-TC-AI-223-001,Player & AI Systems,Functional,System,High,High,"Verify that 'Hard' AI opponents actively attempt to create housing shortages.","A game is in progress where a 'Hard' AI has a monopoly and there is a low supply of houses remaining in the bank.","1. Observe the 'Hard' AI's behavior during its 'Pre-Roll Management Phase'.
-2. The AI should prioritize buying up the remaining houses, even if it's not the most optimal placement, to deny them to other players.
-3. Check the debug logs for AI decision-making.","The 'Hard' AI demonstrates the strategic behavior of creating a housing shortage by purchasing the last available houses from the bank.",A save file where a housing shortage is imminent.,Unity Test Framework, Game Logs,3,WI-223
-TC-AI-223-002,Player & AI Systems,Usability,UAT,High,Manual Only,"Evaluate the perceived fairness and challenge of the 'Medium' AI.","A human tester plays a full game against three 'Medium' AI opponents.","1. Play a complete game from start to finish.
-2. Pay attention to the AI's trading decisions, property acquisition priorities, and building strategies.
-3. After the game, fill out a qualitative feedback form.","The 'Medium' AI plays competently. It prioritizes monopolies, makes reasonable trade offers, and does not make obviously foolish mistakes. It provides a fair and engaging challenge for an average player.",N/A,Manual Testing (Playtesting),8,WI-223
-TC-INST-631-001,Technical Foundation & DevOps,Functional,System,Critical,Manual Only,"Verify the full installation and uninstallation process on a clean Windows 11 machine.","A clean Windows 11 virtual machine is available. The final installer `.exe` is ready.","1. Run the installer, using a custom directory and creating a desktop shortcut.
-2. Verify all files are installed correctly.
-3. Verify the shortcut works and launches the game.
-4. Verify the game appears in 'Apps & features'.
-5. Run the uninstaller, choosing to remove all user data.
-6. Verify all application files, shortcuts, and user data directories are completely removed.","The installer and uninstaller function perfectly on the target OS, providing a clean and professional user experience.",Final installer package.,Virtual Machine (Windows 11),2,WI-631
+4. Repeat 5 times and average the result.","The average load time is under 10 seconds.",A large, complex save file representing a late-game state.,"Stopwatch",2,TASK-LOAD-003
+TEST-UI-001,Core Gameplay Loop & Presentation,Non-Functional,System,High,Manual Only,"Verify the game's UI and 3D view adapt correctly to all supported aspect ratios (16:9, 16:10, 21:9) without visual bugs (REQ-1-016, US-004).","The game is running.","1. Set the game resolution to a 16:9 aspect ratio (e.g., 1920x1080) and check the Main Menu, Game Setup, and Game HUD.
+2. Repeat for a 16:10 ratio (e.g., 1920x1200).
+3. Repeat for a 21:9 ratio (e.g., 2560x1080).","In all cases, no UI elements are overlapped, distorted, or rendered off-screen. The game board maintains its correct proportions. All buttons are clickable.",N/A,"Unity Resolution Simulator or Physical Monitors",3,TASK-HUD-004
+TEST-RULE-001,Domain Model & Rule Engine,Functional,Unit,Critical,High,"Verify the Dice Service produces fair and correct results (REQ-1-042).","The DiceService is instantiated.","1. In a loop (e.g., 10,000 iterations), call the `Roll()` method.
+2. Store the results of each die.
+3. Check that every value is between 1 and 6 inclusive.
+4. Check the distribution of the results.
+5. Check that the `isDouble` flag is true only when both dice have the same value.","All values are within the correct range. The distribution is reasonably flat (no obvious bias). The `isDouble` flag is always correct.",N/A,"NUnit",2,TASK-RULE-001
+TEST-RULE-002,Domain Model & Rule Engine,Functional,Unit,Critical,High,"Verify the 3-doubles-to-jail rule is correctly enforced (REQ-1-043, US-018).","A mock GameState with an active player is created. The Turn Manager logic is being tested.","1. Simulate a first doubles roll. Assert player state has `consecutive_doubles = 1` and turn continues.
+2. Simulate a second doubles roll. Assert player state has `consecutive_doubles = 2` and turn continues.
+3. Simulate a third doubles roll.
+4. Simulate a non-doubles roll after a doubles roll.","After step 3, assert the player's status is `InJail` and their turn has ended. After step 4, assert the `consecutive_doubles` counter is reset to 0 and the turn has ended.",Mock GameState and dice roll results,"NUnit",2,TASK-RULE-002
+TEST-E2E-001,Game Flow,Functional,System,Critical,Medium,"Verify the complete end-to-end gameplay loop for a single turn: Pre-Roll Management -> Roll -> Move -> Action -> Post-Roll.","A 2-player game (Human vs. AI) is in progress. It is the human player's turn.","1. (Pre-Roll) Open the Property Management screen, mortgage a property, and close it.
+2. (Roll) Click 'Roll Dice'.
+3. (Move) Watch the token animate to the new space.
+4. (Action) The player lands on an unowned property. Click 'Buy' on the modal dialog.
+5. (Post-Roll) The roll was not doubles. Verify the turn ends.","The mortgage action is successful and cash updates. The token moves to the correct space. The property is purchased and ownership is updated. The HUD correctly indicates it is now the AI's turn.",A saved game where the player has a property to mortgage and is near an unowned property.,"Development Build",3.5,TASK-TURN-002
+TEST-RULE-003,Domain Model & Rule Engine,Functional,Unit,Critical,High,"Verify the full logic for getting out of jail (US-020, US-021, US-022, US-023).","A mock GameState is created with a player in jail.","1. Test 'Pay Fine': Assert cash is deducted and status becomes 'Active'.
+2. Test 'Use Card': Assert card count decrements, card returns to deck, status becomes 'Active'.
+3. Test 'Roll Doubles' (Success): Assert status becomes 'Active' and turn does NOT repeat.
+4. Test 'Roll Doubles' (Fail on 1st/2nd try): Assert `jail_turns_remaining` decrements and turn ends.
+5. Test 'Roll Doubles' (Fail on 3rd try): Assert cash is deducted, status becomes 'Active', and player moves.","Each test case results in the correct and specific state changes as per the official rules.",Mock GameState with player in jail, with/without cash/cards,"NUnit",4,TASK-RULE-004
+TEST-RULE-004,Domain Model & Rule Engine,Functional,Unit,Critical,High,"Verify the rent calculation logic for all property types and conditions (REQ-1-003, US-044).","The Rent Calculation service is instantiated. Mock property and player data are provided.","1. Test rent for a single property, no monopoly.
+2. Test rent for an undeveloped monopoly (should be double).
+3. Test rent for a property with 1-4 houses and a hotel.
+4. Test rent for owning 1, 2, 3, and 4 railroads.
+5. Test rent for owning 1 and 2 utilities, with a given dice roll.
+6. Test rent for a mortgaged property (should be zero).","In every case, the calculated rent amount is exactly correct according to the official Monopoly rent table.",Mock property data and player ownership states,"NUnit",4,TASK-RULE-008
+TEST-RULE-005,Domain Model & Rule Engine,Functional,Unit,Critical,High,"Verify the 'even building' rule validation for both building and selling houses (REQ-1-054, US-034).","The building validation logic is being tested. A mock monopoly property set is created.","1. Test building a 2nd house on Property A when Property B has 0 houses. Assert failure.
+2. Test building a 1st house on Property B. Assert success.
+3. Test selling a house from Property A (has 2 houses) when Property B has 3 houses. Assert failure.
+4. Test building a hotel when one property in the set has only 3 houses. Assert failure.","Each validation test returns the correct boolean result (allow/disallow) and a descriptive reason for failure.",Mock property ownership data with varying house counts,"NUnit",3,TASK-RULE-012
+TEST-E2E-002,Bankruptcy,Functional,System,Critical,Medium,"Verify the end-to-end player-to-player bankruptcy workflow (REQ-1-066, US-047).","The game is running. Use a curated save file where the human player is about to land on a property with massive rent and has insufficient cash but sufficient assets to cover it.","1. Load the save file.
+2. Take the turn, landing on the high-rent property.
+3. The game should prompt to liquidate assets. Sell buildings and mortgage properties.
+4. The debt is still not covered.
+5. Observe the bankruptcy sequence.","After step 4, the game declares the human player bankrupt to the creditor AI. All of the human's remaining cash, properties (including mortgaged ones), and cards are transferred to the AI. The 'Game Over' screen appears.",Curated 'Near Bankruptcy' save file,"Development Build",2,TASK-TEST-005
+TEST-PERSIST-001,Game State Persistence,Functional,Integration,Critical,High,"Verify the Save/Load cycle results in a perfectly restored game state (REQ-1-085, US-061, US-062).","An integration test is set up in the Unity Test Framework.","1. Programmatically create a complex, non-trivial `GameState` object (player in jail, properties mortgaged, specific card deck order, etc.).
+2. Serialize the original state to a string for later comparison.
+3. Call the `SaveGameRepository` to save the state to a temporary file.
+4. Call the `SaveGameRepository` to load the state from that file into a new object.
+5. Serialize the loaded state to a string.
+6. Assert that the two JSON strings are identical.","The assertion passes, confirming a lossless save/load round trip.",A complex GameState object created in code,"Unity Test Framework",3,TASK-TEST-003
+TEST-PERSIST-002,Game State Persistence,Functional,System,High,Manual Only,"Verify the system gracefully handles corrupted and incompatible save files in the UI (REQ-1-088, US-063).","The game is on the main menu. The saves directory contains prepared invalid files.","1. Place a corrupted save file (checksum mismatch) in the saves directory.
+2. Place an incompatible save file (old version number) in the directory.
+3. Navigate to the 'Load Game' screen.","The UI correctly labels the two slots as 'Corrupted' and 'Incompatible Version'. The 'Load' button for these slots is disabled. A helpful tooltip appears on hover. The application does not crash.",Corrupted and incompatible save files,"Development Build",2,TASK-LOAD-002
+TEST-AI-001,Artificial Intelligence,Functional,Unit,High,High,"Verify the AI's trade evaluation logic under controlled conditions (REQ-1-062, US-041).","The AI's trade evaluation service is instantiated. Mock game states and trade offers are provided.","1. Create a game state where an AI needs one property for a monopoly.
+2. Propose a trade offering that property for a fair price.
+3. Propose a trade offering that property for an exorbitant price.
+4. Propose a trade for a property the AI has no strategic interest in.","For #2, the 'Hard' AI should accept. For #3, all AIs should decline. For #4, the 'Easy' AI might accept, but 'Medium'/'Hard' should decline. The evaluation score returned by the service should reflect these outcomes.",Mock GameState objects and TradeOffer objects,"NUnit, Moq",4,TASK-TEST-002
+TEST-AI-002,Artificial Intelligence,Functional,System,High,Manual Only,"Verify AI difficulty levels exhibit distinct strategic profiles during gameplay (REQ-1-019, US-010).","Run a full game in spectator mode or play against the AI.","1. Play a game against 3 'Easy' AIs.
+2. Play a game against 3 'Hard' AIs.
+3. Observe their behavior regarding property acquisition, trading, and building.","The 'Easy' AIs will make noticeable mistakes, like declining to buy valuable properties or accepting poor trades. The 'Hard' AIs will aggressively pursue monopolies, attempt to block human players, and manage their cash strategically.",N/A,"Development Build",6,TASK-AI-TUNE-001
+TEST-THEME-001,UI/UX,Functional,System,Medium,Manual Only,"Verify the theme system correctly swaps all visual and audio assets (REQ-1-093, US-066).","The game is running and has at least two themes available.","1. Start the game with the 'Classic' theme. Observe the main menu, start a game, and observe the board, tokens, HUD, and listen to the music/SFX.
+2. Go to settings and switch to the 'Futuristic' theme.
+3. Repeat the observations from step 1.","After step 2, all visual and audio assets should change. The main menu UI is re-skinned, the in-game board/tokens have a different model/texture, the HUD has a different style, and the background music and sound effects are completely different.",N/A,"Development Build",3,TASK-THEME-003
