@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save/Load Slot Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Reset & Base Styles */
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #F7F5F2;
+            color: #1C1A17;
+            padding: 48px;
+        }
+        button {
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+            padding: 0;
+            background: none;
+            border: none;
+            color: inherit;
+        }
+
+        /* Showcase Styles */
+        .showcase {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .showcase__header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .showcase__header h1 {
+            font-family: 'Lora', serif;
+            font-size: 48px;
+            margin: 0 0 16px 0;
+        }
+        .showcase__header p {
+            font-size: 18px;
+            color: #7D7871;
+            max-width: 60ch;
+            margin: 0 auto;
+        }
+        .showcase__section {
+            margin-bottom: 64px;
+        }
+        .showcase__section h2 {
+            font-family: 'Lora', serif;
+            font-size: 28px;
+            border-bottom: 1px solid #E8E5E1;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .showcase__grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Save/Load Slot Component CSS */
+
+        :root {
+            /* Design System Tokens */
+            --font-primary: 'Lora', serif;
+            --font-secondary: 'Inter', sans-serif;
+            --color-primary-500: #1987C7;
+            --color-primary-700: #0C537F;
+            --color-neutral-white: #FFFFFF;
+            --color-neutral-gray-50: #F7F5F2;
+            --color-neutral-gray-100: #E8E5E1;
+            --color-neutral-gray-500: #7D7871;
+            --color-neutral-gray-900: #1C1A17;
+            --color-semantic-error: #C0392B;
+            --color-semantic-warning: #F39C12;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --border-radius-md: 8px;
+            --shadow-sm: 0 4px 6px rgba(28, 26, 23, 0.07);
+            --shadow-md: 0 8px 12px rgba(28, 26, 23, 0.1);
+            --transition-speed: 0.2s;
+        }
+
+        .save-slot {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-neutral-white);
+            border: 2px solid var(--color-neutral-100);
+            box-shadow: var(--shadow-sm);
+            text-align: left;
+            font-family: var(--font-secondary);
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .save-slot:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary-500);
+        }
+
+        .save-slot:focus-visible {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 3px rgba(25, 135, 199, 0.3), var(--shadow-md);
+        }
+        
+        .save-slot.is-selected {
+            border-color: var(--color-primary-700);
+            box-shadow: 0 0 0 3px var(--color-primary-500), var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .save-slot:disabled, .save-slot--disabled {
+            cursor: not-allowed;
+            background-color: var(--color-neutral-gray-50);
+        }
+
+        .save-slot:disabled:hover, .save-slot--disabled:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+            border-color: var(--color-neutral-100);
+        }
+
+        /* Elements */
+        .save-slot__header {
+            font-family: var(--font-primary);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-neutral-gray-900);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .save-slot__content {
+            flex-grow: 1;
+        }
+
+        .save-slot__player-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--color-primary-700);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .save-slot__metadata {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 14px;
+            color: var(--color-neutral-gray-500);
+        }
+
+        .save-slot__timestamp {
+            margin-top: auto;
+            padding-top: var(--spacing-md);
+            font-size: 13px;
+            color: var(--color-neutral-gray-500);
+            border-top: 1px solid var(--color-neutral-100);
+        }
+        
+        .save-slot__status-badge {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Variants */
+        .save-slot--empty {
+            justify-content: center;
+            align-items: center;
+            border-style: dashed;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        .save-slot--empty:hover {
+            background-color: rgba(25, 135, 199, 0.05);
+        }
+        .save-slot--empty .save-slot__header {
+            color: var(--color-neutral-gray-500);
+        }
+
+        .save-slot--corrupted {
+            border-color: var(--color-semantic-error);
+        }
+        .save-slot--corrupted .save-slot__header, 
+        .save-slot--corrupted .save-slot__content,
+        .save-slot--corrupted .save-slot__timestamp {
+            opacity: 0.4;
+        }
+        .save-slot--corrupted .save-slot__status-badge {
+            background-color: var(--color-semantic-error);
+            color: var(--color-neutral-white);
+        }
+
+        .save-slot--incompatible {
+            border-color: var(--color-semantic-warning);
+        }
+        .save-slot--incompatible .save-slot__header, 
+        .save-slot--incompatible .save-slot__content,
+        .save-slot--incompatible .save-slot__timestamp {
+            opacity: 0.4;
+        }
+        .save-slot--incompatible .save-slot__status-badge {
+            background-color: var(--color-semantic-warning);
+            color: var(--color-neutral-gray-900);
+        }
+
+    </style>
+</head>
+<body>
+
+    <main class="showcase">
+        <header class="showcase__header">
+            <h1>Save/Load Slot</h1>
+            <p>This component is used in the Save and Load Game menus to display the status and metadata of a persistent game file.</p>
+        </header>
+
+        <section class="showcase__section">
+            <h2>Occupied Slot</h2>
+            <div class="showcase__grid">
+                <button class="save-slot save-slot--occupied" aria-label="Save Slot 1, BoardwalkKing, Turn 45. Press to select.">
+                    <div class="save-slot__header">Slot 1</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">BoardwalkKing</div>
+                        <div class="save-slot__metadata">
+                            <span>Turn: 45</span>
+                            <span>Cash: $2,150</span>
+                        </div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2025-01-26 10:30 PM</div>
+                </button>
+                <button class="save-slot save-slot--occupied is-selected" aria-label="Save Slot 2, RailroadMogul, Turn 12, currently selected.">
+                    <div class="save-slot__header">Slot 2 (Selected)</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">RailroadMogul</div>
+                        <div class="save-slot__metadata">
+                            <span>Turn: 12</span>
+                            <span>Cash: $880</span>
+                        </div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2025-01-25 08:15 AM</div>
+                </button>
+            </div>
+        </section>
+
+        <section class="showcase__section">
+            <h2>Empty Slot</h2>
+            <div class="showcase__grid">
+                <button class="save-slot save-slot--empty" aria-label="Save Slot 3, Empty. Press to save here.">
+                    <div class="save-slot__header">Empty Slot</div>
+                </button>
+            </div>
+        </section>
+
+        <section class="showcase__section">
+            <h2>Unusable Slots (Disabled)</h2>
+            <div class="showcase__grid">
+                <button class="save-slot save-slot--corrupted" disabled aria-label="Save Slot 4, Corrupted. Cannot be loaded.">
+                    <div class="save-slot__status-badge">Corrupted</div>
+                    <div class="save-slot__header">Slot 4</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">TycoonPro</div>
+                        <div class="save-slot__metadata">
+                            <span>Turn: ???</span>
+                            <span>Cash: ???</span>
+                        </div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2025-01-24 11:00 PM</div>
+                </button>
+                <button class="save-slot save-slot--incompatible" disabled aria-label="Save Slot 5, Incompatible Version. Cannot be loaded.">
+                    <div class="save-slot__status-badge">Incompatible</div>
+                    <div class="save-slot__header">Slot 5</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">OldTimer</div>
+                        <div class="save-slot__metadata">
+                            <span>Turn: 89</span>
+                            <span>Cash: $5,400</span>
+                        </div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2024-11-10 02:00 PM</div>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <div class="showcase">
+        <section class="showcase__section">
+            <h2>Component Variations</h2>
+            <div>
+                <h3>Variant Name: Empty</h3>
+                <p>Represents an available slot where a new game can be saved. Has a distinct visual style (dashed border) to differentiate it.</p>
+                <button class="save-slot save-slot--empty" style="max-width: 300px; margin-top: 16px;">
+                    <div class="save-slot__header">Empty Slot</div>
+                </button>
+            </div>
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid #E8E5E1;">
+            <div>
+                <h3>Variant Name: Occupied</h3>
+                <p>The standard state for a valid, loadable save file. Displays all relevant metadata for the player to identify the save.</p>
+                <button class="save-slot save-slot--occupied" style="max-width: 300px; margin-top: 16px;">
+                    <div class="save-slot__header">Slot 1</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">BoardwalkKing</div>
+                        <div class="save-slot__metadata">
+                            <span>Turn: 45</span>
+                            <span>Cash: $2,150</span>
+                        </div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2025-01-26 10:30 PM</div>
+                </button>
+            </div>
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid #E8E5E1;">
+            <div>
+                <h3>Variant Name: Corrupted</h3>
+                <p>Indicates that the save file has failed an integrity check (checksum mismatch). The component is disabled to prevent load attempts.</p>
+                <button class="save-slot save-slot--corrupted" disabled style="max-width: 300px; margin-top: 16px;">
+                    <div class="save-slot__status-badge">Corrupted</div>
+                    <div class="save-slot__header">Slot 4</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">TycoonPro</div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2025-01-24 11:00 PM</div>
+                </button>
+            </div>
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid #E8E5E1;">
+            <div>
+                <h3>Variant Name: Incompatible</h3>
+                <p>Indicates the save file was created with an older, unsupported version of the game. The component is disabled.</p>
+                <button class="save-slot save-slot--incompatible" disabled style="max-width: 300px; margin-top: 16px;">
+                    <div class="save-slot__status-badge">Incompatible</div>
+                    <div class="save-slot__header">Slot 5</div>
+                    <div class="save-slot__content">
+                        <div class="save-slot__player-name">OldTimer</div>
+                    </div>
+                    <div class="save-slot__timestamp">Saved: 2024-11-10 02:00 PM</div>
+                </button>
+            </div>
+        </section>
+    </div>
+
+</body>
+</html>

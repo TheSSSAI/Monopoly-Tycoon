@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly Tycoon - Player Records</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------ */
+    /* --- 1. Design System Tokens -- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      
+      --color-destructive-500: #D7263D;
+      --color-success-500: #1E8449; --color-warning-500: #F39C12;
+
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-family-monospace: 'Roboto Mono', monospace;
+      
+      --font-size-h1: 48px; --font-size-h2: 36px; --font-size-h3: 28px; --font-size-h4: 20px;
+      --font-size-body: 16px; --font-size-caption: 14px;
+
+      --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+      /* Spacing */
+      --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+      --spacing-xl: 32px; --spacing-2xl: 48px; --spacing-3xl: 64px;
+      
+      /* Borders & Shadows */
+      --border-radius-md: 8px;
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    }
+
+    /* ------------------------------ */
+    /* --- 2. CSS Reset & Base Styles -- */
+    /* ------------------------------ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-primary-900);
+      color: var(--color-neutral-900);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23063A5B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+    }
+    
+    /* ----------------------------------- */
+    /* --- 3. Screen Layout & Structure -- */
+    /* ----------------------------------- */
+    .screen-container {
+      width: 100%;
+      max-width: 900px;
+      background-color: var(--color-neutral-50);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin: var(--spacing-xl);
+      max-height: 90vh;
+    }
+
+    .screen-header {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-bottom: 1px solid var(--color-neutral-100);
+      background-color: var(--color-neutral-white);
+    }
+    
+    .screen-header h1 {
+        font-family: var(--font-family-primary);
+        font-size: var(--font-size-h3);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary-800);
+    }
+    
+    .screen-tabs {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-md);
+    }
+
+    .screen-content {
+      padding: var(--spacing-xl);
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+    
+    .tab-panel {
+        display: none;
+    }
+    .tab-panel--active {
+        display: block;
+        animation: panelFadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes panelFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen-footer {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-top: 1px solid var(--color-neutral-100);
+      background-color: var(--color-neutral-white);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* ------------------------------ */
+    /* --- 4. Component Styles ------ */
+    /* ------------------------------ */
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-family-secondary);
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease-out;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-sm);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--color-primary-300);
+      outline-offset: 2px;
+    }
+    
+    .btn--primary {
+      background-color: var(--color-primary-500);
+      color: var(--color-neutral-white);
+      padding: 12px 24px;
+    }
+    .btn--primary:hover {
+      background-color: var(--color-primary-600);
+      box-shadow: var(--shadow-md);
+    }
+    .btn--primary:active {
+      background-color: var(--color-primary-700);
+      transform: scale(0.98);
+    }
+    .btn--primary:disabled {
+      background-color: var(--color-primary-200);
+      color: var(--color-primary-50);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn--secondary {
+        background: transparent;
+        color: var(--color-primary-700);
+        padding: 11px 23px;
+        border: 1px solid var(--color-primary-700);
+    }
+    .btn--secondary:hover {
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-800);
+    }
+     .btn--secondary:active {
+      background-color: var(--color-primary-100);
+      transform: scale(0.98);
+    }
+
+    /* Tab Button */
+    .tab-button {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-body);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-neutral-500);
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .tab-button:hover {
+        color: var(--color-primary-700);
+        background-color: var(--color-primary-50);
+    }
+    .tab-button--active {
+        color: var(--color-primary-700);
+        border-bottom-color: var(--color-primary-500);
+    }
+    
+    /* Statistics View */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--spacing-lg);
+    }
+    .stat-item {
+        background-color: var(--color-neutral-white);
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--color-neutral-100);
+    }
+    .stat-item__label {
+        font-size: var(--font-size-caption);
+        color: var(--color-neutral-500);
+        margin-bottom: var(--spacing-xs);
+        display: block;
+    }
+    .stat-item__value {
+        font-size: var(--font-size-h4);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-primary-800);
+        font-family: var(--font-family-primary);
+    }
+
+    /* Top Scores View */
+    .scores-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .scores-table__header {
+        text-align: left;
+        font-size: var(--font-size-caption);
+        color: var(--color-neutral-500);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--color-neutral-100);
+    }
+    .scores-table__header th {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    .scores-table__body tr {
+        border-bottom: 1px solid var(--color-neutral-100);
+    }
+    .scores-table__body tr:last-child {
+        border-bottom: none;
+    }
+    .scores-table__body td {
+        padding: var(--spacing-md);
+        vertical-align: middle;
+    }
+    .score-rank {
+        font-family: var(--font-family-primary);
+        font-size: var(--font-size-h4);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-primary-700);
+        width: 5%;
+        text-align: center;
+    }
+    .score-name {
+        font-weight: var(--font-weight-semibold);
+        width: 35%;
+    }
+    .score-networth {
+        font-family: var(--font-family-monospace);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-success-500);
+        width: 25%;
+    }
+    .score-duration, .score-turns {
+        font-family: var(--font-family-monospace);
+        color: var(--color-neutral-500);
+        width: 17.5%;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-3xl) var(--spacing-xl);
+        background-color: var(--color-neutral-white);
+        border-radius: var(--border-radius-md);
+        border: 1px dashed var(--color-neutral-100);
+    }
+    .empty-state p {
+        font-size: var(--font-size-body);
+        color: var(--color-neutral-500);
+    }
+    
+    /* Variations section for documentation */
+    .screen-variations {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: rgba(0,0,0,0.8);
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        max-width: 300px;
+        font-size: 14px;
+        z-index: 100;
+        display: none; /* Hidden in production, shown for this mockup */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="screen-container">
+    <header class="screen-header">
+      <h1>Player Records</h1>
+      <nav class="screen-tabs" role="tablist" aria-label="Player Records">
+        <button id="tab-stats" class="tab-button tab-button--active" role="tab" aria-selected="true" aria-controls="panel-stats">Statistics</button>
+        <button id="tab-scores" class="tab-button" role="tab" aria-selected="false" aria-controls="panel-scores">Top Scores</button>
+      </nav>
+    </header>
+    
+    <main class="screen-content">
+      <!-- Statistics Panel -->
+      <div id="panel-stats" class="tab-panel tab-panel--active" role="tabpanel" aria-labelledby="tab-stats">
+        <div class="stats-grid">
+          <div class="stat-item"><span class="stat-item__label">Total Games Played</span><span class="stat-item__value">27</span></div>
+          <div class="stat-item"><span class="stat-item__label">Total Wins</span><span class="stat-item__value">15</span></div>
+          <div class="stat-item"><span class="stat-item__label">Win / Loss Ratio</span><span class="stat-item__value">55.56%</span></div>
+          <div class="stat-item"><span class="stat-item__label">Average Game Duration</span><span class="stat-item__value">48m 12s</span></div>
+          <div class="stat-item"><span class="stat-item__label">Total Rent Paid</span><span class="stat-item__value">$18,450</span></div>
+          <div class="stat-item"><span class="stat-item__label">Total Rent Collected</span><span class="stat-item__value">$25,320</span></div>
+          <div class="stat-item"><span class="stat-item__label">Most Profitable Property</span><span class="stat-item__value">Boardwalk</span></div>
+          <div class="stat-item"><span class="stat-item__label">Total Properties Acquired</span><span class="stat-item__value">189</span></div>
+          <div class="stat-item"><span class="stat-item__label">Largest Trade Deal</span><span class="stat-item__value">$2,100</span></div>
+        </div>
+      </div>
+
+      <!-- Top Scores Panel -->
+      <div id="panel-scores" class="tab-panel" role="tabpanel" aria-labelledby="tab-scores">
+        <table class="scores-table">
+            <thead class="scores-table__header">
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Net Worth</th>
+                    <th>Duration</th>
+                    <th>Turns</th>
+                </tr>
+            </thead>
+            <tbody class="scores-table__body">
+                <tr>
+                    <td class="score-rank">1</td>
+                    <td class="score-name">BoardwalkKing</td>
+                    <td class="score-networth">$15,840</td>
+                    <td class="score-duration">01:12:45</td>
+                    <td class="score-turns">128</td>
+                </tr>
+                <tr>
+                    <td class="score-rank">2</td>
+                    <td class="score-name">BoardwalkKing</td>
+                    <td class="score-networth">$12,500</td>
+                    <td class="score-duration">55:30</td>
+                    <td class="score-turns">95</td>
+                </tr>
+                <tr>
+                    <td class="score-rank">3</td>
+                    <td class="score-name">BoardwalkKing</td>
+                    <td class="score-networth">$12,500</td>
+                    <td class="score-duration">01:05:10</td>
+                    <td class="score-turns">102</td>
+                </tr>
+                <tr>
+                    <td class="score-rank">4</td>
+                    <td class="score-name">BoardwalkKing</td>
+                    <td class="score-networth">$9,780</td>
+                    <td class="score-duration">45:15</td>
+                    <td class="score-turns">88</td>
+                </tr>
+                <!-- More rows as needed -->
+            </tbody>
+        </table>
+      </div>
+    </main>
+    
+    <footer class="screen-footer">
+      <button class="btn btn--secondary" type="button">Back to Main Menu</button>
+      <button id="export-button" class="btn btn--primary" type="button" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L6.354 8.146a.5.5 0 1 0-.708.708l2 2z"/></svg>
+        Export to Text
+      </button>
+    </footer>
+  </div>
+
+  <!-- Screen Variations -->
+  <div class="screen-variations" style="position: absolute; bottom: 20px; right: 20px; background: #333; padding: 20px; border-radius: 8px; color: white; display: block; max-width: 400px; z-index: 1000; font-family: sans-serif;">
+      <h3 style="font-family: var(--font-family-primary); margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 5px;">Screen Variations</h3>
+      <div id="stats_view_with_data" style="margin-bottom: 15px;">
+        <h4 style="margin-bottom: 5px;">Statistics View (With Data)</h4>
+        <p style="font-size: 14px; color: #ccc;">Default view. Shows all historical statistics for a player who has completed at least one game.</p>
+      </div>
+      <div id="stats_view_empty" style="margin-bottom: 15px;">
+        <h4 style="margin-bottom: 5px;">Statistics View (Empty)</h4>
+        <p style="font-size: 14px; color: #ccc;">This view is shown when a new player with no game history accesses the screen.</p>
+        <div class="tab-panel" style="display: block; margin-top: 10px;">
+             <div class="empty-state">
+                <p>No statistics recorded yet. Complete a game to see your progress!</p>
+             </div>
+        </div>
+      </div>
+       <div id="scores_view_with_data" style="margin-bottom: 15px;">
+        <h4 style="margin-bottom: 5px;">Top Scores View (With Data)</h4>
+        <p style="font-size: 14px; color: #ccc;">Shows the top 10 victories, sorted by net worth. The 'Export' button is enabled.</p>
+      </div>
+      <div id="scores_view_empty" style="margin-bottom: 15px;">
+        <h4 style="margin-bottom: 5px;">Top Scores View (Empty)</h4>
+        <p style="font-size: 14px; color: #ccc;">This view is shown when a player has not yet won any games. The 'Export' button would be disabled.</p>
+        <div class="tab-panel" style="display: block; margin-top: 10px;">
+             <div class="empty-state">
+                <p>No victories recorded yet. Win a game to get on the leaderboard!</p>
+             </div>
+        </div>
+      </div>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabStats = document.getElementById('tab-stats');
+      const tabScores = document.getElementById('tab-scores');
+      const panelStats = document.getElementById('panel-stats');
+      const panelScores = document.getElementById('panel-scores');
+      const exportButton = document.getElementById('export-button');
+
+      function switchTab(activeTab, inactiveTab, activePanel, inactivePanel) {
+        activeTab.classList.add('tab-button--active');
+        activeTab.setAttribute('aria-selected', 'true');
+        inactiveTab.classList.remove('tab-button--active');
+        inactiveTab.setAttribute('aria-selected', 'false');
+
+        activePanel.classList.add('tab-panel--active');
+        inactivePanel.classList.remove('tab-panel--active');
+        
+        if (activeTab === tabScores) {
+            exportButton.style.display = 'inline-flex';
+        } else {
+            exportButton.style.display = 'none';
+        }
+      }
+
+      tabStats.addEventListener('click', () => switchTab(tabStats, tabScores, panelStats, panelScores));
+      tabScores.addEventListener('click', () => switchTab(tabScores, tabStats, panelScores, panelStats));
+    });
+  </script>
+
+</body>
+</html>

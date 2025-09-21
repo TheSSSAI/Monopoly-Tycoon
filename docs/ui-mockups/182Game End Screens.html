@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Tycoon - Game End Screen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* ------------------------------ */
+        /* --- 1. Design System Tokens -- */
+        /* ------------------------------ */
+        :root {
+            /* Color Palette */
+            --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+            --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+            --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+            --color-primary-900: #032037;
+            
+            --color-secondary-50: #FBE9EC; --color-secondary-500: #D7263D; --color-secondary-900: #5A0A15;
+
+            --color-success: #1E8449; --color-warning: #F39C12; --color-error: #C0392B; --color-info: #2980B9;
+            --color-success-bg: #E9F6ED; --color-error-bg: #FADBD8;
+
+            --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+            --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+            --color-gold: #FFD700;
+
+            /* Typography */
+            --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+            --font-family-monospace: 'Roboto Mono', monospace;
+            
+            --font-size-h1: 48px; --font-size-h2: 36px; --font-size-h3: 28px; --font-size-h4: 20px;
+            --font-size-body: 16px; --font-size-caption: 14px;
+
+            --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+            --line-height-tight: 1.2; --line-height-heading: 1.4; --line-height-body: 1.6;
+
+            /* Spacing */
+            --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+            --spacing-xl: 32px; --spacing-2xl: 48px; --spacing-3xl: 64px;
+
+            /* Shadows & Borders */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 16px;
+        }
+
+        /* ------------------------------ */
+        /* --- 2. CSS Reset & Base Styles -- */
+        /* ------------------------------ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: var(--font-family-secondary);
+            background-color: var(--color-primary-900);
+            background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 93c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 43c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23063A5B" fill-opacity="0.4" fill-rule="evenodd"/%3E%3C/svg%3E');
+            color: var(--color-neutral-white);
+            line-height: var(--line-height-body);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* ------------------------------ */
+        /* --- 3. Buttons Component ----- */
+        /* ------------------------------ */
+        .btn {
+            font-family: var(--font-family-secondary);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            border: none;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+
+        .btn--primary {
+            background-color: var(--color-primary-500);
+            color: var(--color-neutral-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        .btn--primary:hover {
+            background-color: var(--color-primary-600);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .btn--primary:active {
+            background-color: var(--color-primary-700);
+            transform: translateY(0) scale(0.98);
+        }
+        .btn--primary:focus-visible {
+            outline: 2px solid var(--color-primary-300);
+            outline-offset: 2px;
+        }
+        
+        .btn--secondary {
+            background-color: transparent;
+            color: var(--color-neutral-100);
+            padding: calc(var(--spacing-md) - 1px) calc(var(--spacing-lg) - 1px);
+            border: 1px solid var(--color-neutral-100);
+        }
+        .btn--secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-neutral-white);
+            color: var(--color-neutral-white);
+        }
+         .btn--secondary:active {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(0.98);
+        }
+        .btn--secondary:focus-visible {
+            outline: 2px solid var(--color-primary-300);
+            outline-offset: 2px;
+        }
+
+        /* -------------------------------- */
+        /* --- 4. Screen Implementation --- */
+        /* -------------------------------- */
+        .game-end-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+            background-color: rgba(3, 32, 55, 0.7);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-dialog {
+            background-color: var(--color-primary-800);
+            border: 1px solid var(--color-primary-600);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: scaleUp 0.5s ease-out forwards;
+            transform-origin: center;
+        }
+        
+        @keyframes scaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-dialog__header {
+            padding: var(--spacing-xl) var(--spacing-2xl);
+            text-align: center;
+            border-bottom: 1px solid var(--color-primary-700);
+            position: relative;
+        }
+
+        .modal-dialog__title {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-bold);
+            line-height: var(--line-height-tight);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .modal-dialog__title--victory {
+             color: var(--color-gold);
+             text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .modal-dialog__title--game-over {
+             color: var(--color-secondary-500);
+             text-shadow: 0 0 15px rgba(215, 38, 61, 0.5);
+        }
+        
+        .modal-dialog__subtitle {
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-regular);
+            color: var(--color-primary-200);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .modal-dialog__content {
+            padding: var(--spacing-xl) var(--spacing-2xl);
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .modal-dialog__footer {
+            padding: var(--spacing-lg) var(--spacing-2xl);
+            border-top: 1px solid var(--color-primary-700);
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            background-color: var(--color-primary-900);
+        }
+
+        /* Summary Screen Specifics */
+        .player-summary-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .player-stat-card {
+            background-color: var(--color-primary-700);
+            border: 1px solid var(--color-primary-600);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            transition: all 0.2s ease-out;
+        }
+        
+        .player-stat-card--bankrupt {
+            opacity: 0.6;
+            background-color: var(--color-primary-800);
+        }
+        
+        .player-stat-card--winner {
+            background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-600));
+            border-color: var(--color-gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-basis: 250px;
+            flex-shrink: 0;
+        }
+
+        .player-info__token {
+            width: 50px;
+            height: 50px;
+            background-color: var(--color-primary-500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--color-primary-300);
+        }
+        
+        .player-info__token svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--color-neutral-white);
+        }
+        
+        .player-stat-card--winner .player-info__token {
+             border-color: var(--color-gold);
+        }
+
+        .player-info__name-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-info__name {
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-neutral-white);
+        }
+        
+        .player-stat-card--winner .player-info__name {
+            color: var(--color-gold);
+        }
+
+        .player-info__status {
+            font-size: var(--font-size-caption);
+            font-weight: var(--font-weight-regular);
+            color: var(--color-primary-200);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .player-info__status--winner {
+            color: var(--color-success);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .player-info__status--bankrupt {
+            color: var(--color-secondary-500);
+        }
+
+        .player-stats {
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-item__value {
+            font-family: var(--font-family-monospace);
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-neutral-white);
+        }
+
+        .stat-item__label {
+            font-size: var(--font-size-caption);
+            color: var(--color-primary-300);
+            text-transform: uppercase;
+        }
+        
+        /* Victory Screen specifics */
+        .victory-stats {
+            text-align: center;
+            padding: var(--spacing-2xl) 0;
+        }
+        
+        .victory-stats .stat-item {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .victory-stats .stat-item__value {
+            font-size: var(--font-size-h2);
+        }
+        
+        .victory-stats .stat-item__label {
+            font-size: var(--font-size-body);
+        }
+        
+        /* Confetti for Victory Screen */
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: var(--color-gold);
+            top: -20px;
+            opacity: 0;
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+          0% { transform: translateY(0) rotateZ(0); opacity: 1; }
+          100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
+        }
+
+        .confetti:nth-child(2) { left: 10%; animation-delay: 1s; background-color: var(--color-primary-300); }
+        .confetti:nth-child(3) { left: 20%; animation-delay: 0.5s; }
+        .confetti:nth-child(4) { left: 30%; animation-delay: 2.5s; background-color: var(--color-neutral-white); }
+        .confetti:nth-child(5) { left: 40%; animation-delay: 1.5s; }
+        .confetti:nth-child(6) { left: 50%; animation-delay: 3s; background-color: var(--color-primary-300); }
+        .confetti:nth-child(7) { left: 60%; animation-delay: 0.2s; }
+        .confetti:nth-child(8) { left: 70%; animation-delay: 2s; background-color: var(--color-neutral-white); }
+        .confetti:nth-child(9) { left: 80%; animation-delay: 1.2s; }
+        .confetti:nth-child(10) { left: 90%; animation-delay: 3.5s; background-color: var(--color-primary-300); }
+        
+        /* General helper for the variations section */
+        .screen-variations {
+            display: none; /* Hidden by default, for demonstration purposes only */
+            position: absolute;
+            top: 105vh;
+            left: 0;
+            width: 100%;
+            padding: var(--spacing-xl);
+            background-color: #eee;
+            color: #111;
+        }
+        .variation-group { margin-bottom: var(--spacing-3xl); }
+        .variation-group h3 { font-family: var(--font-family-primary); margin-bottom: var(--spacing-sm); }
+        .variation-group p { margin-bottom: var(--spacing-md); }
+    </style>
+</head>
+<body>
+    
+    <!-- This is the default implementation shown. -->
+    <!-- It demonstrates the 'Victory Screen' variant. -->
+    <div class="game-end-screen" role="dialog" aria-modal="true" aria-labelledby="dialog-title-victory">
+        <div class="confetti-container" aria-hidden="true">
+            <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+            <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+            <div class="confetti"></div><div class="confetti"></div><div class="confetti"></div>
+            <div class="confetti"></div>
+        </div>
+        <div class="modal-dialog">
+            <header class="modal-dialog__header">
+                <h1 id="dialog-title-victory" class="modal-dialog__title modal-dialog__title--victory">Victory!</h1>
+                <p class="modal-dialog__subtitle">BoardwalkKing is the last tycoon standing!</p>
+            </header>
+            <main class="modal-dialog__content">
+                <div class="victory-stats">
+                     <div class="stat-item">
+                        <span class="stat-item__value">$10,450</span>
+                        <span class="stat-item__label">Final Net Worth</span>
+                    </div>
+                     <div class="stat-item">
+                        <span class="stat-item__value">01:15:32</span>
+                        <span class="stat-item__label">Game Duration</span>
+                    </div>
+                     <div class="stat-item">
+                        <span class="stat-item__value">124</span>
+                        <span class="stat-item__label">Total Turns</span>
+                    </div>
+                </div>
+            </main>
+            <footer class="modal-dialog__footer">
+                <button class="btn btn--secondary">Return to Main Menu</button>
+                <button class="btn btn--primary">View Game Summary</button>
+            </footer>
+        </div>
+    </div>
+    
+
+    <div class="screen-variations">
+        <!-- Variant: Game Over -->
+        <div class="variation-group">
+            <h3>Variant Name: "Game Over"</h3>
+            <p>This screen appears when the human player is declared bankrupt. It presents a simple message and a single path forward to the game summary.</p>
+            <div class="game-end-screen" role="dialog" aria-modal="true" aria-labelledby="dialog-title-game-over">
+                <div class="modal-dialog">
+                    <header class="modal-dialog__header">
+                        <h1 id="dialog-title-game-over" class="modal-dialog__title modal-dialog__title--game-over">Game Over</h1>
+                        <p class="modal-dialog__subtitle">You finished 3rd and have been eliminated.</p>
+                    </header>
+                    <main class="modal-dialog__content">
+                        <!-- Content for game over can be simple, or show final stats for the player -->
+                        <div class="victory-stats">
+                             <div class="stat-item">
+                                <span class="stat-item__value">$0</span>
+                                <span class="stat-item__label">Final Net Worth</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-item__value">Bankrupt</span>
+                                <span class="stat-item__label">Status</span>
+                            </div>
+                        </div>
+                    </main>
+                    <footer class="modal-dialog__footer">
+                        <button class="btn btn--primary">View Game Summary</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Variant: Game Summary -->
+        <div class="variation-group">
+            <h3>Variant Name: "Game Summary" (Human Wins, 4 Players)</h3>
+            <p>This screen provides a detailed breakdown of all players' performance after the match has concluded.</p>
+            <div class="game-end-screen" role="dialog" aria-modal="true" aria-labelledby="dialog-title-summary">
+                <div class="modal-dialog">
+                    <header class="modal-dialog__header">
+                        <h1 id="dialog-title-summary" class="modal-dialog__title">Game Summary</h1>
+                        <p class="modal-dialog__subtitle">BoardwalkKing was the ultimate Monopoly Tycoon!</p>
+                    </header>
+                    <main class="modal-dialog__content">
+                        <div class="player-summary-grid">
+                            <!-- Winner -->
+                            <div class="player-stat-card player-stat-card--winner">
+                                <div class="player-info">
+                                    <div class="player-info__token">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2L9.5 8.5H3L8 13L6 19L12 15L18 19L16 13L21 8.5H14.5L12 2Z"></path></svg>
+                                    </div>
+                                    <div class="player-info__name-block">
+                                        <span class="player-info__name">BoardwalkKing</span>
+                                        <span class="player-info__status player-info__status--winner">Winner</span>
+                                    </div>
+                                </div>
+                                <div class="player-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-item__value">$10,450</span>
+                                        <span class="stat-item__label">Net Worth</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-item__value">$5,230</span>
+                                        <span class="stat-item__label">Rent</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-item__value">12</span>
+                                        <span class="stat-item__label">Properties</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Bankrupt Players -->
+                            <div class="player-stat-card player-stat-card--bankrupt">
+                                <div class="player-info">
+                                    <div class="player-info__token">
+                                        <svg viewBox="0 0 24 24"><path d="M19.5 16.5c-1.88 0-3.62-1-4.5-2.58c-.88 1.58-2.62 2.58-4.5 2.58c-2.92 0-5.25-2.52-5.25-5.62c0-3.5 3.53-6.42 8.75-10.88l1.25 1.15l1.25-1.15c5.22 4.46 8.75 7.38 8.75 10.88c0 3.1-2.33 5.62-5.25 5.62z"></path></svg>
+                                    </div>
+                                    <div class="player-info__name-block">
+                                        <span class="player-info__name">AI Player 2</span>
+                                        <span class="player-info__status player-info__status--bankrupt">Bankrupt (2nd)</span>
+                                    </div>
+                                </div>
+                                <div class="player-stats">
+                                    <div class="stat-item"><span class="stat-item__value">$0</span><span class="stat-item__label">Net Worth</span></div>
+                                    <div class="stat-item"><span class="stat-item__value">$1,890</span><span class="stat-item__label">Rent</span></div>
+                                    <div class="stat-item"><span class="stat-item__value">8</span><span class="stat-item__label">Properties</span></div>
+                                </div>
+                            </div>
+                            <div class="player-stat-card player-stat-card--bankrupt">
+                                <div class="player-info">
+                                    <div class="player-info__token">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 15c-.83 0-1.5-.67-1.5-1.5S11.17 14 12 14s1.5.67 1.5 1.5S12.83 17 12 17zm0-5c-.83 0-1.5-.67-1.5-1.5S11.17 9 12 9s1.5.67 1.5 1.5S12.83 12 12 12z"></path></svg>
+                                    </div>
+                                    <div class="player-info__name-block">
+                                        <span class="player-info__name">AI Player 3</span>
+                                        <span class="player-info__status player-info__status--bankrupt">Bankrupt (3rd)</span>
+                                    </div>
+                                </div>
+                                <div class="player-stats">
+                                    <div class="stat-item"><span class="stat-item__value">$0</span><span class="stat-item__label">Net Worth</span></div>
+                                    <div class="stat-item"><span class="stat-item__value">$950</span><span class="stat-item__label">Rent</span></div>
+                                    <div class="stat-item"><span class="stat-item__value">5</span><span class="stat-item__label">Properties</span></div>
+                                </div>
+                            </div>
+                            <div class="player-stat-card player-stat-card--bankrupt">
+                                <div class="player-info">
+                                    <div class="player-info__token">
+                                        <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"></path></svg>
+                                    </div>
+                                    <div class="player-info__name-block">
+                                        <span class="player-info__name">AI Player 1</span>
+                                        <span class="player-info__status player-info__status--bankrupt">Bankrupt (4th)</span>
+                                    </div>
+                                </div>
+                                <div class="player-stats">
+                                    <div class="stat-item"><span class="stat-item__value">$0</span><span class="stat-item__label">Net Worth</span></div>
+                                    <div class="stat-item"><span class="stat-item__value">$400</span><span class="stat-item__label">Rent</span></div>
+                                    <div class="stat-item"><span class="stat-item__value">3</span><span class="stat-item__label">Properties</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <footer class="modal-dialog__footer">
+                        <button class="btn btn--primary">Return to Main Menu</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

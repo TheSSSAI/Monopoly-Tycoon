@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Score Row Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Foundational Styles & Design Tokens */
+        :root {
+            /* Typography */
+            --font-family-primary: 'Lora', serif;
+            --font-family-secondary: 'Inter', sans-serif;
+            --font-weight-regular: 400;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --font-size-body: 16px;
+            --font-size-caption: 14px;
+            --font-size-h3: 28px;
+            --font-size-h2: 2rem;
+
+            /* Colors */
+            --color-primary-50: #E6F0F6;
+            --color-primary-700: #0C537F;
+            --color-neutral-white: #FFFFFF;
+            --color-neutral-gray-50: #F7F5F2;
+            --color-neutral-gray-100: #E8E5E1;
+            --color-neutral-gray-500: #7D7871;
+            --color-neutral-gray-900: #1C1A17;
+            --color-warning-bg: #fffbeb; 
+            --color-warning-border: #f59e0b;
+            --color-warning-text: #92400e; 
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+
+            /* Borders */
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+        }
+
+        body {
+            font-family: var(--font-family-secondary);
+            background-color: var(--color-neutral-gray-50);
+            margin: 0;
+            padding: var(--spacing-xxl);
+            color: var(--color-neutral-gray-900);
+        }
+
+        .showcase-container {
+            max-width: 800px;
+            margin: auto;
+            background: var(--color-neutral-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .showcase-header {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            background: var(--color-primary-700);
+            color: var(--color-neutral-white);
+        }
+
+        .showcase-header h1 {
+            margin: 0;
+            font-family: var(--font-family-primary);
+        }
+
+        .showcase-header p {
+            margin: var(--spacing-xs) 0 0 0;
+            opacity: 0.9;
+        }
+
+        .component-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .variant-title {
+            padding: var(--spacing-md) var(--spacing-xl) var(--spacing-sm);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-neutral-gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--color-neutral-gray-100);
+        }
+
+        /* Component: High Score Row CSS */
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--color-neutral-white);
+            border-bottom: 1px solid var(--color-neutral-gray-100);
+            font-family: var(--font-family-secondary);
+            transition: background-color 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        .score-row:last-child {
+            border-bottom: none;
+        }
+
+        .score-row__rank {
+            flex: 0 0 40px;
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-h3);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-700);
+            text-align: center;
+        }
+
+        .score-row__details {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevents long names from breaking layout */
+        }
+        
+        .score-row__name {
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-neutral-gray-900);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .score-row__meta {
+            font-size: var(--font-size-caption);
+            color: var(--color-neutral-gray-500);
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xs);
+            flex-wrap: wrap; /* Allow meta to wrap on small screens if needed */
+        }
+        
+        .score-row__net-worth {
+            flex: 0 0 120px;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-neutral-gray-900);
+            text-align: right;
+        }
+
+        .score-row__icon {
+            width: 20px;
+            height: 20px;
+            color: var(--color-warning-text);
+            flex-shrink: 0;
+        }
+
+        /* Component States */
+        .score-row:hover {
+            background-color: var(--color-primary-50);
+            transform: scale(1.01);
+            cursor: pointer;
+            z-index: 2;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-radius: var(--border-radius-md);
+        }
+
+        .score-row:focus-visible {
+            outline: 2px solid var(--color-primary-700);
+            outline-offset: -2px;
+            z-index: 1;
+            position: relative;
+            border-radius: 2px;
+        }
+
+        /* Component Variants */
+        .score-row--top {
+            background-color: var(--color-warning-bg);
+            border-left: 4px solid var(--color-warning-border);
+            padding-left: calc(var(--spacing-lg) - 4px);
+        }
+
+        .score-row--top .score-row__rank {
+            color: var(--color-warning-text);
+        }
+        
+        .score-row--top:hover {
+             background-color: #fff6e0; /* A slightly darker hover for the top row */
+        }
+
+        /* Accessibility & Responsiveness */
+        @media (prefers-reduced-motion: reduce) {
+          .score-row {
+            transition: none;
+          }
+          .score-row:hover {
+            transform: none;
+          }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+            .showcase-container {
+                border-radius: 0;
+            }
+            .score-row {
+                flex-wrap: wrap;
+                padding: var(--spacing-md);
+                gap: var(--spacing-sm) var(--spacing-md);
+            }
+            .score-row:hover {
+                transform: none;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .score-row__rank {
+                flex: 0 0 auto;
+                font-size: 24px;
+            }
+            .score-row__net-worth {
+                flex-basis: 100%;
+                text-align: left;
+                order: 3; /* Move net worth to the bottom */
+                font-size: 18px;
+            }
+             .score-row__details {
+                flex: 1 1 auto;
+             }
+            .score-row__meta {
+                flex-direction: column;
+                gap: var(--spacing-xs);
+                margin-top: var(--spacing-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-container">
+        <div class="showcase-header">
+            <h1>High Score Row</h1>
+            <p>A molecular component for displaying a single high score entry.</p>
+        </div>
+        <ul class="component-list" aria-label="High Score List Showcase">
+            <li>
+                <div class="variant-title">Component Variations</div>
+                <div class="score-row score-row--top" tabindex="0" role="listitem">
+                    <div class="score-row__rank">1</div>
+                    <div class="score-row__details">
+                        <div class="score-row__name">
+                             <svg class="score-row__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a.75.75 0 01.666.452l1.58 3.206 3.538.514a.75.75 0 01.416 1.28l-2.56 2.495.604 3.524a.75.75 0 01-1.088.79l-3.164-1.663-3.164 1.663a.75.75 0 01-1.088-.79l.604-3.524-2.56-2.495a.75.75 0 01.416-1.28l3.538-.514L9.334 2.452A.75.75 0 0110 2z" clip-rule="evenodd" /></svg>
+                             BoardwalkKing
+                        </div>
+                        <div class="score-row__meta">
+                            <span>Duration: 45:32</span>
+                            <span>Turns: 88</span>
+                        </div>
+                    </div>
+                    <div class="score-row__net-worth">$10,500</div>
+                </div>
+            </li>
+            <li>
+                <div class="score-row" tabindex="0" role="listitem">
+                    <div class="score-row__rank">2</div>
+                    <div class="score-row__details">
+                        <div class="score-row__name">RailroadMogul</div>
+                        <div class="score-row__meta">
+                            <span>Duration: 1:02:15</span>
+                            <span>Turns: 112</span>
+                        </div>
+                    </div>
+                    <div class="score-row__net-worth">$9,850</div>
+                </div>
+            </li>
+            <li>
+                <div class="score-row" tabindex="0" role="listitem">
+                    <div class="score-row__rank">3</div>
+                    <div class="score-row__details">
+                        <div class="score-row__name">Hotelier</div>
+                        <div class="score-row__meta">
+                            <span>Duration: 38:50</span>
+                            <span>Turns: 75</span>
+                        </div>
+                    </div>
+                    <div class="score-row__net-worth">$9,850</div>
+                </div>
+            </li>
+            <li>
+                <div class="score-row" tabindex="0" role="listitem">
+                    <div class="score-row__rank">4</div>
+                    <div class="score-row__details">
+                        <div class="score-row__name">Player 1</div>
+                        <div class="score-row__meta">
+                            <span>Duration: 55:01</span>
+                            <span>Turns: 99</span>
+                        </div>
+                    </div>
+                    <div class="score-row__net-worth">$8,200</div>
+                </div>
+            </li>
+        </ul>
+    </div>
+	
+	<div class="showcase-container" style="margin-top: 2rem;">
+        <div class="showcase-header">
+            <h2>Component Variations</h2>
+        </div>
+        <div>
+            <div class="variant-title">Default Row</div>
+            <p style="padding: 0 24px 16px;">The standard appearance for a high score entry. It clearly separates rank, player details, and final net worth.</p>
+            <!-- Variant 1 HTML -->
+            <div class="score-row">
+                <div class="score-row__rank">5</div>
+                <div class="score-row__details">
+                    <div class="score-row__name">AverageJoe</div>
+                    <div class="score-row__meta">
+                        <span>Duration: 1:15:45</span>
+                        <span>Turns: 130</span>
+                    </div>
+                </div>
+                <div class="score-row__net-worth">$7,500</div>
+            </div>
+        </div>
+         <div>
+            <div class="variant-title">Top Rank Row</div>
+            <p style="padding: 0 24px 16px;">A highlighted variant for the #1 position, using a distinct background color and a visual icon to celebrate the top achievement.</p>
+            <!-- Variant 2 HTML -->
+            <div class="score-row score-row--top">
+                <div class="score-row__rank">1</div>
+                <div class="score-row__details">
+                    <div class="score-row__name">
+                         <svg class="score-row__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a.75.75 0 01.666.452l1.58 3.206 3.538.514a.75.75 0 01.416 1.28l-2.56 2.495.604 3.524a.75.75 0 01-1.088.79l-3.164-1.663-3.164 1.663a.75.75 0 01-1.088-.79l.604-3.524-2.56-2.495a.75.75 0 01.416-1.28l3.538-.514L9.334 2.452A.75.75 0 0110 2z" clip-rule="evenodd" /></svg>
+                         BoardwalkKing
+                    </div>
+                    <div class="score-row__meta">
+                        <span>Duration: 45:32</span>
+                        <span>Turns: 88</span>
+                    </div>
+                </div>
+                <div class="score-row__net-worth">$10,500</div>
+            </div>
+        </div>
+    </div>
+	
+</body>
+</html>

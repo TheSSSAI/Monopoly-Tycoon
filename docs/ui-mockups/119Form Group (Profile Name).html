@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Group Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles & Design System Tokens */
+        :root {
+            /* Typography */
+            --font-family-primary: 'Lora', serif;
+            --font-family-secondary: 'Inter', sans-serif;
+            --font-size-body: 16px;
+            --font-size-caption: 14px;
+            --font-weight-body: 400;
+            --font-weight-semibold: 600;
+            --line-height-body: 1.6;
+            --line-height-caption: 1.4;
+
+            /* Colors */
+            --color-text: #1C1A17;
+            --color-text-subtle: #7D7871;
+            --color-background: #F7F5F2;
+            --color-surface: #FFFFFF;
+            --color-border-default: #7D7871;
+            --color-border-disabled: #E8E5E1;
+            --color-primary-500: #1987C7;
+            --color-primary-focus-shadow: rgba(25, 135, 199, 0.2);
+            --color-semantic-error: #C0392B;
+            --color-semantic-success: #1E8449;
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Borders & Shadows */
+            --border-radius-md: 6px;
+            --shadow-focus: 0 0 0 3px var(--color-primary-focus-shadow);
+        }
+
+        body {
+            font-family: var(--font-family-secondary);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            margin: 0;
+            padding: var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .showcase {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--color-surface);
+            padding: var(--spacing-xl);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .showcase h1 {
+            font-family: var(--font-family-primary);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-primary-500);
+        }
+
+        .showcase__section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .showcase__section h2 {
+            font-family: var(--font-family-secondary);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border-disabled);
+            padding-bottom: var(--spacing-sm);
+        }
+        
+        .variations-section {
+            margin-top: var(--spacing-xl);
+        }
+
+        /* Component: Form Group CSS */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            width: 100%;
+        }
+
+        .form-group__label {
+            font-family: var(--font-family-secondary);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            line-height: var(--line-height-body);
+            color: var(--color-text);
+            cursor: pointer;
+        }
+
+        .form-group__input {
+            font-family: var(--font-family-secondary);
+            font-size: var(--font-size-body);
+            padding: 12px 16px;
+            border: 1px solid var(--color-border-default);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            border-radius: var(--border-radius-md);
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            min-height: 44px; /* Touch-friendly */
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .form-group__input::placeholder {
+            color: var(--color-text-subtle);
+        }
+
+        .form-group__input:focus-visible {
+            outline: none;
+            border: 2px solid var(--color-primary-500);
+            padding: 11px 15px; /* Adjust padding to account for thicker border */
+            box-shadow: var(--shadow-focus);
+        }
+
+        .form-group__message {
+            font-family: var(--font-family-secondary);
+            font-size: var(--font-size-caption);
+            line-height: var(--line-height-caption);
+            color: var(--color-text-subtle);
+            min-height: calc(var(--font-size-caption) * var(--line-height-caption));
+            transition: color 0.2s ease-in-out;
+            margin: 0;
+        }
+
+        /* Component States */
+        .form-group--error .form-group__label {
+            color: var(--color-semantic-error);
+        }
+
+        .form-group--error .form-group__input {
+            border: 2px solid var(--color-semantic-error);
+            padding: 11px 15px;
+        }
+
+        .form-group--error .form-group__message {
+            color: var(--color-semantic-error);
+        }
+
+        .form-group--valid .form-group__label {
+            color: var(--color-semantic-success);
+        }
+
+        .form-group--valid .form-group__input {
+            border: 2px solid var(--color-semantic-success);
+            padding: 11px 15px;
+        }
+
+        .form-group--valid .form-group__message {
+            color: var(--color-semantic-success);
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .form-group__input {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="showcase">
+        <h1>Form Group Component</h1>
+
+        <div class="showcase__section">
+            <h2>Default State</h2>
+            <div class="form-group">
+                <label for="profile-name-default" class="form-group__label">Profile Name</label>
+                <input type="text" id="profile-name-default" class="form-group__input" placeholder="e.g., BoardwalkKing" aria-describedby="help-text-default">
+                <p id="help-text-default" class="form-group__message">Enter a name between 3 and 16 characters.</p>
+            </div>
+        </div>
+
+        <div class="showcase__section">
+            <h2>Error State</h2>
+            <div class="form-group form-group--error">
+                <label for="profile-name-error" class="form-group__label">Profile Name</label>
+                <input type="text" id="profile-name-error" class="form-group__input" value="Ty" aria-describedby="help-text-error" aria-invalid="true">
+                <p id="help-text-error" class="form-group__message">Name must be at least 3 characters long.</p>
+            </div>
+        </div>
+
+        <div class="showcase__section">
+            <h2>Valid State</h2>
+            <div class="form-group form-group--valid">
+                <label for="profile-name-valid" class="form-group__label">Profile Name</label>
+                <input type="text" id="profile-name-valid" class="form-group__input" value="RailroadMogul" aria-describedby="help-text-valid" aria-invalid="false">
+                <p id="help-text-valid" class="form-group__message">Looks great!</p>
+            </div>
+        </div>
+
+        <div class="showcase__section">
+            <h2>Focus State</h2>
+            <div class="form-group">
+                <label for="profile-name-focus" class="form-group__label">Profile Name (Click to focus)</label>
+                <input type="text" id="profile-name-focus" class="form-group__input" placeholder="Click me">
+                <p class="form-group__message">The input will show a blue border and shadow when focused.</p>
+            </div>
+        </div>
+        
+        <div class="variations-section">
+          <hr>
+          <h2>Component Variations</h2>
+          <div>
+            <h3>Variant: Default</h3>
+            <p>The standard implementation of the form group used for text entry.</p>
+            <!-- The "Default State" showcase above serves as the example for this variant -->
+          </div>
+        </div>
+        
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player HUD Panel Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&family=Roboto+Mono:wght@600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles & Design System Tokens */
+        :root {
+            /* Typography */
+            --font-family-primary: 'Lora', serif;
+            --font-family-secondary: 'Inter', sans-serif;
+            --font-family-monospace: 'Roboto Mono', monospace;
+            --font-size-h4: 20px;
+            --font-weight-h4: 600;
+            --font-size-h2: 36px;
+            --font-weight-h2: 600;
+            --font-size-caption: 14px;
+
+            /* Colors */
+            --color-primary-50: #E6F0F6;
+            --color-primary-100: #BEDAED;
+            --color-primary-400: #429BD0;
+            --color-primary-500: #1987C7;
+            --color-neutral-white: #FFFFFF;
+            --color-neutral-gray-50: #F7F5F2;
+            --color-neutral-gray-100: #E8E5E1;
+            --color-neutral-gray-500: #7D7871;
+            --color-neutral-gray-900: #1C1A17;
+            --color-semantic-success: #1E8449;
+            --color-semantic-error: #C0392B;
+            --color-warning-500: #F39C12;
+
+            /* Spacing */
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Borders & Shadows */
+            --border-radius-md: 8px;
+            --shadow-md: 0 4px 6px rgba(28, 26, 23, 0.1);
+            --shadow-lg-glow: 0 0 12px 0px var(--color-primary-400);
+        }
+
+        /* Showcase Layout Styles */
+        body {
+            font-family: var(--font-family-secondary);
+            background-color: var(--color-neutral-gray-50);
+            color: var(--color-neutral-gray-900);
+            margin: 0;
+            padding: var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-xl);
+        }
+        
+        .showcase {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--spacing-xl);
+            padding: var(--spacing-xl);
+        }
+        
+        .showcase__item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .showcase__item h3 {
+            font-family: var(--font-family-primary);
+            margin: 0;
+            font-size: var(--font-size-h4);
+            color: var(--color-neutral-gray-500);
+        }
+        
+        .showcase__docs {
+            max-width: 800px;
+            width: 100%;
+            background-color: var(--color-neutral-white);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .showcase__docs h2 {
+            font-family: var(--font-family-primary);
+            margin-top: 0;
+            border-bottom: 1px solid var(--color-neutral-gray-100);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        /* Player HUD Panel Component CSS */
+        .hud-panel {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background-color: var(--color-neutral-white);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            width: 280px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .hud-panel__header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .hud-panel__token {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            padding: 4px;
+            border-radius: 50%;
+            background-color: var(--color-neutral-gray-50);
+            border: 1px solid var(--color-neutral-gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hud-panel__token svg {
+            width: 80%;
+            height: 80%;
+            fill: var(--color-neutral-gray-500);
+        }
+
+        .hud-panel__name {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-h4);
+            color: var(--color-neutral-gray-900);
+            line-height: 1.2;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+        }
+
+        .hud-panel__cash {
+            font-family: var(--font-family-monospace);
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            color: var(--color-semantic-success);
+            line-height: 1;
+            text-align: right;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        /* Component Variants/States */
+        .hud-panel--human .hud-panel__token {
+            background-color: var(--color-primary-50);
+        }
+        
+        .hud-panel--human .hud-panel__token svg {
+            fill: var(--color-primary-500);
+        }
+
+        .hud-panel--active {
+            border-color: var(--color-primary-400);
+            box-shadow: var(--shadow-md), var(--shadow-lg-glow);
+            transform: scale(1.02);
+        }
+
+        .hud-panel--bankrupt {
+            opacity: 0.6;
+            filter: grayscale(80%);
+            background-color: var(--color-neutral-gray-50);
+        }
+
+        .hud-panel--bankrupt .hud-panel__cash {
+            color: var(--color-semantic-error);
+            text-decoration: line-through;
+        }
+        
+        .hud-panel--bankrupt .hud-panel__cash-value::before {
+            content: "BANKRUPT";
+            font-family: var(--font-family-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--color-semantic-error);
+            letter-spacing: 0.5px;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <main class="showcase">
+        <div class="showcase__item">
+            <h3>Human Player (Active Turn)</h3>
+            <div class="hud-panel hud-panel--human hud-panel--active">
+                <div class="hud-panel__header">
+                    <div class="hud-panel__token">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 9.5C5.32843 9.5 6 8.82843 6 8V6C6 3.79086 7.79086 2 10 2H14C16.2091 2 18 3.79086 18 6V8C18 8.82843 18.6716 9.5 19.5 9.5C20.3284 9.5 21 8.82843 21 8V6C21 2.68629 18.3137 0 15 0H9C5.68629 0 3 2.68629 3 6V8C3 8.82843 3.67157 9.5 4.5 9.5Z" /><path d="M19 12H5C3.34315 12 2 13.3431 2 15V21C2 22.6569 3.34315 24 5 24H19C20.6569 24 22 22.6569 22 21V15C22 13.3431 20.6569 12 19 12ZM8.5 19C8.5 19.8284 7.82843 20.5 7 20.5C6.17157 20.5 5.5 19.8284 5.5 19C5.5 18.1716 6.17157 17.5 7 17.5C7.82843 17.5 8.5 18.1716 8.5 19ZM18.5 19C18.5 19.8284 17.8284 20.5 17 20.5C16.1716 20.5 15.5 19.8284 15.5 19C15.5 18.1716 16.1716 17.5 17 17.5C17.8284 17.5 18.5 18.1716 18.5 19Z" /></svg>
+                    </div>
+                    <h4 class="hud-panel__name">BoardwalkKing</h4>
+                </div>
+                <p class="hud-panel__cash">$1,500</p>
+            </div>
+        </div>
+
+        <div class="showcase__item">
+            <h3>AI Player (Default)</h3>
+            <div class="hud-panel hud-panel--ai">
+                <div class="hud-panel__header">
+                    <div class="hud-panel__token">
+                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M464 128H272l-64-64H48C21.5 64 0 85.5 0 112v288c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V176c0-26.5-21.5-48-48-48z"/></svg>
+                    </div>
+                    <h4 class="hud-panel__name">AI Opponent 1</h4>
+                </div>
+                <p class="hud-panel__cash">$1,250</p>
+            </div>
+        </div>
+        
+        <div class="showcase__item">
+            <h3>AI Player (Bankrupt)</h3>
+             <div class="hud-panel hud-panel--ai hud-panel--bankrupt">
+                <div class="hud-panel__header">
+                    <div class="hud-panel__token">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    </div>
+                    <h4 class="hud-panel__name">AI Opponent 2</h4>
+                </div>
+                <div class="hud-panel__cash">
+                    <span class="hud-panel__cash-value">$0</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="showcase__docs">
+        <h2>Component: Player HUD Panel</h2>
+        <p>This molecular component displays the real-time status of a single player. It is designed to be placed within the main Heads-Up Display (HUD) organism, typically anchored to a corner of the screen.</p>
+        
+        <h3>Component Variations</h3>
+
+        <div>
+            <h4>Human Player</h4>
+            <p><strong>Class: </strong> <code>.hud-panel--human</code></p>
+            <p>Provides a subtle visual distinction for the human player's panel, typically by changing the background color of the token icon. This helps the user quickly identify their own status panel.</p>
+        </div>
+
+        <div>
+            <h4>AI Player</h4>
+            <p><strong>Class: </strong> <code>.hud-panel--ai</code> or no specific class</p>
+            <p>The default appearance for an AI opponent. It has a neutral token background.</p>
+        </div>
+
+        <div>
+            <h4>Active Turn</h4>
+            <p><strong>Class: </strong> <code>.hud-panel--active</code></p>
+            <p>This state is crucial for gameplay. It adds a prominent glowing border and slightly scales up the panel to clearly indicate whose turn it is. This style overrides the default state.</p>
+        </div>
+
+        <div>
+            <h4>Bankrupt</h4>
+            <p><strong>Class: </strong> <code>.hud-panel--bankrupt</code></p>
+            <p>Indicates a player has been eliminated from the game. The panel is desaturated, its opacity is reduced, and the cash value is styled to show the player is out of money. The "BANKRUPT" label appears above the cash value for clarity.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>

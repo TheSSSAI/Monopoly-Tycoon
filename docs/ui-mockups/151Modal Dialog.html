@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Tycoon - Modal Dialog Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* ---------------------------------- */
+        /* --- 1. CSS Reset & Base Styles --- */
+        /* ---------------------------------- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F7F5F2;
+            color: #1C1A17;
+            padding: 32px;
+            line-height: 1.6;
+        }
+
+        /* ------------------------------ */
+        /* --- 2. Design System Tokens -- */
+        /* ------------------------------ */
+        :root {
+            /* Color Palette */
+            --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+            --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+            --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+            --color-primary-900: #032037;
+            --color-destructive-500: #D7263D;
+            --color-success-500: #1E8449; --color-error-500: #C0392B; --color-info-500: #2980B9;
+            --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+            --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+            /* Typography */
+            --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+            --font-size-h3: 28px; --font-size-body: 16px; --font-size-caption: 14px;
+            --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+            --line-height-heading: 1.4; --line-height-body: 1.6;
+
+            /* Spacing */
+            --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px; --spacing-xl: 32px;
+            
+            /* Borders & Shadows */
+            --border-radius-md: 8px; --border-radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        /* ------------------------------ */
+        /* --- 3. Page & Layout Styles -- */
+        /* ------------------------------ */
+        .showcase { max-width: 1000px; margin: 0 auto; }
+        .showcase__header { text-align: center; margin-bottom: 48px; }
+        .showcase__header h1 { font-family: var(--font-family-primary); font-size: 36px; color: var(--color-primary-800); }
+        .showcase__header p { color: var(--color-neutral-500); max-width: 60ch; margin: 8px auto 0; }
+        .showcase__group { margin-bottom: 48px; }
+        .showcase__group h2 { font-family: var(--font-family-primary); margin-bottom: 24px; font-size: 28px; color: var(--color-primary-900); }
+        .variant-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+        .variant-card { text-align: center; padding: 24px; background: var(--color-neutral-white); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); }
+        .variant-card h3 { font-family: var(--font-family-primary); margin-bottom: 8px; }
+        .variant-card p { color: var(--color-neutral-500); margin-bottom: 16px; font-size: 14px; }
+
+        /* ----------------------------------- */
+        /* --- 4. Atomic Component Styles --- */
+        /* ----------------------------------- */
+
+        /* Text Label */
+        .text-label--h3 { font-family: var(--font-family-primary); font-size: var(--font-size-h3); font-weight: var(--font-weight-semibold); line-height: var(--line-height-heading); }
+        .text-label--body { font-size: var(--font-size-body); font-weight: var(--font-weight-regular); line-height: var(--line-height-body); }
+        .text-label--caption { font-size: var(--font-size-caption); font-weight: var(--font-weight-regular); color: var(--color-neutral-500); line-height: var(--line-height-heading); }
+
+        /* Icon */
+        .icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; stroke-width: 2; fill: none; stroke: currentColor; }
+
+        /* Button */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm); min-height: 44px; padding: 12px 24px; font-family: var(--font-family-secondary); font-size: var(--font-size-body); font-weight: var(--font-weight-semibold); border: 1px solid transparent; border-radius: var(--border-radius-md); cursor: pointer; text-decoration: none; text-align: center; white-space: nowrap; transition: all 150ms ease-out; }
+        .btn:focus-visible { outline: 2px solid var(--color-primary-300); outline-offset: 2px; }
+        .btn--primary { background-color: var(--color-primary-500); color: var(--color-neutral-white); }
+        .btn--primary:hover { background-color: var(--color-primary-600); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .btn--primary:active { background-color: var(--color-primary-700); box-shadow: var(--shadow-sm); transform: translateY(0); }
+        .btn--secondary { background-color: transparent; color: var(--color-primary-700); border-color: var(--color-primary-700); }
+        .btn--secondary:hover { background-color: var(--color-primary-50); color: var(--color-primary-800); border-color: var(--color-primary-800); }
+        .btn--secondary:active { background-color: var(--color-primary-100); transform: translateY(1px); }
+        .btn--destructive { background-color: var(--color-destructive-500); color: var(--color-neutral-white); }
+        .btn--destructive:hover { background-color: #a51e2f; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .btn--destructive:active { background-color: #8b1927; box-shadow: var(--shadow-sm); transform: translateY(0); }
+        
+        /* Card */
+        .card { padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); background: var(--color-neutral-white); }
+
+        /* ---------------------------------------- */
+        /* --- 5. Organism Component: Modal Dialog -- */
+        /* ---------------------------------------- */
+        .modal__overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(6, 58, 91, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 200ms ease-out, visibility 0s 200ms;
+        }
+
+        .modal__dialog {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 250ms ease-out, opacity 250ms ease-out;
+        }
+
+        .modal__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-neutral-100);
+        }
+        
+        .modal__header--icon {
+            align-items: center;
+        }
+
+        .modal__header--error { color: var(--color-error-500); }
+        .modal__header--info { color: var(--color-info-500); }
+
+        .modal__title {
+            flex-grow: 1;
+            padding-right: var(--spacing-md);
+        }
+
+        .modal__header .icon {
+            font-size: var(--font-size-h3);
+            flex-shrink: 0;
+        }
+
+        .modal__close-btn {
+            background: none; border: none; cursor: pointer;
+            font-family: sans-serif;
+            font-size: 28px; line-height: 1; color: var(--color-neutral-500);
+            padding: 0;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 150ms ease, background-color 150ms ease;
+        }
+        .modal__close-btn:hover { color: var(--color-neutral-900); background-color: var(--color-neutral-50); }
+        .modal__close-btn:focus-visible { outline: 2px solid var(--color-primary-300); outline-offset: 2px; }
+
+        .modal__body p { margin: 0; color: var(--color-neutral-900); }
+
+        .modal__footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            padding-top: var(--spacing-md);
+            margin-top: auto; /* Push footer to bottom */
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+          .btn, .modal__overlay, .modal__dialog { transition: none; }
+          .btn:hover { transform: none; }
+        }
+
+        /* CSS-only interactivity for demo */
+        .modal-trigger { display: none; }
+        .modal-trigger:checked + .modal__overlay {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 200ms ease-out, visibility 0s;
+        }
+        .modal-trigger:checked + .modal__overlay .modal__dialog {
+            transform: scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="showcase">
+        <header class="showcase__header">
+            <h1>Modal Dialog Component</h1>
+            <p>A modal dialog requires a user to interact with it before they can return to the main application view. It's used for critical, turn-halting actions and information.</p>
+        </header>
+
+        <div class="showcase__group">
+            <h2>Static Example (Visible by Default)</h2>
+            <div class="modal__overlay" style="position: relative; visibility: visible; opacity: 1; background-color: var(--color-neutral-100); padding: var(--spacing-xl); z-index: 1;">
+                <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-static" aria-describedby="modal-desc-static" style="opacity:1; transform: none;">
+                    <header class="modal__header">
+                        <h2 class="modal__title text-label--h3" id="modal-title-static">Purchase Property?</h2>
+                        <button class="modal__close-btn" aria-label="Close dialog">&times;</button>
+                    </header>
+                    <div class="modal__body" id="modal-desc-static">
+                        <p class="text-label--body">Would you like to purchase Boardwalk for $400? This property is part of the Dark Blue set.</p>
+                    </div>
+                    <footer class="modal__footer">
+                        <button class="btn btn--secondary">Send to Auction</button>
+                        <button class="btn btn--primary">Buy for $400</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+
+        <div class="showcase__group">
+            <h2>Interactive Variants</h2>
+            <div class="variant-grid">
+                
+                <!-- Decision Modal Variant -->
+                <div class="variant-card">
+                    <h3>Decision</h3>
+                    <p>Presents the user with multiple choices for a critical action.</p>
+                    <label for="modal-trigger-1" class="btn btn--primary">Open Decision Modal</label>
+                </div>
+                
+                <!-- Confirmation Modal Variant -->
+                <div class="variant-card">
+                    <h3>Confirmation</h3>
+                    <p>Asks the user to confirm a destructive or irreversible action.</p>
+                    <label for="modal-trigger-2" class="btn btn--primary">Open Confirmation Modal</label>
+                </div>
+
+                <!-- Error Modal Variant -->
+                <div class="variant-card">
+                    <h3>Error</h3>
+                    <p>Informs the user about an error that prevents an action.</p>
+                    <label for="modal-trigger-3" class="btn btn--primary">Open Error Modal</label>
+                </div>
+
+                <!-- Informational Modal Variant -->
+                <div class="variant-card">
+                    <h3>Informational</h3>
+                    <p>Provides important information that must be acknowledged.</p>
+                    <label for="modal-trigger-4" class="btn btn--primary">Open Info Modal</label>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Implementations (hidden by default) -->
+
+    <!-- 1. Decision Modal -->
+    <input type="checkbox" id="modal-trigger-1" class="modal-trigger">
+    <div class="modal__overlay">
+        <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-1" aria-describedby="modal-desc-1">
+            <header class="modal__header">
+                <h2 class="modal__title text-label--h3" id="modal-title-1">Income Tax</h2>
+                <label for="modal-trigger-1" class="modal__close-btn" aria-label="Close dialog">&times;</label>
+            </header>
+            <div class="modal__body" id="modal-desc-1">
+                <p class="text-label--body">You have landed on Income Tax. Please choose how you would like to pay.</p>
+            </div>
+            <footer class="modal__footer">
+                <label for="modal-trigger-1" class="btn btn--secondary">Pay 10% ($150)</label>
+                <label for="modal-trigger-1" class="btn btn--primary">Pay Flat $200</label>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- 2. Confirmation (Destructive) Modal -->
+    <input type="checkbox" id="modal-trigger-2" class="modal-trigger">
+    <div class="modal__overlay">
+        <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-2" aria-describedby="modal-desc-2">
+            <header class="modal__header">
+                <h2 class="modal__title text-label--h3" id="modal-title-2">Reset All Statistics?</h2>
+                <label for="modal-trigger-2" class="modal__close-btn" aria-label="Close dialog">&times;</label>
+            </header>
+            <div class="modal__body" id="modal-desc-2">
+                <p class="text-label--body">Are you sure you want to reset all your historical data? This action is permanent and cannot be undone.</p>
+            </div>
+            <footer class="modal__footer">
+                <label for="modal-trigger-2" class="btn btn--secondary">Cancel</label>
+                <label for="modal-trigger-2" class="btn btn--destructive">Yes, Reset Data</label>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- 3. Error Modal -->
+    <input type="checkbox" id="modal-trigger-3" class="modal-trigger">
+    <div class="modal__overlay">
+        <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-3" aria-describedby="modal-desc-3">
+            <header class="modal__header modal__header--icon modal__header--error">
+                <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <h2 class="modal__title text-label--h3" id="modal-title-3">Insufficient Funds</h2>
+                <label for="modal-trigger-3" class="modal__close-btn" aria-label="Close dialog">&times;</label>
+            </header>
+            <div class="modal__body" id="modal-desc-3">
+                <p class="text-label--body">You do not have enough cash to build a house on this property. You can raise funds by mortgaging properties or selling buildings.</p>
+            </div>
+            <footer class="modal__footer">
+                <label for="modal-trigger-3" class="btn btn--primary">OK</label>
+            </footer>
+        </div>
+    </div>
+
+    <!-- 4. Informational Modal -->
+    <input type="checkbox" id="modal-trigger-4" class="modal-trigger">
+    <div class="modal__overlay">
+        <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-4" aria-describedby="modal-desc-4">
+            <header class="modal__header modal__header--icon modal__header--info">
+                <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <h2 class="modal__title text-label--h3" id="modal-title-4">Building Shortage</h2>
+                <label for="modal-trigger-4" class="modal__close-btn" aria-label="Close dialog">&times;</label>
+            </header>
+            <div class="modal__body" id="modal-desc-4">
+                <p class="text-label--body">The Bank has run out of houses. The remaining houses will now be auctioned off to eligible players.</p>
+            </div>
+            <footer class="modal__footer">
+                <label for="modal-trigger-4" class="btn btn--primary">Proceed to Auction</label>
+            </footer>
+        </div>
+    </div>
+	<div> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name : decision<h3>
+		<!--description--><normal>Presents the user with multiple choices for a critical action.</normal>
+		<!-- vrient 1 html -->
+        <div class="modal__overlay" style="position: relative; visibility: visible; opacity: 1; background-color: var(--color-neutral-100); padding: var(--spacing-xl); z-index: 1;">
+                <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-1" aria-describedby="modal-desc-1" style="opacity:1; transform: none;">
+                    <header class="modal__header">
+                        <h2 class="modal__title text-label--h3" id="modal-title-1">Income Tax</h2>
+                        <button class="modal__close-btn" aria-label="Close dialog">&times;</button>
+                    </header>
+                    <div class="modal__body" id="modal-desc-1">
+                        <p class="text-label--body">You have landed on Income Tax. Please choose how you would like to pay.</p>
+                    </div>
+                    <footer class="modal__footer">
+                        <button class="btn btn--secondary">Pay 10% ($150)</button>
+                        <button class="btn btn--primary">Pay Flat $200</button>
+                    </footer>
+                </div>
+            </div>     
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : confirmation<h3>
+		<!--description--><normal>Asks the user to confirm a destructive or irreversible action.</normal>
+		<!-- vrient 1 html -->
+        <div class="modal__overlay" style="position: relative; visibility: visible; opacity: 1; background-color: var(--color-neutral-100); padding: var(--spacing-xl); z-index: 1;">
+                <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-2" aria-describedby="modal-desc-2" style="opacity:1; transform: none;">
+                    <header class="modal__header">
+                        <h2 class="modal__title text-label--h3" id="modal-title-2">Reset All Statistics?</h2>
+                        <button class="modal__close-btn" aria-label="Close dialog">&times;</button>
+                    </header>
+                    <div class="modal__body" id="modal-desc-2">
+                        <p class="text-label--body">Are you sure you want to reset all your historical data? This action is permanent and cannot be undone.</p>
+                    </div>
+                    <footer class="modal__footer">
+                        <button class="btn btn--secondary">Cancel</button>
+                        <button class="btn btn--destructive">Yes, Reset Data</button>
+                    </footer>
+                </div>
+            </div>     
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : error<h3>
+		<!--description--><normal>Informs the user about an error that prevents an action.</normal>
+		<!-- vrient 1 html -->
+        <div class="modal__overlay" style="position: relative; visibility: visible; opacity: 1; background-color: var(--color-neutral-100); padding: var(--spacing-xl); z-index: 1;">
+                <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-3" aria-describedby="modal-desc-3" style="opacity:1; transform: none;">
+                    <header class="modal__header modal__header--icon modal__header--error">
+                        <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        <h2 class="modal__title text-label--h3" id="modal-title-3">Insufficient Funds</h2>
+                        <button class="modal__close-btn" aria-label="Close dialog">&times;</button>
+                    </header>
+                    <div class="modal__body" id="modal-desc-3">
+                        <p class="text-label--body">You do not have enough cash to build a house on this property. You can raise funds by mortgaging properties or selling buildings.</p>
+                    </div>
+                    <footer class="modal__footer">
+                        <button class="btn btn--primary">OK</button>
+                    </footer>
+                </div>
+            </div>     
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : informational<h3>
+		<!--description--><normal>Provides important information that must be acknowledged.</normal>
+		<!-- vrient 1 html -->
+        <div class="modal__overlay" style="position: relative; visibility: visible; opacity: 1; background-color: var(--color-neutral-100); padding: var(--spacing-xl); z-index: 1;">
+                <div class="modal__dialog card" role="dialog" aria-modal="true" aria-labelledby="modal-title-4" aria-describedby="modal-desc-4" style="opacity:1; transform: none;">
+                    <header class="modal__header modal__header--icon modal__header--info">
+                        <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <h2 class="modal__title text-label--h3" id="modal-title-4">Building Shortage</h2>
+                        <button class="modal__close-btn" aria-label="Close dialog">&times;</button>
+                    </header>
+                    <div class="modal__body" id="modal-desc-4">
+                        <p class="text-label--body">The Bank has run out of houses. The remaining houses will now be auctioned off to eligible players.</p>
+                    </div>
+                    <footer class="modal__footer">
+                        <button class="btn btn--primary">Proceed to Auction</button>
+                    </footer>
+                </div>
+            </div>     
+		
+      <div>
+	 </div>
+	</div>
+</body>
+</html>

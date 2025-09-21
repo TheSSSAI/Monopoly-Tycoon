@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly Tycoon - Settings Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ---------------------------------- */
+    /* --- 1. CSS Reset & Base Styles --- */
+    /* ---------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* ------------------------------ */
+    /* --- 2. Design System Tokens -- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      
+      --color-destructive-50: #FBE9EC; --color-destructive-500: #D7263D; --color-destructive-900: #5A0A15;
+
+      --color-success-500: #1E8449; --color-warning-500: #F39C12; --color-error-500: #C0392B; --color-info-500: #2980B9;
+
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-family-monospace: 'Roboto Mono', monospace;
+      
+      --font-size-h1: 48px; --font-size-h2: 36px; --font-size-h3: 28px; --font-size-h4: 20px;
+      --font-size-body: 16px; --font-size-caption: 14px;
+
+      --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+      --line-height-tight: 1.2; --line-height-heading: 1.4; --line-height-body: 1.6;
+
+      /* Spacing */
+      --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+      --spacing-xl: 32px; --spacing-2xl: 48px; --spacing-3xl: 64px;
+
+      /* Borders & Shadows */
+      --border-radius-sm: 4px; --border-radius-md: 8px; --border-radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+
+    /* ------------------------------ */
+    /* --- 3. Page & Layout Styles -- */
+    /* ------------------------------ */
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-neutral-50);
+      color: var(--color-neutral-900);
+      line-height: var(--line-height-body);
+      background-image: linear-gradient(45deg, var(--color-primary-50) 0%, var(--color-neutral-100) 100%);
+    }
+
+    /* ----------------------------------- */
+    /* --- 4. Atomic Component Styles --- */
+    /* ----------------------------------- */
+    .text-label--h2 { font-family: var(--font-family-primary); font-size: var(--font-size-h2); font-weight: var(--font-weight-semibold); line-height: var(--line-height-heading); }
+    .text-label--h3 { font-family: var(--font-family-primary); font-size: var(--font-size-h3); font-weight: var(--font-weight-semibold); line-height: var(--line-height-heading); }
+    .icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; stroke-width: 2; fill: none; stroke: currentColor; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm); min-height: 44px; padding: 12px 24px; font-family: var(--font-family-secondary); font-size: var(--font-size-body); font-weight: var(--font-weight-semibold); border: 1px solid transparent; border-radius: var(--border-radius-md); cursor: pointer; text-decoration: none; text-align: center; white-space: nowrap; transition: all 150ms ease-out; }
+    .btn:focus-visible { outline: 2px solid var(--color-primary-300); outline-offset: 2px; }
+    .btn--destructive { background-color: var(--color-destructive-500); color: var(--color-neutral-white); }
+    .btn--destructive:hover { background-color: #a51e2f; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .btn--destructive:active { background-color: #8b1927; box-shadow: var(--shadow-sm); transform: translateY(0); }
+    .btn--destructive:disabled { background-color: #e8a0a7; color: #fbe9ec; cursor: not-allowed; }
+    
+    .segmented-control { display: inline-flex; border: 1px solid var(--color-primary-700); border-radius: var(--border-radius-md); overflow: hidden; }
+    .segmented-control__label { position: relative; cursor: pointer; }
+    .segmented-control__input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .segmented-control__text { display: block; padding: 8px 16px; background-color: var(--color-neutral-white); color: var(--color-primary-700); font-weight: var(--font-weight-semibold); transition: background-color 150ms ease; border-right: 1px solid var(--color-primary-700); }
+    .segmented-control__label:last-child .segmented-control__text { border-right: none; }
+    .segmented-control__label:hover .segmented-control__text { background-color: var(--color-primary-50); }
+    .segmented-control__input:checked + .segmented-control__text { background-color: var(--color-primary-700); color: var(--color-neutral-white); }
+    .segmented-control__input:focus-visible + .segmented-control__text { outline: 2px solid var(--color-primary-300); outline-offset: -2px; z-index: 1; }
+
+    .slider-container { display: flex; flex-direction: column; gap: var(--spacing-sm); width: 100%; max-width: 200px; }
+    .slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: var(--color-neutral-100); border-radius: 4px; outline: none; cursor: pointer; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--color-primary-500); border-radius: 50%; border: 2px solid var(--color-neutral-white); box-shadow: var(--shadow-md); transition: background-color 150ms ease; }
+    .slider:hover::-webkit-slider-thumb { background: var(--color-primary-600); }
+    .slider:active::-webkit-slider-thumb { background: var(--color-primary-700); }
+    .slider::-moz-range-thumb { width: 20px; height: 20px; background: var(--color-primary-500); border-radius: 50%; border: 2px solid var(--color-neutral-white); box-shadow: var(--shadow-md); transition: background-color 150ms ease; }
+    .slider:hover::-moz-range-thumb { background: var(--color-primary-600); }
+    .slider:active::-moz-range-thumb { background: var(--color-primary-700); }
+    
+    /* ----------------------------------- */
+    /* --- 5. Organism Component Styles -- */
+    /* ----------------------------------- */
+    
+    /* Organism: Settings Panel Overlay */
+    .settings-panel-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(6, 58, 91, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: var(--spacing-lg);
+    }
+
+    /* Organism: Settings Panel */
+    .settings-panel {
+      background-color: var(--color-neutral-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      overflow: hidden;
+      animation: modal-entry 250ms ease-out;
+    }
+
+    @keyframes modal-entry {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Panel Header */
+    .settings-panel__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--color-neutral-100);
+      flex-shrink: 0;
+    }
+    
+    .settings-panel__title {
+        color: var(--color-primary-900);
+    }
+
+    .settings-panel__close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--spacing-xs);
+      border-radius: 50%;
+      color: var(--color-neutral-500);
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+
+    .settings-panel__close-btn:hover {
+      background-color: var(--color-neutral-100);
+      color: var(--color-neutral-900);
+    }
+    
+    .settings-panel__close-btn:focus-visible {
+      outline: 2px solid var(--color-primary-300);
+      outline-offset: 2px;
+    }
+
+    .settings-panel__close-btn .icon {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.5;
+    }
+
+    /* Panel Content */
+    .settings-panel__content {
+      padding: var(--spacing-xl);
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    /* Section Styling */
+    .settings-panel__section {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .settings-panel__section:last-child {
+      margin-bottom: 0;
+    }
+
+    .settings-panel__section-title {
+      color: var(--color-primary-800);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* Individual Setting Styling */
+    .settings-panel__setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      border-bottom: 1px solid var(--color-neutral-100);
+      gap: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+
+    .settings-panel__section:last-child .settings-panel__setting:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .settings-panel__setting-label {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+    }
+
+    /* Data Management Section variant */
+    .settings-panel__setting--actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-sm);
+    }
+
+    .settings-panel__setting--actions p {
+      color: var(--color-neutral-500);
+      font-size: var(--font-size-caption);
+      margin-bottom: var(--spacing-sm);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="settings-panel-overlay">
+    <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="settings-panel__header">
+        <h2 id="settings-title" class="settings-panel__title text-label--h2">Settings</h2>
+        <button class="settings-panel__close-btn" aria-label="Close settings">
+          <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </header>
+
+      <div class="settings-panel__content">
+        <!-- Audio Section -->
+        <section class="settings-panel__section" aria-labelledby="audio-settings-title">
+          <h3 id="audio-settings-title" class="settings-panel__section-title text-label--h3">Audio</h3>
+          
+          <div class="settings-panel__setting">
+            <label for="master-volume" class="settings-panel__setting-label">Master Volume</label>
+            <div class="slider-container">
+              <input type="range" min="0" max="100" value="80" class="slider" id="master-volume">
+            </div>
+          </div>
+          
+          <div class="settings-panel__setting">
+            <label for="music-volume" class="settings-panel__setting-label">Music Volume</label>
+            <div class="slider-container">
+              <input type="range" min="0" max="100" value="65" class="slider" id="music-volume">
+            </div>
+          </div>
+          
+          <div class="settings-panel__setting">
+            <label for="sfx-volume" class="settings-panel__setting-label">Sound Effects (SFX) Volume</label>
+            <div class="slider-container">
+              <input type="range" min="0" max="100" value="90" class="slider" id="sfx-volume">
+            </div>
+          </div>
+        </section>
+
+        <!-- Gameplay Section -->
+        <section class="settings-panel__section" aria-labelledby="gameplay-settings-title">
+          <h3 id="gameplay-settings-title" class="settings-panel__section-title text-label--h3">Gameplay</h3>
+          
+          <div class="settings-panel__setting">
+            <span id="game-speed-label" class="settings-panel__setting-label">Game Speed</span>
+            <fieldset class="segmented-control" aria-labelledby="game-speed-label">
+              <label class="segmented-control__label">
+                <input type="radio" name="game-speed" value="normal" class="segmented-control__input">
+                <span class="segmented-control__text">Normal</span>
+              </label>
+              <label class="segmented-control__label">
+                <input type="radio" name="game-speed" value="fast" class="segmented-control__input" checked>
+                <span class="segmented-control__text">Fast</span>
+              </label>
+              <label class="segmented-control__label">
+                <input type="radio" name="game-speed" value="instant" class="segmented-control__input">
+                <span class="segmented-control__text">Instant</span>
+              </label>
+            </fieldset>
+          </div>
+        </section>
+        
+        <!-- Data Management Section -->
+        <section class="settings-panel__section" aria-labelledby="data-settings-title">
+          <h3 id="data-settings-title" class="settings-panel__section-title text-label--h3">Data Management</h3>
+
+          <div class="settings-panel__setting settings-panel__setting--actions">
+              <span class="settings-panel__setting-label">Reset Statistics</span>
+              <p>Permanently delete all historical player stats and high scores. This action cannot be undone.</p>
+              <button class="btn btn--destructive">Reset All Statistics</button>
+          </div>
+
+          <div class="settings-panel__setting settings-panel__setting--actions">
+              <span class="settings-panel__setting-label">Delete Save Files</span>
+              <p>Permanently delete all of your saved game files. This action cannot be undone.</p>
+              <button class="btn btn--destructive" disabled>Delete All Saved Games</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+  
+  <div style="padding: 2rem; max-width: 900px; margin: 20vh auto 0;">
+    <h1 class="text-label--h1">Settings Panel Organism</h1>
+    <p class="text-label--body" style="color: var(--color-neutral-500);">This component is a modal dialog that groups various game settings into logical sections. It is composed of several atomic components like sliders, segmented controls, and buttons to provide a comprehensive settings experience.</p>
+    <div style="margin-top: 2rem;">
+        <h2 style="font-family: var(--font-family-primary); margin-bottom: 1rem;">Component Variations</h2>
+        <div style="background: white; padding: 1.5rem; border-radius: var(--border-radius-md); box-shadow: var(--shadow-sm);">
+            <h3>Default</h3>
+            <p style="color: var(--color-neutral-500); margin-bottom: 1rem;">The standard presentation of the Settings Panel, shown as a modal overlay. It includes sections for Audio, Gameplay, and Data Management, demonstrating the composition of various atomic controls.</p>
+        </div>
+    </div>
+  </div>
+
+</body>
+</html>

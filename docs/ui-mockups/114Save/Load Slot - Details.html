@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save/Load Slot - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Save/Load Slot</h1>
+            <div class="component-type-badge">molecular Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">13</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-DADI-001</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Save/Load Slot</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>molecular</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>A card-based component that displays the state and metadata of a game save slot. It can represent empty, occupied, corrupted, or incompatible states and supports selection.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>Utilizes the 'Card' base from data display specifications, along with typography and color tokens for text and semantic states (error, warning). Interaction states follow system guidelines for focus and hover.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Organism Map</h4>
+                    <p>orga-menu-load,orga-pause-save</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--font-primary</div><div class="token">--font-secondary</div><div class="token">--color-primary-500</div><div class="token">--color-primary-700</div><div class="token">--color-neutral-white</div><div class="token">--color-neutral-gray-50</div><div class="token">--color-neutral-gray-100</div><div class="token">--color-neutral-gray-500</div><div class="token">--color-neutral-gray-900</div><div class="token">--color-semantic-error</div><div class="token">--color-semantic-warning</div><div class="token">--spacing-md</div><div class="token">--border-radius-md</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>N/A. Component is designed for desktop aspect ratios.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>N/A</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>The component is part of a grid layout in its parent organism, which will reflow based on screen width.</li><li>Hover and focus states provide clear feedback for mouse/keyboard users.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>Component is a <button>, making it tabbable and activatable with Enter/Space.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>Semantic button element announces its purpose. Disabled state is programmatically communicated. All metadata is readable text.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>A clear, high-contrast focus ring is applied on :focus-visible.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>aria-label on the button combines all info for a concise screen reader announcement, e.g., 'Save Slot 1, BoardwalkKing, Turn 45. Press to select.'</li><li>aria-disabled='true' is implicitly set by the disabled attribute on corrupted/incompatible slots.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>All text/background combinations meet WCAG AA standards. Status indicators (corrupted, incompatible) use text labels in addition to color.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* Save/Load Slot Component CSS */
+
+:root {
+  /* Design System Tokens */
+  --font-primary: &#039;Lora&#039;, serif;
+  --font-secondary: &#039;Inter&#039;, sans-serif;
+  --color-primary-500: #1987C7;
+  --color-primary-700: #0C537F;
+  --color-neutral-white: #FFFFFF;
+  --color-neutral-gray-50: #F7F5F2;
+  --color-neutral-gray-100: #E8E5E1;
+  --color-neutral-gray-500: #7D7871;
+  --color-neutral-gray-900: #1C1A17;
+  --color-semantic-error: #C0392B;
+  --color-semantic-warning: #F39C12;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --border-radius-md: 8px;
+  --shadow-sm: 0 4px 6px rgba(0,0,0,0.07);
+  --shadow-md: 0 8px 12px rgba(0,0,0,0.1);
+  --transition-speed: 0.2s;
+}
+
+.save-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-neutral-white);
+  border: 2px solid var(--color-neutral-100);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+  font-family: var(--font-secondary);
+  cursor: pointer;
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.save-slot:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-500);
+}
+
+.save-slot:focus-visible {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(25, 135, 199, 0.3), var(--shadow-md);
+}
+
+.save-slot.is-selected {
+  border-color: var(--color-primary-700);
+  box-shadow: 0 0 0 3px var(--color-primary-500), var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.save-slot:disabled, .save-slot--disabled {
+  cursor: not-allowed;
+  background-color: var(--color-neutral-gray-50);
+}
+
+.save-slot:disabled:hover, .save-slot--disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-neutral-100);
+}
+
+/* Elements */
+.save-slot__header {
+  font-family: var(--font-primary);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-neutral-gray-900);
+  margin-bottom: var(--spacing-sm);
+}
+
+.save-slot__content {
+  flex-grow: 1;
+}
+
+.save-slot__player-name {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-primary-700);
+  margin-bottom: var(--spacing-sm);
+}
+
+.save-slot__metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--color-neutral-gray-500);
+}
+
+.save-slot__timestamp {
+  margin-top: auto;
+  padding-top: var(--spacing-md);
+  font-size: 13px;
+  color: var(--color-neutral-gray-500);
+  border-top: 1px solid var(--color-neutral-100);
+}
+
+.save-slot__status-badge {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Variants */
+.save-slot--empty {
+  justify-content: center;
+  align-items: center;
+  border-style: dashed;
+  background-color: var(--color-neutral-gray-50);
+}
+.save-slot--empty .save-slot__header {
+  color: var(--color-neutral-gray-500);
+}
+
+.save-slot--corrupted {
+  border-color: var(--color-semantic-error);
+}
+.save-slot--corrupted .save-slot__header, 
+.save-slot--corrupted .save-slot__content {
+  opacity: 0.5;
+}
+.save-slot--corrupted .save-slot__status-badge {
+  background-color: var(--color-semantic-error);
+  color: var(--color-neutral-white);
+}
+
+.save-slot--incompatible {
+  border-color: var(--color-semantic-warning);
+}
+.save-slot--incompatible .save-slot__header, 
+.save-slot--incompatible .save-slot__content {
+  opacity: 0.5;
+}
+.save-slot--incompatible .save-slot__status-badge {
+  background-color: var(--color-semantic-warning);
+  color: var(--color-neutral-gray-900);
+}
+</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All styles are embedded in the <style> tag, using design system tokens as CSS custom properties. A BEM naming convention (.save-slot, .save-slot__header) is used for clarity.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML is structured to showcase each of the component's four main variants, along with interactive states like 'selected'.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>The component itself is a fixed-min-height block. The parent organism (a CSS grid) is responsible for responsive layout.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>Built using a semantic <button> element to ensure native keyboard accessibility. Focus styles are prominent, and state is communicated via text and color.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>Designed for modern evergreen browsers (Chrome, Firefox, Edge).</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>Use within the Save Game or Load Game screens to represent a persistent game state file.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>Metadata should be concise. Player name, turn number, and save timestamp are key identifiers.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>Typically placed in a 2 or 3-column grid within a modal dialog or full-screen menu.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">Apply .is-selected class via JavaScript when a user clicks the slot to indicate selection.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The disabled attribute should be applied to corrupted and incompatible slots to prevent interaction.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test in latest Chrome, Firefox, and Edge.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Test on 16:9, 16:10, and 21:9 aspect ratios to ensure the parent grid layout adapts correctly.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Verify keyboard navigation (tabbing to each slot, pressing Enter/Space).</li><li>Check color contrast for all text and status badges.</li><li>Use a screen reader to verify that slot information and states are announced clearly.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>N/A for this static component.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

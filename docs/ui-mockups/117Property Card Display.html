@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Card Display Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* DESIGN SYSTEM & BASE STYLES */
+        :root {
+            /* Colors */
+            --color-text-primary: #1C1A17;
+            --color-text-secondary: #7D7871;
+            --color-background-card: #FFFFFF;
+            --color-background-body: #F7F5F2;
+            --color-border-light: #E8E5E1;
+            --color-mortgaged-overlay: rgba(100, 116, 139, 0.85);
+            --color-mortgaged-text: #FFFFFF;
+            --color-secondary-500: #D7263D;
+
+            /* Property Colors */
+            --prop-color-brown: #955436;
+            --prop-color-light-blue: #aae0fa;
+            --prop-color-pink: #d93a96;
+            --prop-color-orange: #f7921b;
+            --prop-color-red: #ed1b24;
+            --prop-color-yellow: #fef200;
+            --prop-color-green: #1fb25a;
+            --prop-color-dark-blue: #0072bb;
+            --prop-color-railroad: #333333;
+            --prop-color-utility: #8a8d8f;
+
+            /* Typography */
+            --font-family-primary: 'Lora', serif;
+            --font-family-secondary: 'Inter', sans-serif;
+            --font-size-h3: 28px;
+            --font-size-h4: 20px;
+            --font-size-body: 16px;
+            --font-size-caption: 14px;
+            --font-weight-bold: 700;
+            --font-weight-semibold: 600;
+            --font-weight-regular: 400;
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Borders & Shadows */
+            --border-radius-md: 8px;
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 8px 12px rgba(0,0,0,0.1);
+
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-secondary);
+            background-color: var(--color-background-body);
+            margin: 0;
+            padding: var(--spacing-xl);
+            color: var(--color-text-primary);
+        }
+
+        .showcase {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .showcase__header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .showcase__header h1 {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-h3);
+            margin: 0 0 var(--spacing-sm) 0;
+        }
+        
+        .showcase__header p {
+            font-size: var(--font-size-body);
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        .showcase-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .showcase-section__title {
+            font-size: var(--font-size-h4);
+            font-family: var(--font-family-primary);
+            border-bottom: 2px solid var(--color-border-light);
+            padding-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .showcase-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        /* COMPONENT CSS */
+        .property-card {
+            background-color: var(--color-background-card);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--color-border-light);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .property-card__header {
+            padding: var(--spacing-sm);
+            background-color: var(--property-color, var(--color-text-secondary));
+            color: var(--header-text-color, white);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .property-card__title {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-bold);
+            margin: 0;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        
+        .property-card__subtitle {
+            font-size: 12px;
+            font-weight: var(--font-weight-regular);
+            margin: 2px 0 0 0;
+            opacity: 0.9;
+        }
+
+        .property-card__development {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+            height: 20px;
+        }
+
+        .property-card__dev-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .property-card__body {
+            padding: var(--spacing-md);
+            flex-grow: 1;
+        }
+
+        .property-card__rent-table {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            font-size: var(--font-size-caption);
+        }
+
+        .property-card__rent-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .property-card__rent-item:last-child {
+            border-bottom: none;
+        }
+
+        .property-card__rent-label {
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .property-card__rent-value {
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .property-card__footer {
+            padding: var(--spacing-md);
+            background-color: #F7F5F2; /* gray_50 */
+            border-top: 1px solid var(--color-border-light);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            text-align: center;
+            font-size: var(--font-size-caption);
+        }
+
+        .property-card__cost-label {
+            color: var(--color-text-secondary);
+            display: block;
+        }
+
+        .property-card__cost-value {
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-body);
+        }
+
+        /* States */
+        .property-card--mortgaged::after {
+            content: 'MORTGAGED';
+            position: absolute;
+            inset: 0;
+            background-color: var(--color-mortgaged-overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-mortgaged-text);
+            font-family: var(--font-family-primary);
+            font-size: 2.5em;
+            font-weight: var(--font-weight-bold);
+            text-align: center;
+            transform: rotate(-15deg);
+            letter-spacing: 2px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Variants */
+        .property-card--summary {
+            flex-direction: row;
+            align-items: center;
+            padding: var(--spacing-sm);
+            gap: var(--spacing-md);
+            cursor: pointer;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .property-card--summary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .property-card--summary .property-card__header {
+            flex-shrink: 0;
+            width: 12px;
+            min-height: auto;
+            height: 50px;
+            padding: 0;
+            border-radius: 4px;
+            border-bottom: none;
+        }
+
+        .property-card--summary .property-card__title {
+            font-size: var(--font-size-body);
+            text-transform: none;
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .property-card--summary .property-card__subtitle {
+             display: none;
+        }
+
+        .property-card--summary .property-card__body {
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .property-card--summary .property-card__development {
+            margin-top: 0;
+            height: 16px;
+        }
+
+        .property-card--summary .property-card__dev-icon {
+            width: 16px;
+            height: 16px;
+            fill: var(--color-text-secondary);
+        }
+
+        .property-card--summary .property-card__dev-icon--hotel {
+            fill: var(--color-secondary-500);
+        }
+        
+        .property-card--summary .property-card__mortgage-indicator {
+            display: none; /* Hidden by default */
+        }
+        
+        .property-card--summary.property-card--mortgaged {
+            opacity: 0.65;
+        }
+
+        .property-card--summary.property-card--mortgaged::after {
+            content: none;
+        }
+        
+        .property-card--summary.property-card--mortgaged .property-card__mortgage-indicator {
+            display: block;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--color-text-secondary);
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hidden SVG definitions for icons -->
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <symbol id="icon-house" viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </symbol>
+        <symbol id="icon-hotel" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M19 12.5V19l-7 4-7-4v-6.5" fill="currentColor"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="showcase">
+        <header class="showcase__header">
+            <h1>Property Card Display</h1>
+            <p>A molecular component for displaying property information in various contexts.</p>
+        </header>
+
+        <section class="showcase-section">
+            <h2 class="showcase-section__title">Variant: Full Deed</h2>
+            <div class="showcase-grid">
+                <!-- Full Deed: Default State -->
+                <div class="property-card property-card--full-deed" style="--property-color: var(--prop-color-dark-blue);">
+                    <header class="property-card__header">
+                        <h3 class="property-card__title">Boardwalk</h3>
+                    </header>
+                    <div class="property-card__body">
+                        <ul class="property-card__rent-table">
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">Rent</span> <span class="property-card__rent-value">$50</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With Color Set</span> <span class="property-card__rent-value">$100</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 1 House</span> <span class="property-card__rent-value">$200</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 2 Houses</span> <span class="property-card__rent-value">$600</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 3 Houses</span> <span class="property-card__rent-value">$1400</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 4 Houses</span> <span class="property-card__rent-value">$1700</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With HOTEL</span> <span class="property-card__rent-value">$2000</span></li>
+                        </ul>
+                    </div>
+                    <footer class="property-card__footer">
+                        <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Houses Cost</span>
+                            <span class="property-card__cost-value">$200</span>
+                        </div>
+                        <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Mortgage Value</span>
+                            <span class="property-card__cost-value">$200</span>
+                        </div>
+                    </footer>
+                </div>
+
+                <!-- Full Deed: Developed State -->
+                <div class="property-card property-card--full-deed" style="--property-color: var(--prop-color-light-blue); --header-text-color: #000;">
+                    <header class="property-card__header">
+                        <h3 class="property-card__title">Connecticut Avenue</h3>
+                        <div class="property-card__development">
+                            <svg class="property-card__dev-icon"><use xlink:href="#icon-house"></use></svg>
+                            <svg class="property-card__dev-icon"><use xlink:href="#icon-house"></use></svg>
+                        </div>
+                    </header>
+                    <div class="property-card__body">
+                        <ul class="property-card__rent-table">
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">Rent</span> <span class="property-card__rent-value">$8</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With Color Set</span> <span class="property-card__rent-value">$16</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 1 House</span> <span class="property-card__rent-value">$40</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 2 Houses</span> <span class="property-card__rent-value">$100</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 3 Houses</span> <span class="property-card__rent-value">$300</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 4 Houses</span> <span class="property-card__rent-value">$450</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With HOTEL</span> <span class="property-card__rent-value">$600</span></li>
+                        </ul>
+                    </div>
+                    <footer class="property-card__footer">
+                         <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Houses Cost</span>
+                            <span class="property-card__cost-value">$50</span>
+                        </div>
+                        <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Mortgage Value</span>
+                            <span class="property-card__cost-value">$60</span>
+                        </div>
+                    </footer>
+                </div>
+                
+                <!-- Full Deed: Mortgaged State -->
+                <div class="property-card property-card--full-deed property-card--mortgaged" style="--property-color: var(--prop-color-railroad);">
+                    <header class="property-card__header">
+                        <h3 class="property-card__title">Reading Railroad</h3>
+                    </header>
+                    <div class="property-card__body">
+                         <ul class="property-card__rent-table">
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">Rent</span> <span class="property-card__rent-value">$25</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">If 2 R.R.'s are owned</span> <span class="property-card__rent-value">$50</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">If 3 R.R.'s are owned</span> <span class="property-card__rent-value">$100</span></li>
+                             <li class="property-card__rent-item"><span class="property-card__rent-label">If 4 R.R.'s are owned</span> <span class="property-card__rent-value">$200</span></li>
+                        </ul>
+                    </div>
+                    <footer class="property-card__footer">
+                         <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Price</span>
+                            <span class="property-card__cost-value">$200</span>
+                        </div>
+                        <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Mortgage Value</span>
+                            <span class="property-card__cost-value">$100</span>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        </section>
+        
+        <section class="showcase-section">
+            <h2 class="showcase-section__title">Variant: Summary Card (in a list)</h2>
+            <div class="showcase-list">
+                <!-- Summary Card: Default -->
+                <div class="property-card property-card--summary" style="--property-color: var(--prop-color-orange);">
+                    <header class="property-card__header"></header>
+                    <div class="property-card__body">
+                        <h3 class="property-card__title">St. James Place</h3>
+                        <div class="property-card__development"></div>
+                        <div class="property-card__mortgage-indicator">M</div>
+                    </div>
+                </div>
+                <!-- Summary Card: Developed (Houses) -->
+                <div class="property-card property-card--summary" style="--property-color: var(--prop-color-red);">
+                    <header class="property-card__header"></header>
+                    <div class="property-card__body">
+                        <h3 class="property-card__title">Kentucky Avenue</h3>
+                        <div class="property-card__development">
+                           <svg class="property-card__dev-icon"><use xlink:href="#icon-house"></use></svg>
+                           <svg class="property-card__dev-icon"><use xlink:href="#icon-house"></use></svg>
+                           <svg class="property-card__dev-icon"><use xlink:href="#icon-house"></use></svg>
+                        </div>
+                        <div class="property-card__mortgage-indicator">M</div>
+                    </div>
+                </div>
+                <!-- Summary Card: Developed (Hotel) -->
+                <div class="property-card property-card--summary" style="--property-color: var(--prop-color-green);">
+                    <header class="property-card__header"></header>
+                    <div class="property-card__body">
+                        <h3 class="property-card__title">Pennsylvania Avenue</h3>
+                        <div class="property-card__development">
+                            <svg class="property-card__dev-icon property-card__dev-icon--hotel"><use xlink:href="#icon-hotel"></use></svg>
+                        </div>
+                        <div class="property-card__mortgage-indicator">M</div>
+                    </div>
+                </div>
+                <!-- Summary Card: Mortgaged -->
+                <div class="property-card property-card--summary property-card--mortgaged" style="--property-color: var(--prop-color-yellow); --header-text-color: #000;">
+                    <header class="property-card__header"></header>
+                    <div class="property-card__body">
+                        <h3 class="property-card__title">Atlantic Avenue</h3>
+                        <div class="property-card__development"></div>
+                        <div class="property-card__mortgage-indicator">M</div>
+                    </div>
+                </div>
+                 <!-- Summary Card: Railroad -->
+                <div class="property-card property-card--summary" style="--property-color: var(--prop-color-railroad);">
+                    <header class="property-card__header"></header>
+                    <div class="property-card__body">
+                        <h3 class="property-card__title">B. & O. Railroad</h3>
+                        <div class="property-card__development"></div>
+                        <div class="property-card__mortgage-indicator">M</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+	
+	<div> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name : "full_deed"</h3>
+		<!--description-->A complete, detailed view of a property card, typically shown in a modal or management screen. It includes all rent information, costs, etc.
+		<!-- vrient 1 html -->
+        <div class="property-card property-card--full-deed" style="--property-color: var(--prop-color-dark-blue);">
+                    <header class="property-card__header">
+                        <h3 class="property-card__title">Boardwalk</h3>
+                    </header>
+                    <div class="property-card__body">
+                        <ul class="property-card__rent-table">
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">Rent</span> <span class="property-card__rent-value">$50</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With Color Set</span> <span class="property-card__rent-value">$100</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 1 House</span> <span class="property-card__rent-value">$200</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 2 Houses</span> <span class="property-card__rent-value">$600</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 3 Houses</span> <span class="property-card__rent-value">$1400</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With 4 Houses</span> <span class="property-card__rent-value">$1700</span></li>
+                            <li class="property-card__rent-item"><span class="property-card__rent-label">With HOTEL</span> <span class="property-card__rent-value">$2000</span></li>
+                        </ul>
+                    </div>
+                    <footer class="property-card__footer">
+                        <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Houses Cost</span>
+                            <span class="property-card__cost-value">$200</span>
+                        </div>
+                        <div class="property-card__cost-item">
+                            <span class="property-card__cost-label">Mortgage Value</span>
+                            <span class="property-card__cost-value">$200</span>
+                        </div>
+                    </footer>
+                </div>     
+		
+      </div>
+	 </div>
+      <div>
+        <h3>Variant Name : "summary_in_list"</h3>
+		<!--description-->A smaller, more compact version used in lists, like the property management screen or trade interface. It shows the essential info: name, color, and development status.
+		<!-- vrient 1 html -->
+        <div class="property-card property-card--summary" style="--property-color: var(--prop-color-orange);">
+                    <header class="property-card__header"></header>
+                    <div class="property-card__body">
+                        <h3 class="property-card__title">St. James Place</h3>
+                        <div class="property-card__development"></div>
+                        <div class="property-card__mortgage-indicator">M</div>
+                    </div>
+                </div>     
+		
+      </div>
+	 </div>    
+	
+	</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Management Interface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      --color-destructive-500: #D7263D;
+      --color-success-500: #1E8449; --color-error-500: #C0392B; --color-info-500: #2980B9;
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-size-h3: 28px; --font-size-h4: 20px; --font-size-body: 16px; --font-size-caption: 14px;
+      --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+      --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px; --spacing-xl: 32px;
+      --border-radius-md: 8px; --border-radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family-secondary); background-color: #ccc; }
+
+    /* Organism Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(6, 58, 91, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-xl);
+      z-index: 1000;
+    }
+    .prop-management {
+      background-color: var(--color-neutral-50);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 900px;
+      height: 90vh;
+      max-height: 800px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--color-primary-100);
+    }
+    .prop-management__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--color-neutral-100);
+      background-color: var(--color-neutral-white);
+      flex-shrink: 0;
+    }
+    .prop-management__title {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h3);
+      color: var(--color-primary-800);
+    }
+    .prop-management__cash {
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-success-500);
+    }
+    .prop-management__close-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-neutral-500); padding: var(--spacing-sm);
+      border-radius: 50%;
+      display: inline-flex;
+    }
+    .prop-management__close-btn:hover { background-color: var(--color-neutral-100); color: var(--color-neutral-900); }
+    .prop-management__list {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: var(--spacing-lg);
+    }
+    .prop-management__empty-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--color-neutral-500);
+        font-family: var(--font-family-primary);
+        font-size: var(--font-size-h4);
+        text-align: center;
+    }
+    .prop-group {
+      margin-bottom: var(--spacing-lg);
+    }
+    .prop-group__header {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 2px solid;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+    .prop-group__header .icon { font-size: 24px; }
+    .prop-group__body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .prop-group--light-blue { border-color: #aae0fa; color: #0072a3; }
+    .prop-group--magenta { border-color: #d93a96; color: #8c2561; }
+    .prop-group--railroad { border-color: #6a6a6a; color: #1C1A17; }
+    .property-card {
+      background-color: var(--color-neutral-white);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-md);
+      border-top: 5px solid;
+      display: flex;
+      flex-direction: column;
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+    .property-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .property-card--light-blue { border-color: #aae0fa; }
+    .property-card--magenta { border-color: #d93a96; }
+    .property-card--railroad { border-color: #6a6a6a; }
+    .property-card__header { padding: var(--spacing-md); border-bottom: 1px solid var(--color-neutral-100); }
+    .property-card__name { font-family: var(--font-family-primary); font-size: var(--font-size-h4); font-weight: var(--font-weight-bold); }
+    .property-card__body { padding: var(--spacing-md); flex-grow: 1; }
+    .property-card__development { display: flex; align-items: center; gap: var(--spacing-sm); min-height: 24px; font-size: 24px; }
+    .property-card__house-icon { color: var(--color-success-500); }
+    .property-card__hotel-icon { color: var(--color-error-500); }
+    .property-card__footer { padding: var(--spacing-md); background-color: var(--color-neutral-50); border-top: 1px solid var(--color-neutral-100); }
+    .property-card__actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+    .property-card--mortgaged { background-color: var(--color-neutral-100); position: relative; overflow: hidden; }
+    .property-card--mortgaged::after {
+      content: 'MORTGAGED'; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg); font-size: 36px;
+      font-weight: var(--font-weight-bold); color: var(--color-error-500);
+      opacity: 0.15; pointer-events: none;
+    }
+    /* Atomic Component Styles */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm); flex-grow: 1; min-height: 40px; padding: 8px 12px; font-family: var(--font-family-secondary); font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold); border: 1px solid transparent; border-radius: var(--border-radius-md); cursor: pointer; text-decoration: none; text-align: center; white-space: nowrap; transition: all 150ms ease-out;}
+    .btn:focus-visible { outline: 2px solid var(--color-primary-300); outline-offset: 2px;}
+    .btn--primary { background-color: var(--color-primary-500); color: var(--color-neutral-white); }
+    .btn--primary:hover { background-color: var(--color-primary-600); }
+    .btn--primary:active { background-color: var(--color-primary-700); }
+    .btn--primary:disabled { background-color: var(--color-primary-200); color: var(--color-primary-50); cursor: not-allowed; }
+    .btn--secondary { background-color: transparent; color: var(--color-primary-700); border-color: var(--color-primary-700); }
+    .btn--secondary:hover { background-color: var(--color-primary-50); color: var(--color-primary-800); border-color: var(--color-primary-800); }
+    .btn--secondary:disabled { color: var(--color-primary-200); border-color: var(--color-primary-200); cursor: not-allowed; }
+    .btn--destructive { background-color: var(--color-destructive-500); color: var(--color-neutral-white); }
+    .btn--destructive:hover { background-color: #a51e2f; }
+    .icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; stroke-width: 2.5; fill: none; stroke: currentColor; }
+    .tooltip-trigger { position: relative; display: flex; flex-grow: 1; }
+    .tooltip-content { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 150ms ease, visibility 150ms ease; z-index: 10; min-width: 180px; max-width: 250px; background-color: var(--color-neutral-900); color: var(--color-neutral-white); padding: var(--spacing-sm) var(--spacing-md); margin-bottom: var(--spacing-sm); border-radius: var(--border-radius-md); font-size: var(--font-size-caption); text-align: center; white-space: pre-wrap; }
+    .tooltip-trigger:hover .tooltip-content { opacity: 1; visibility: visible; }
+  </style>
+</head>
+<body>
+
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="prop-mgmt-title">
+    <div class="prop-management">
+      <header class="prop-management__header">
+        <h2 class="prop-management__title" id="prop-mgmt-title">Manage Properties</h2>
+        <div class="prop-management__cash">$1,250</div>
+        <button class="prop-management__close-btn" aria-label="Close Property Management">
+          <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </header>
+
+      <main class="prop-management__list">
+        <!-- Light Blue Monopoly (Demonstrates Even Building) -->
+        <div class="prop-group prop-group--light-blue">
+          <h3 class="prop-group__header">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2 20h20"></path><path d="M4 12V8a4 4 0 0 1 8 0v4"></path><path d="M12 20V12"></path><path d="M20 12V8a4 4 0 0 0-8 0v4"></path></svg>
+            Light Blue Properties
+          </h3>
+          <div class="prop-group__body">
+            <div class="property-card property-card--light-blue">
+              <div class="property-card__header"><h4 class="property-card__name">Oriental Avenue</h4></div>
+              <div class="property-card__body">
+                <div class="property-card__development">
+                  <span class="property-card__house-icon" title="1 House">
+                    <svg class="icon" fill="currentColor" stroke="none" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 9 9-2 2M5 10v10h14V10M9 20v-5h6v5"></path></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="property-card__footer">
+                <div class="property-card__actions">
+                    <div class="tooltip-trigger">
+                        <button class="btn btn--primary" disabled>Build House</button>
+                        <div class="tooltip-content">You must build on other properties in this set first (Even Building Rule).</div>
+                    </div>
+                  <button class="btn btn--secondary">Sell House</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-card property-card--light-blue">
+              <div class="property-card__header"><h4 class="property-card__name">Vermont Avenue</h4></div>
+              <div class="property-card__body"><div class="property-card__development"></div></div>
+              <div class="property-card__footer">
+                <div class="property-card__actions">
+                  <button class="btn btn--primary">Build House</button>
+                  <button class="btn btn--secondary" disabled>Sell House</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-card property-card--light-blue">
+              <div class="property-card__header"><h4 class="property-card__name">Connecticut Avenue</h4></div>
+              <div class="property-card__body"><div class="property-card__development"></div></div>
+              <div class="property-card__footer">
+                <div class="property-card__actions">
+                  <button class="btn btn--primary">Build House</button>
+                  <button class="btn btn--secondary" disabled>Sell House</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Magenta Monopoly (Demonstrates Mortgaging) -->
+        <div class="prop-group prop-group--magenta">
+          <h3 class="prop-group__header">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2 20h20"></path><path d="M4 12V8a4 4 0 0 1 8 0v4"></path><path d="M12 20V12"></path><path d="M20 12V8a4 4 0 0 0-8 0v4"></path></svg>
+            Magenta Properties
+          </h3>
+          <div class="prop-group__body">
+            <div class="property-card property-card--magenta property-card--mortgaged">
+              <div class="property-card__header"><h4 class="property-card__name">St. Charles Place</h4></div>
+              <div class="property-card__body"><div class="property-card__development"></div></div>
+              <div class="property-card__footer">
+                <div class="property-card__actions">
+                  <button class="btn btn--primary">Unmortgage</button>
+                  <button class="btn btn--secondary">Trade</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-card property-card--magenta">
+              <div class="property-card__header"><h4 class="property-card__name">States Avenue</h4></div>
+              <div class="property-card__body"><div class="property-card__development"></div></div>
+              <div class="property-card__footer">
+                <div class="property-card__actions">
+                    <div class="tooltip-trigger">
+                        <button class="btn btn--primary" disabled>Build House</button>
+                        <div class="tooltip-content">Cannot build while a property in this set is mortgaged.</div>
+                    </div>
+                  <button class="btn btn--secondary">Mortgage</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Railroads (Demonstrates non-developable property) -->
+        <div class="prop-group prop-group--railroad">
+          <h3 class="prop-group__header">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2 12h20M2 6h20M2 18h20"></path><circle cx="6" cy="12" r="2"></circle><circle cx="18" cy="12" r="2"></circle></svg>
+            Railroads
+          </h3>
+          <div class="prop-group__body">
+            <div class="property-card property-card--railroad">
+              <div class="property-card__header"><h4 class="property-card__name">Reading Railroad</h4></div>
+              <div class="property-card__body"><div class="property-card__development"></div></div>
+              <div class="property-card__footer">
+                <div class="property-card__actions">
+                  <button class="btn btn--secondary">Mortgage</button>
+                  <button class="btn btn--secondary">Trade</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div style="position: absolute; bottom: 20px; left: 20px; background-color: white; padding: 20px; border-radius: 12px; max-width: 90vw;">
+    <h2>Component Variations</h2>
+    <hr style="margin: 10px 0;">
+    
+    <div>
+      <h3>Variant: Empty State</h3>
+      <p>The view shown when a player opens the interface without owning any properties.</p>
+      
+      <div class="modal-overlay" style="position: relative; height: 300px; width: 500px; margin-top: 10px;">
+        <div class="prop-management" style="height: 100%; max-height: 300px;">
+          <header class="prop-management__header">
+            <h2 class="prop-management__title" id="prop-mgmt-title-empty">Manage Properties</h2>
+            <div class="prop-management__cash">$1500</div>
+            <button class="prop-management__close-btn" aria-label="Close Property Management">
+              <svg class="icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </header>
+          <main class="prop-management__list">
+            <div class="prop-management__empty-state">
+                You do not own any properties yet.
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heads-Up Display (HUD) Component</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Base & Showcase Styles */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      /* Colors */
+      --color-primary-500: #1987C7;
+      --color-primary-700: #0C537F;
+      --color-primary-900: #032037;
+      --color-neutral-white: #FFFFFF;
+      --color-neutral-50: #F7F5F2;
+      --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871;
+      --color-neutral-900: #1C1A17;
+      --color-success-500: #1E8449;
+      --color-error-500: #C0392B;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif;
+      --font-family-secondary: 'Inter', sans-serif;
+      --font-size-h3: 28px;
+      --font-size-h4: 20px;
+      --font-size-body: 16px;
+      --font-weight-regular: 400;
+      --font-weight-semibold: 600;
+
+      /* Spacing */
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-neutral-50);
+    }
+    .showcase-container {
+      padding: var(--spacing-2xl);
+    }
+    .showcase-title {
+      font-family: var(--font-family-primary);
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+      color: var(--color-primary-900);
+    }
+    .mock-game-screen {
+      position: relative;
+      height: 90vh;
+      background-image: linear-gradient(45deg, var(--color-primary-800), var(--color-primary-900));
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--spacing-2xl);
+      border: 1px solid var(--color-primary-900);
+    }
+    .mock-game-screen__board {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      height: 60%;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 2px dashed var(--color-primary-700);
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary-700);
+      font-family: var(--font-family-primary);
+      font-size: 2rem;
+    }
+    .variations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: var(--spacing-xl);
+    }
+    .variation-title {
+      font-family: var(--font-family-primary);
+      margin-bottom: var(--spacing-md);
+      font-size: 1.5rem;
+    }
+    .variation-description {
+        margin-bottom: var(--spacing-md);
+        color: var(--color-neutral-500);
+    }
+
+    /* HUD Organism CSS */
+    .hud {
+      position: absolute;
+      inset: 0;
+      padding: var(--spacing-lg);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Player Panel Molecule CSS */
+    .player-panel {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      background-color: rgba(247, 245, 242, 0.85); /* --color-neutral-50 with alpha */
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(28, 26, 23, 0.1);
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      min-width: 280px;
+      max-width: 320px;
+      pointer-events: auto;
+      transition: transform 200ms ease-out, box-shadow 200ms ease-out, opacity 300ms ease-out;
+    }
+
+    .player-panel__token {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      background-color: var(--color-neutral-100);
+      border-radius: var(--border-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--color-primary-700);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .player-panel__token svg {
+        width: 36px;
+        height: 36px;
+        stroke-width: 1.5;
+    }
+
+    .player-panel__info {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .player-panel__name {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-panel__cash {
+      font-family: var(--font-family-secondary);
+      font-size: var(--font-size-h3);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-success-500);
+      margin-top: var(--spacing-sm);
+    }
+
+    /* Placement Modifiers */
+    .player-panel--top-left { top: var(--spacing-lg); left: var(--spacing-lg); }
+    .player-panel--top-right { top: var(--spacing-lg); right: var(--spacing-lg); }
+    .player-panel--bottom-left { bottom: var(--spacing-lg); left: var(--spacing-lg); }
+    .player-panel--bottom-right { bottom: var(--spacing-lg); right: var(--spacing-lg); }
+
+    /* State Modifiers */
+    .player-panel--active-turn {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 3px var(--color-primary-500), var(--shadow-lg);
+    }
+
+    .player-panel--bankrupt {
+      opacity: 0.6;
+      filter: grayscale(1);
+      position: relative;
+    }
+
+    .player-panel--bankrupt::after {
+      content: 'BANKRUPT';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(28, 26, 23, 0.6);
+      color: var(--color-neutral-white);
+      font-family: var(--font-family-primary);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-h4);
+      border-radius: var(--border-radius-lg);
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase-container">
+    <h1 class="showcase-title">Heads-Up Display (HUD)</h1>
+
+    <div class="mock-game-screen">
+      <div class="mock-game-screen__board">
+        Game Board Area
+      </div>
+      
+      <!-- Main Mockup: 4-Player Game with Active and Bankrupt States -->
+      <div class="hud">
+        <!-- Player 1 (Human) - Active Turn -->
+        <div class="player-panel player-panel--top-left player-panel--active-turn">
+          <div class="player-panel__token">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="player-panel__info">
+            <h3 class="player-panel__name">BoardwalkKing</h3>
+            <p class="player-panel__cash">$1,250</p>
+          </div>
+        </div>
+
+        <!-- Player 2 (AI) -->
+        <div class="player-panel player-panel--top-right">
+          <div class="player-panel__token" style="color: #c0392b;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </div>
+          <div class="player-panel__info">
+            <h3 class="player-panel__name">AI Opponent 1</h3>
+            <p class="player-panel__cash">$800</p>
+          </div>
+        </div>
+
+        <!-- Player 3 (AI) - Bankrupt -->
+        <div class="player-panel player-panel--bottom-right player-panel--bankrupt">
+          <div class="player-panel__token" style="color: #f39c12;">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          </div>
+          <div class="player-panel__info">
+            <h3 class="player-panel__name">AI Opponent 2</h3>
+            <p class="player-panel__cash">$0</p>
+          </div>
+        </div>
+        
+        <!-- Player 4 (AI) -->
+        <div class="player-panel player-panel--bottom-left">
+          <div class="player-panel__token" style="color: #16a085;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          </div>
+          <div class="player-panel__info">
+            <h3 class="player-panel__name">AI Opponent 3</h3>
+            <p class="player-panel__cash">$2,100</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div>
+      <h2 class="showcase-title">Component Variations</h2>
+      <div class="variations-grid">
+
+        <div>
+            <h3 class="variation-title">4-Player HUD</h3>
+            <p class="variation-description">Standard layout for a full game with four players.</p>
+            <div class="mock-game-screen" style="height: 400px;">
+                <div class="hud">
+                    <div class="player-panel player-panel--top-left">...</div>
+                    <div class="player-panel player-panel--top-right">...</div>
+                    <div class="player-panel player-panel--bottom-right">...</div>
+                    <div class="player-panel player-panel--bottom-left">...</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="variation-title">3-Player HUD</h3>
+            <p class="variation-description">Layout for a game with three players. Bottom right corner is empty.</p>
+            <div class="mock-game-screen" style="height: 400px;">
+                <div class="hud">
+                    <div class="player-panel player-panel--top-left">...</div>
+                    <div class="player-panel player-panel--top-right">...</div>
+                    <div class="player-panel player-panel--bottom-left">...</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="variation-title">2-Player HUD</h3>
+            <p class="variation-description">Layout for a heads-up game. Panels are typically placed opposite each other.</p>
+            <div class="mock-game-screen" style="height: 400px;">
+                <div class="hud">
+                    <div class="player-panel player-panel--top-left">...</div>
+                    <div class="player-panel player-panel--bottom-right">...</div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

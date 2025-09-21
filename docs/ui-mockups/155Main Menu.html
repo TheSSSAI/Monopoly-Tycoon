@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly Tycoon - Main Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---------------------------------- */
+    /* --- 1. CSS Reset & Base Styles --- */
+    /* ---------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ------------------------------ */
+    /* --- 2. Design System Tokens -- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      
+      --font-size-h1: 48px; --font-size-body: 16px; --font-size-caption: 14px;
+
+      --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+      --line-height-tight: 1.2;
+
+      /* Spacing */
+      --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+      --spacing-xl: 32px; --spacing-2xl: 48px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 8px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+
+    /* ------------------------------ */
+    /* --- 3. Page & Layout Styles -- */
+    /* ------------------------------ */
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-primary-800);
+      background-image: linear-gradient(160deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+      color: var(--color-neutral-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: var(--spacing-xl);
+    }
+    
+    /* ------------------------------------- */
+    /* --- 4. Component Implementation --- */
+    /* ------------------------------------- */
+
+    /* --- 4.1 Dependency: Button --- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm);
+      min-height: 44px; padding: 12px 24px; width: 280px;
+      font-family: var(--font-family-secondary); font-size: 18px; font-weight: var(--font-weight-semibold);
+      border: 1px solid transparent; border-radius: var(--border-radius-md);
+      cursor: pointer; text-decoration: none; text-align: center; white-space: nowrap;
+      transition: all 150ms ease-out;
+    }
+    
+    .btn:focus-visible {
+      outline: 2px solid var(--color-primary-300); outline-offset: 2px;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .btn { transition: none; }
+      .btn:hover { transform: none; }
+    }
+
+    .btn--primary {
+      background-color: var(--color-primary-500);
+      color: var(--color-neutral-white);
+      box-shadow: var(--shadow-md);
+    }
+    .btn--primary:hover {
+      background-color: var(--color-primary-600);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    .btn--primary:active {
+      background-color: var(--color-primary-700);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(0);
+    }
+
+    .btn--secondary {
+      background-color: transparent;
+      color: var(--color-primary-100);
+      border-color: var(--color-primary-200);
+    }
+    .btn--secondary:hover {
+      background-color: rgba(230, 240, 246, 0.1);
+      color: var(--color-neutral-white);
+      border-color: var(--color-neutral-white);
+    }
+    .btn--secondary:active {
+      background-color: rgba(230, 240, 246, 0.2);
+      transform: translateY(1px);
+    }
+    
+    /* --- 4.2 Organism: Main Menu --- */
+    .main-menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-2xl);
+    }
+
+    .main-menu__title {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-white);
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .main-menu__nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+    
+    .main-menu__footer {
+      position: absolute;
+      bottom: var(--spacing-lg);
+      font-size: var(--font-size-caption);
+      color: var(--color-primary-200);
+      opacity: 0.8;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <main class="main-menu">
+    <h1 class="main-menu__title">Monopoly Tycoon</h1>
+    
+    <nav class="main-menu__nav" aria-label="Main game menu">
+      <ul class="main-menu__nav-list">
+        <li class="main-menu__nav-item">
+          <a href="#" class="btn btn--primary">New Game</a>
+        </li>
+        <li class="main-menu__nav-item">
+          <a href="#" class="btn btn--primary">Load Game</a>
+        </li>
+        <li class="main-menu__nav-item">
+          <a href="#" class="btn btn--primary">Player Statistics</a>
+        </li>
+         <li class="main-menu__nav-item">
+          <a href="#" class="btn btn--primary">Tutorial</a>
+        </li>
+        <li class="main-menu__nav-item">
+          <a href="#" class="btn btn--primary">Settings</a>
+        </li>
+        <li class="main-menu__nav-item">
+          <a href="#" class="btn btn--secondary">Quit Game</a>
+        </li>
+      </ul>
+    </nav>
+  </main>
+
+  <footer class="main-menu__footer">
+    <p>Version 1.0.0 &copy; 2024 Monopoly Tycoon Team</p>
+  </footer>
+  
+  <div class="component-variations" style="display: none;">
+    <h2>Component Variations</h2>
+    <div>
+      <h3>Default</h3>
+      <p>The standard appearance and state of the Main Menu organism.</p>
+      <!-- The entire component above serves as the "Default" variant -->
+    </div>
+    <div>
+      <h3>Button Hover State</h3>
+      <p>This state is demonstrated by hovering over any of the buttons in the menu. The button background darkens, and it elevates slightly.</p>
+      <!-- This state is interactive and part of the main component demonstration. -->
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification Toast Component</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ----------------------------------- */
+    /* Base & Showcase Styles              */
+    /* ----------------------------------- */
+    :root {
+      /* Colors */
+      --color-success-bg: #E9F6ED;
+      --color-success-text: #1E8449;
+      --color-error-bg: #FADBD8;
+      --color-error-text: #C0392B;
+      --color-info-bg: #E6F0F6;
+      --color-info-text: #2980B9;
+      --color-white: #FFFFFF;
+      --color-shadow: rgba(28, 26, 23, 0.1);
+      --color-gray-50: #F7F5F2;
+      --color-gray-900: #1C1A17;
+      --color-primary-700: #0C537F;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif;
+      --font-family-secondary: 'Inter', sans-serif;
+      --font-size-body: 16px;
+      --font-weight-body: 400;
+      --font-weight-semibold: 600;
+
+      /* Spacing */
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 8px;
+      --shadow-md: 0 4px 6px var(--color-shadow);
+      --shadow-lg: 0 10px 15px var(--color-shadow);
+
+      /* Animation */
+      --animation-duration: 0.3s;
+      --animation-timing: ease-out;
+    }
+    
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-gray-50);
+      color: var(--color-gray-900);
+      margin: 0;
+      padding: var(--spacing-xl);
+    }
+    
+    .showcase-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: var(--spacing-xl);
+      background: var(--color-white);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .showcase-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-lg);
+      border-bottom: 1px solid #E8E5E1;
+    }
+    
+    .showcase-header h1 {
+      font-family: var(--font-family-primary);
+      font-size: 36px;
+      color: var(--color-primary-700);
+      margin: 0 0 8px 0;
+    }
+    
+    .showcase-header p {
+      font-size: var(--font-size-body);
+      color: #7D7871;
+      margin: 0;
+    }
+    
+    .variant-group {
+      margin-bottom: var(--spacing-xl);
+    }
+    
+    .variant-group h2 {
+      font-family: var(--font-family-primary);
+      font-weight: var(--font-weight-semibold);
+      font-size: 20px;
+      margin-bottom: var(--spacing-md);
+      color: var(--color-primary-700);
+    }
+
+    /* ----------------------------------- */
+    /* Notification Toast Component        */
+    /* ----------------------------------- */
+    .toast-container {
+      position: fixed;
+      top: var(--spacing-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-md);
+      pointer-events: none;
+    }
+
+    .toast {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-md);
+      font-family: var(--font-family-secondary);
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-body);
+      min-width: 320px;
+      max-width: 450px;
+      background-color: var(--color-white);
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    /* States (Animation) */
+    @keyframes toast-fade-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* The is-visible class is what would be toggled by JS to trigger the animation. 
+       For this showcase, we apply the animation directly to demonstrate. */
+    .toast.animate-in {
+      animation: toast-fade-in var(--animation-duration) var(--animation-timing) forwards;
+      /* Add a delay to showcase multiple toasts appearing sequentially */
+      animation-delay: calc(var(--animation-order, 0) * 150ms);
+    }
+    
+    /* Element Styling */
+    .toast__icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+    
+    .toast__message {
+      flex-grow: 1;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Component Variants */
+    .toast--info {
+      background-color: var(--color-info-bg);
+      color: var(--color-info-text);
+      border-left: 4px solid var(--color-info-text);
+    }
+    
+    .toast--success {
+      background-color: var(--color-success-bg);
+      color: var(--color-success-text);
+      border-left: 4px solid var(--color-success-text);
+    }
+    
+    .toast--error {
+      background-color: var(--color-error-bg);
+      color: var(--color-error-text);
+      border-left: 4px solid var(--color-error-text);
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .toast {
+        transition: none;
+        animation: none !important;
+      }
+      .toast.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- This container is where the toasts would appear in a live application. -->
+  <div class="toast-container" aria-live="polite" aria-atomic="true">
+    <!-- Toasts would be dynamically inserted here. For the showcase, we'll display them below. -->
+  </div>
+
+  <div class="showcase-container">
+    <header class="showcase-header">
+      <h1>Notification Toast</h1>
+      <p>Provides non-intrusive, auto-dismissing feedback to the user.</p>
+    </header>
+
+    <div class="variant-group">
+      <h2>Component Variations</h2>
+      <p>The component has three main variants based on semantic colors: Info, Success, and Error. In a live application, these would appear in the top-center of the screen and fade in/out.</p>
+      
+      <!-- Variant 1: Info -->
+      <div class="toast toast--info animate-in" role="status" style="--animation-order: 1; position: relative; opacity: 1; transform: translateY(0); margin-bottom: 16px;">
+        <svg class="toast__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"></path>
+        </svg>
+        <p class="toast__message">AI 1 and AI 2 completed a trade.</p>
+      </div>
+
+      <!-- Variant 2: Success -->
+      <div class="toast toast--success animate-in" role="status" style="--animation-order: 2; position: relative; opacity: 1; transform: translateY(0); margin-bottom: 16px;">
+        <svg class="toast__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path>
+        </svg>
+        <p class="toast__message">Game settings saved successfully!</p>
+      </div>
+      
+      <!-- Variant 3: Error -->
+      <div class="toast toast--error animate-in" role="status" style="--animation-order: 3; position: relative; opacity: 1; transform: translateY(0);">
+        <svg class="toast__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"></path>
+        </svg>
+        <p class="toast__message">Could not save game. Please check disk space.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="showcase-container">
+    <h2>Component Variations</h2>
+    <div>
+      <h3>Variant Name: Info Toast</h3>
+      <p>Used for neutral, informational messages that keep the player aware of game state changes, such as AI-to-AI trades.</p>
+      <div class="toast toast--info" role="status" style="position: relative; opacity: 1; transform: translateY(0);">
+        <svg class="toast__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"></path>
+        </svg>
+        <p class="toast__message">AI 1 and AI 2 completed a trade.</p>
+      </div>
+    </div>
+    <div style="margin-top: 24px;">
+      <h3>Variant Name: Success Toast</h3>
+      <p>Used to confirm that a player's action was completed successfully, such as saving the game or changing settings.</p>
+      <div class="toast toast--success" role="status" style="position: relative; opacity: 1; transform: translateY(0);">
+        <svg class="toast__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path>
+        </svg>
+        <p class="toast__message">Game settings saved successfully!</p>
+      </div>
+    </div>
+    <div style="margin-top: 24px;">
+      <h3>Variant Name: Error Toast</h3>
+      <p>Used to provide feedback on a failed, non-critical operation. Critical errors should use a modal dialog instead.</p>
+      <div class="toast toast--error" role="status" style="position: relative; opacity: 1; transform: translateY(0);">
+        <svg class="toast__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"></path>
+        </svg>
+        <p class="toast__message">Could not save game. Please check disk space.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

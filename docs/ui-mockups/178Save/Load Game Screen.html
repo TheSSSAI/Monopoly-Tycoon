@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save/Load Game Screen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------ */
+    /* --- 1. Design System Tokens -- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      
+      --color-destructive-50: #FBE9EC; --color-destructive-500: #D7263D; --color-destructive-900: #5A0A15;
+
+      --color-success-500: #1E8449; --color-warning-500: #F39C12; --color-error-500: #C0392B; --color-info-500: #2980B9;
+
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-family-monospace: 'Roboto Mono', monospace;
+      
+      --font-size-h1: 48px; --font-size-h2: 36px; --font-size-h3: 28px; --font-size-h4: 20px;
+      --font-size-body: 16px; --font-size-caption: 14px;
+
+      --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+      /* Spacing */
+      --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+      --spacing-xl: 32px; --spacing-2xl: 48px; --spacing-3xl: 64px;
+      
+      /* Borders & Shadows */
+      --border-radius-md: 8px;
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 12px rgba(0,0,0,0.15);
+    }
+
+    /* ------------------------------ */
+    /* --- 2. CSS Reset & Base Styles -- */
+    /* ------------------------------ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-primary-900);
+      background-image: radial-gradient(circle at top, var(--color-primary-800) 0%, var(--color-primary-900) 60%);
+      color: var(--color-neutral-50);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: var(--spacing-2xl);
+    }
+    
+    /* ------------------------------ */
+    /* --- 3. Screen Layout -------- */
+    /* ------------------------------ */
+    .screen-container {
+      width: 100%;
+      max-width: 1280px;
+      background-color: rgba(6, 58, 91, 0.5);
+      border: 1px solid var(--color-primary-700);
+      border-radius: var(--border-radius-md);
+      padding: var(--spacing-xl);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .screen__header {
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-lg);
+      border-bottom: 1px solid var(--color-primary-700);
+    }
+    
+    .screen__title {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h2);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-white);
+    }
+
+    .screen__content {
+        min-height: 400px;
+    }
+    
+    .screen__footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--color-primary-700);
+    }
+
+    /* ------------------------------ */
+    /* --- 4. Component: Button ----- */
+    /* ------------------------------ */
+    .btn {
+      font-family: var(--font-family-secondary);
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+      border-radius: var(--border-radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 150ms ease-out;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--color-primary-300);
+      outline-offset: 2px;
+    }
+    
+    .btn--primary {
+      background-color: var(--color-primary-500);
+      color: var(--color-neutral-white);
+      padding: 12px 24px;
+    }
+    .btn--primary:hover {
+      background-color: var(--color-primary-600);
+      box-shadow: var(--shadow-md);
+    }
+    .btn--primary:active {
+      background-color: var(--color-primary-700);
+      transform: scale(0.98);
+    }
+    .btn--primary:disabled {
+      background-color: var(--color-primary-200);
+      color: var(--color-primary-50);
+      cursor: not-allowed;
+    }
+
+    .btn--secondary {
+      background-color: transparent;
+      color: var(--color-primary-100);
+      border: 1px solid var(--color-primary-600);
+      padding: 11px 23px;
+    }
+    .btn--secondary:hover {
+      background-color: var(--color-primary-700);
+      color: var(--color-neutral-white);
+    }
+    .btn--secondary:active {
+      background-color: var(--color-primary-800);
+      transform: scale(0.98);
+    }
+
+    .btn--destructive {
+        background-color: var(--color-destructive-500);
+        color: var(--color-neutral-white);
+    }
+    .btn--destructive:hover {
+        background-color: var(--color-destructive-900);
+    }
+
+    /* --------------------------------- */
+    /* --- 5. Component: Save/Load Slot -- */
+    /* --------------------------------- */
+    .save-load-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    .slot {
+      background: var(--color-primary-800);
+      border: 1px solid var(--color-primary-700);
+      border-radius: var(--border-radius-md);
+      padding: var(--spacing-md);
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      transition: all 150ms ease-out;
+      position: relative;
+    }
+    
+    .slot:not(.slot--disabled) {
+      cursor: pointer;
+    }
+    
+    .slot:not(.slot--disabled):hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-500);
+    }
+    
+    .slot:focus-visible {
+        outline: 2px solid var(--color-primary-300);
+        outline-offset: 2px;
+    }
+
+    .slot__header {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary-200);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .slot__body {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Slot States */
+    .slot--empty .slot__body {
+      align-items: center;
+      font-size: var(--font-size-body);
+      color: var(--color-primary-600);
+      font-style: italic;
+    }
+
+    .slot--occupied .slot__metadata {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+    .slot--occupied .metadata-item {
+      font-size: var(--font-size-caption);
+      color: var(--color-primary-200);
+    }
+    .slot--occupied .metadata-item__label {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary-100);
+      margin-right: var(--spacing-sm);
+    }
+    
+    .slot--selected {
+      border: 2px solid var(--color-primary-300);
+      background: var(--color-primary-700);
+    }
+
+    .slot--disabled {
+      background: var(--color-primary-800);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .slot--disabled .slot__status {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-family-primary);
+        font-size: var(--font-size-h3);
+        font-weight: var(--font-weight-bold);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .slot--corrupted .slot__status {
+        color: var(--color-error-500);
+    }
+    
+    .slot--incompatible .slot__status {
+        color: var(--color-warning-500);
+    }
+    
+    .slot--disabled .slot__header,
+    .slot--disabled .slot__body {
+        opacity: 0.3;
+    }
+    
+    /* ------------------------------ */
+    /* --- 6. Component: Modal ------ */
+    /* ------------------------------ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 200ms ease-out, visibility 200ms ease-out;
+    }
+
+    .modal-overlay--visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background-color: var(--color-primary-900);
+      border: 1px solid var(--color-primary-700);
+      border-radius: var(--border-radius-md);
+      padding: var(--spacing-xl);
+      width: 100%;
+      max-width: 500px;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95);
+      transition: transform 250ms ease-out;
+    }
+    .modal-overlay--visible .modal-content {
+      transform: scale(1);
+    }
+
+    .modal__header {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h3);
+      color: var(--color-neutral-white);
+      margin-bottom: var(--spacing-md);
+    }
+    .modal__body {
+      font-size: var(--font-size-body);
+      color: var(--color-primary-100);
+      margin-bottom: var(--spacing-xl);
+    }
+    .modal__footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+    }
+    
+    /* For Screen Variations section */
+    .variations-container {
+        margin-top: var(--spacing-3xl);
+        padding-top: var(--spacing-2xl);
+        border-top: 2px dashed var(--color-primary-700);
+        width: 100%;
+        max-width: 1280px;
+    }
+    .variations-container h2 {
+        font-family: var(--font-family-primary);
+        font-size: var(--font-size-h2);
+        margin-bottom: var(--spacing-xl);
+        text-align: center;
+    }
+    .variant {
+        margin-bottom: var(--spacing-3xl);
+    }
+    .variant-title {
+        font-family: var(--font-family-secondary);
+        font-size: var(--font-size-h4);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-primary-300);
+        margin-bottom: var(--spacing-sm);
+    }
+    .variant-description {
+        font-size: var(--font-size-caption);
+        color: var(--color-primary-200);
+        max-width: 800px;
+        margin-bottom: var(--spacing-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================================================================= -->
+  <!-- == PRIMARY MOCKUP: LOAD GAME SCREEN                                  == -->
+  <!-- ======================================================================= -->
+  <div class="screen-container" id="load-game-container">
+    <header class="screen__header">
+      <h1 class="screen__title">Load Game</h1>
+    </header>
+    
+    <main class="screen__content">
+      <div class="save-load-grid">
+        
+        <!-- Slot 1: Occupied -->
+        <div class="slot slot--occupied" tabindex="0" aria-label="Save Slot 1, Occupied. Player BoardwalkKing, Turn 45. Saved on 2024-10-27, 8:15 PM">
+          <div class="slot__header">Slot 1</div>
+          <div class="slot__body">
+            <div class="slot__metadata">
+              <div class="metadata-item"><span class="metadata-item__label">Player:</span>BoardwalkKing</div>
+              <div class="metadata-item"><span class="metadata-item__label">Turn:</span>45</div>
+              <div class="metadata-item"><span class="metadata-item__label">Date:</span>2024-10-27 20:15</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Slot 2: Empty -->
+        <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 2, Empty.">
+          <div class="slot__header">Slot 2</div>
+          <div class="slot__body">
+            <p>Empty</p>
+          </div>
+        </div>
+
+        <!-- Slot 3: Corrupted -->
+        <div class="slot slot--disabled slot--corrupted" aria-label="Save Slot 3, Corrupted. This save file is corrupted and cannot be loaded.">
+          <div class="slot__header">Slot 3</div>
+          <div class="slot__body">
+            <div class="slot__metadata">
+               <div class="metadata-item"><span class="metadata-item__label">Player:</span>RailroadMogul</div>
+            </div>
+          </div>
+          <div class="slot__status" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Corrupted
+          </div>
+        </div>
+        
+        <!-- Slot 4: Incompatible -->
+        <div class="slot slot--disabled slot--incompatible" aria-label="Save Slot 4, Incompatible Version. This save file is from an older version of the game.">
+          <div class="slot__header">Slot 4</div>
+          <div class="slot__body">
+            <div class="slot__metadata">
+               <div class="metadata-item"><span class="metadata-item__label">Player:</span>CashQueen</div>
+            </div>
+          </div>
+          <div class="slot__status" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Incompatible
+          </div>
+        </div>
+
+        <!-- Slot 5: Occupied -->
+        <div class="slot slot--occupied" tabindex="0" aria-label="Save Slot 5, Occupied. Player TaxMan, Turn 12. Saved on 2024-10-26, 11:30 AM">
+          <div class="slot__header">Slot 5</div>
+          <div class="slot__body">
+            <div class="slot__metadata">
+              <div class="metadata-item"><span class="metadata-item__label">Player:</span>TaxMan</div>
+              <div class="metadata-item"><span class="metadata-item__label">Turn:</span>12</div>
+              <div class="metadata-item"><span class="metadata-item__label">Date:</span>2024-10-26 11:30</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+    
+    <footer class="screen__footer">
+      <button class="btn btn--secondary" type="button">Back</button>
+      <button class="btn btn--primary" id="load-game-btn" type="button" disabled>Load Game</button>
+    </footer>
+  </div>
+
+  <!-- Hidden Modal for Overwrite Confirmation -->
+  <div id="overwrite-modal" class="modal-overlay">
+      <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <h2 id="modal-title" class="modal__header">Overwrite Save?</h2>
+          <p class="modal__body">
+              Are you sure you want to overwrite the saved game in <strong>Slot 1</strong>? This action cannot be undone.
+          </p>
+          <div class="modal__footer">
+              <button class="btn btn--secondary" id="cancel-overwrite-btn">Cancel</button>
+              <button class="btn btn--destructive" id="confirm-overwrite-btn">Overwrite</button>
+          </div>
+      </div>
+  </div>
+
+
+  <!-- ======================================================================= -->
+  <!-- == SCREEN VARIATIONS                                                 == -->
+  <!-- ======================================================================= -->
+  <div class="variations-container">
+    <h2>Screen Variations</h2>
+
+    <!-- Variant 1: Save Mode -->
+    <div class="variant">
+      <div class="variant-title">Variant: Save Game Mode</div>
+      <p class="variant-description">This is how the screen appears when accessed from the in-game Pause Menu. The title changes, and the primary action button in the footer is removed. Clicking an empty slot saves directly, while clicking an occupied slot triggers the overwrite confirmation modal.</p>
+      
+      <div class="screen-container" id="save-game-container">
+        <header class="screen__header">
+          <h1 class="screen__title">Save Game</h1>
+        </header>
+        <main class="screen__content">
+          <div class="save-load-grid">
+            <div class="slot slot--occupied" tabindex="0" aria-label="Save Slot 1, Occupied. Player BoardwalkKing, Turn 45.">
+              <div class="slot__header">Slot 1</div>
+              <div class="slot__body"><div class="slot__metadata"><div class="metadata-item"><span class="metadata-item__label">Player:</span>BoardwalkKing</div><div class="metadata-item"><span class="metadata-item__label">Turn:</span>45</div><div class="metadata-item"><span class="metadata-item__label">Date:</span>2024-10-27 20:15</div></div></div>
+            </div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 2, Empty."><div class="slot__header">Slot 2</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 3, Empty."><div class="slot__header">Slot 3</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 4, Empty."><div class="slot__header">Slot 4</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 5, Empty."><div class="slot__header">Slot 5</div><div class="slot__body"><p>Empty</p></div></div>
+          </div>
+        </main>
+        <footer class="screen__footer">
+          <button class="btn btn--secondary" type="button">Back</button>
+        </footer>
+      </div>
+    </div>
+    
+    <!-- Variant 2: Empty State -->
+    <div class="variant">
+      <div class="variant-title">Variant: Empty State</div>
+      <p class="variant-description">How the screen appears when no saved games exist yet. This applies to both Load and Save modes. In Load Mode, the primary button would be disabled.</p>
+       <div class="screen-container">
+        <header class="screen__header">
+          <h1 class="screen__title">Load Game</h1>
+        </header>
+        <main class="screen__content">
+          <div class="save-load-grid">
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 1, Empty."><div class="slot__header">Slot 1</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 2, Empty."><div class="slot__header">Slot 2</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 3, Empty."><div class="slot__header">Slot 3</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 4, Empty."><div class="slot__header">Slot 4</div><div class="slot__body"><p>Empty</p></div></div>
+            <div class="slot slot--empty" tabindex="0" aria-label="Save Slot 5, Empty."><div class="slot__header">Slot 5</div><div class="slot__body"><p>Empty</p></div></div>
+          </div>
+        </main>
+        <footer class="screen__footer">
+          <button class="btn btn--secondary" type="button">Back</button>
+          <button class="btn btn--primary" type="button" disabled>Load Game</button>
+        </footer>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Minimal JavaScript for demonstrating interactivity.
+    // In a real application, this would be handled by the game engine's UI framework.
+    document.addEventListener('DOMContentLoaded', () => {
+      const loadGameContainer = document.getElementById('load-game-container');
+      const loadButton = document.getElementById('load-game-btn');
+      
+      if (loadGameContainer && loadButton) {
+        const slots = loadGameContainer.querySelectorAll('.slot:not(.slot--disabled)');
+        let selectedSlot = null;
+
+        slots.forEach(slot => {
+          slot.addEventListener('click', () => {
+            if (selectedSlot) {
+              selectedSlot.classList.remove('slot--selected');
+            }
+            slot.classList.add('slot--selected');
+            selectedSlot = slot;
+            
+            // Enable the load button only if a valid, occupied slot is selected
+            if (slot.classList.contains('slot--occupied')) {
+              loadButton.disabled = false;
+            } else {
+              loadButton.disabled = true;
+            }
+          });
+        });
+      }
+      
+      // Save Mode and Modal demonstration
+      const saveGameContainer = document.getElementById('save-game-container');
+      const modal = document.getElementById('overwrite-modal');
+      
+      if (saveGameContainer && modal) {
+          const saveSlots = saveGameContainer.querySelectorAll('.slot');
+          saveSlots.forEach(slot => {
+              slot.addEventListener('click', () => {
+                  if (slot.classList.contains('slot--occupied')) {
+                      // Show overwrite modal for occupied slots
+                      modal.classList.add('modal-overlay--visible');
+                  } else if (slot.classList.contains('slot--empty')) {
+                      // In a real app, this would trigger an immediate save.
+                      alert('Game Saved to Empty Slot!');
+                  }
+              });
+          });
+          
+          document.getElementById('cancel-overwrite-btn').addEventListener('click', () => {
+              modal.classList.remove('modal-overlay--visible');
+          });
+          document.getElementById('confirm-overwrite-btn').addEventListener('click', () => {
+              alert('Save Overwritten!');
+              modal.classList.remove('modal-overlay--visible');
+          });
+      }
+
+    });
+  </script>
+
+</body>
+</html>

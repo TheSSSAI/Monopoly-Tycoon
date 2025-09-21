@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Tycoon - Interactive Tutorial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* ------------------------------ */
+        /* --- 1. Design System Tokens -- */
+        /* ------------------------------ */
+        :root {
+            /* Color Palette */
+            --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+            --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+            --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+            --color-primary-900: #032037;
+            --color-destructive-500: #D7263D;
+            --color-success-500: #1E8449; --color-warning-500: #F39C12; --color-error-500: #C0392B;
+            --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+            --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+            /* Typography */
+            --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+            --font-size-h3: 28px; --font-size-h4: 20px; --font-size-body: 16px; --font-size-caption: 14px;
+            --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+            --line-height-heading: 1.4; --line-height-body: 1.6;
+            /* Spacing */
+            --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+            --spacing-xl: 32px; --spacing-2xl: 48px;
+            /* Borders & Shadows */
+            --border-radius-md: 8px;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 15px 5px rgba(189, 237, 237, 0.7);
+        }
+
+        /* ------------------------------ */
+        /* --- 2. CSS Reset & Base Styles -- */
+        /* ------------------------------ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font-family-secondary);
+            background-color: var(--color-primary-900);
+            color: var(--color-neutral-50);
+            line-height: var(--line-height-body);
+            overflow: hidden;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23063A5B" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+        
+        /* ----------------------------------- */
+        /* --- 3. Mocked Game UI Background -- */
+        /* ----------------------------------- */
+        .game-ui-background {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-areas: "header header" "board board" "footer footer";
+            grid-template-rows: auto 1fr auto;
+            padding: var(--spacing-lg);
+            gap: var(--spacing-md);
+            filter: blur(2px); /* Blurred to show it's inactive */
+        }
+        .mock-hud {
+            grid-area: header;
+            display: flex;
+            justify-content: space-between;
+            gap: var(--spacing-md);
+        }
+        .player-card {
+            background: rgba(3, 32, 55, 0.8);
+            border: 1px solid var(--color-primary-700);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            width: 250px;
+        }
+        .player-card__token {
+            width: 40px;
+            height: 40px;
+            background-color: var(--color-neutral-500);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+        }
+        .player-card__info { flex-grow: 1; }
+        .player-card__name { font-weight: var(--font-weight-semibold); font-size: 18px; }
+        .player-card__cash { font-family: var(--font-family-monospace); font-size: 20px; color: var(--color-success-500); }
+
+        .mock-board {
+            grid-area: board;
+            border: 4px solid var(--color-primary-600);
+            background: var(--color-primary-800);
+            border-radius: var(--border-radius-md);
+            display: grid;
+            place-items: center;
+            font-size: 48px;
+            color: var(--color-primary-600);
+            font-family: var(--font-family-primary);
+        }
+        .mock-controls { grid-area: footer; display: flex; justify-content: center; align-items: center; padding: var(--spacing-md); }
+        .btn {
+            font-family: var(--font-family-secondary);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--border-radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 150ms ease-out;
+            padding: 12px 24px;
+        }
+        .btn--primary { background-color: var(--color-primary-500); color: var(--color-neutral-white); }
+        .btn--primary:hover { background-color: var(--color-primary-600); box-shadow: var(--shadow-lg); }
+        .btn--primary:active { background-color: var(--color-primary-700); transform: scale(0.98); }
+        .btn--primary:disabled { background-color: var(--color-primary-200); color: var(--color-primary-50); cursor: not-allowed; }
+        .btn--primary:focus-visible { outline: 2px solid var(--color-primary-300); outline-offset: 2px; }
+
+        /* Mock property modal */
+        .property-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--color-neutral-50);
+            color: var(--color-neutral-900);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            width: 320px;
+            z-index: 10;
+            padding: var(--spacing-lg);
+            border-top: 8px solid #8E44AD; /* Purple property */
+        }
+        .property-modal__header { text-align: center; margin-bottom: var(--spacing-md); }
+        .property-modal__title { font-family: var(--font-family-primary); font-size: 24px; font-weight: var(--font-weight-bold); }
+        .property-modal__price { font-family: var(--font-family-monospace); font-size: 18px; color: var(--color-neutral-500); }
+        .property-modal__rent { text-align: center; font-size: var(--font-size-caption); margin-bottom: var(--spacing-lg); }
+        .property-modal__actions { display: flex; justify-content: space-between; gap: var(--spacing-md); }
+
+
+        /* ------------------------------ */
+        /* --- 4. Tutorial System Styles -- */
+        /* ------------------------------ */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+        }
+
+        .tutorial-scrim {
+            position: absolute;
+            inset: 0;
+            background: rgba(3, 32, 55, 0.7);
+            pointer-events: none;
+        }
+
+        .tutorial-highlight {
+            position: absolute;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 0 0 9999px rgba(3, 32, 55, 0.7), var(--shadow-glow);
+            z-index: 1001;
+            pointer-events: auto; /* The highlighted element is clickable */
+            transition: all 300ms ease-in-out;
+        }
+
+        .tutorial-step-dialog {
+            position: absolute;
+            background-color: var(--color-neutral-white);
+            color: var(--color-neutral-900);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            width: 350px;
+            max-width: 90vw;
+            z-index: 1002;
+            pointer-events: all;
+            animation: dialog-fade-in 300ms ease-out;
+        }
+
+        @keyframes dialog-fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tutorial-step-dialog__header {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-h4);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary-800);
+            margin-bottom: var(--spacing-sm);
+        }
+        .tutorial-step-dialog__body {
+            font-size: var(--font-size-body);
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-neutral-900);
+        }
+        .tutorial-step-dialog__footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .tutorial-step-dialog__arrow {
+            position: absolute;
+            width: 0; 
+            height: 0; 
+            border-style: solid;
+        }
+        
+        /* Arrow pointing up */
+        .tutorial-step-dialog__arrow--up {
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            border-width: 0 10px 10px 10px;
+            border-color: transparent transparent var(--color-neutral-white) transparent;
+        }
+        /* Arrow pointing down */
+        .tutorial-step-dialog__arrow--down {
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0 10px;
+            border-color: var(--color-neutral-white) transparent transparent transparent;
+        }
+
+        /* --------------------------------- */
+        /* --- 5. Step-specific visibility -- */
+        /* --------------------------------- */
+        .tutorial-step-container, .property-modal {
+            display: none;
+        }
+        /* Show step 1 by default */
+        #step1 { display: block; }
+        #step1-target:target ~ .screen-container #step1,
+        #step2-target:target ~ .screen-container #step2,
+        #step3-target:target ~ .screen-container #step3,
+        #step4-target:target ~ .screen-container #step4 {
+            display: block;
+        }
+        #step1-target:target ~ .screen-container .tutorial-step-container:not(#step1),
+        #step2-target:target ~ .screen-container .tutorial-step-container:not(#step2),
+        #step3-target:target ~ .screen-container .tutorial-step-container:not(#step3),
+        #step4-target:target ~ .screen-container .tutorial-step-container:not(#step4) {
+            display: none;
+        }
+
+        /* Show/Hide Property Modal for Step 3 */
+        #step3-target:target ~ .screen-container .property-modal {
+            display: block;
+        }
+        
+        /* Change board text for different steps */
+        #step2-target:target ~ .screen-container .mock-board-text::before {
+            content: "Baltic Avenue";
+        }
+        #step3-target:target ~ .screen-container .mock-board-text::before {
+            content: "Property Bought!";
+        }
+
+        /* Simple nav for demo purposes */
+        .demo-nav {
+            position: fixed;
+            top: 10px; left: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-md);
+            z-index: 9999;
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        .demo-nav a {
+            color: white;
+            text-decoration: none;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: var(--color-primary-700);
+            border-radius: 4px;
+        }
+        .demo-nav a:hover { background: var(--color-primary-500); }
+    </style>
+</head>
+<body>
+    <!-- Hidden targets for CSS navigation -->
+    <div id="step1-target"></div>
+    <div id="step2-target"></div>
+    <div id="step3-target"></div>
+    <div id="step4-target"></div>
+    
+    <nav class="demo-nav" aria-label="Tutorial Step Navigation">
+        <a href="#step1-target">Step 1</a>
+        <a href="#step2-target">Step 2</a>
+        <a href="#step3-target">Step 3</a>
+        <a href="#step4-target">Step 4</a>
+    </nav>
+    
+    <div class="screen-container">
+        <!-- Background Game UI -->
+        <div class="game-ui-background">
+            <header class="mock-hud">
+                <div class="player-card">
+                    <div class="player-card__token">🎩</div>
+                    <div class="player-card__info">
+                        <div class="player-card__name">Player 1</div>
+                        <div class="player-card__cash">$1500</div>
+                    </div>
+                </div>
+                <div class="player-card">
+                    <div class="player-card__token">🚗</div>
+                    <div class="player-card__info">
+                        <div class="player-card__name">AI Opponent</div>
+                        <div class="player-card__cash">$1500</div>
+                    </div>
+                </div>
+            </header>
+            <main class="mock-board">
+                <span class="mock-board-text">Monopoly Tycoon</span>
+            </main>
+            <footer class="mock-controls">
+                <button class="btn btn--primary" id="roll-dice-btn">Roll Dice</button>
+            </footer>
+        </div>
+        
+        <!-- Mock Property Purchase Modal (visible in step 3) -->
+        <div class="property-modal" role="dialog" aria-labelledby="property-title">
+             <div class="property-modal__header">
+                <h3 id="property-title" class="property-modal__title">Baltic Avenue</h3>
+                <p class="property-modal__price">Price: $60</p>
+             </div>
+             <p class="property-modal__rent">Rent $4. With Hotel $450.</p>
+             <div class="property-modal__actions">
+                 <button class="btn btn--secondary" style="flex-grow: 1;">Auction</button>
+                 <button class="btn btn--primary" style="flex-grow: 1;" id="buy-btn">Buy</button>
+             </div>
+        </div>
+
+        <!-- Tutorial Overlays (one per step) -->
+        <div class="tutorial-step-container" id="step1">
+            <div class="tutorial-overlay">
+                <div class="tutorial-highlight" style="bottom: 40px; left: 50%; transform: translateX(-50%); width: 140px; height: 50px;"></div>
+                <div class="tutorial-step-dialog" style="bottom: 110px; left: 50%; transform: translateX(-50%);">
+                    <div class="tutorial-step-dialog__arrow tutorial-step-dialog__arrow--down"></div>
+                    <h4 class="tutorial-step-dialog__header">Welcome to Monopoly Tycoon!</h4>
+                    <p class="tutorial-step-dialog__body">Let's start your turn. To move your token, you need to roll the dice. Click the highlighted button below.</p>
+                    <div class="tutorial-step-dialog__footer">
+                         <button class="btn btn--primary" onclick="window.location.hash='step2-target'">Next &gt;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tutorial-step-container" id="step2">
+            <div class="tutorial-overlay">
+                <div class="tutorial-scrim"></div> <!-- Scrim only, no highlight -->
+                <div class="tutorial-step-dialog" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    <h4 class="tutorial-step-dialog__header">Movement &amp; Landing</h4>
+                    <p class="tutorial-step-dialog__body">Great! You rolled a 3 and landed on 'Baltic Avenue'. When you land on an unowned property, you have a choice to make.</p>
+                    <div class="tutorial-step-dialog__footer">
+                         <button class="btn btn--primary" onclick="window.location.hash='step3-target'">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tutorial-step-container" id="step3">
+            <div class="tutorial-overlay">
+                <div class="tutorial-highlight" style="top: calc(50% + 55px); left: calc(50% + 72px); transform: translate(-50%, -50%); width: 140px; height: 50px; border-radius: 8px;"></div>
+                <div class="tutorial-step-dialog" style="top: 50%; left: calc(50% - 250px); transform: translateY(-50%);">
+                    <h4 class="tutorial-step-dialog__header">Buying Property</h4>
+                    <p class="tutorial-step-dialog__body">You can buy 'Baltic Avenue' for $60. Owning properties lets you collect rent from opponents. Click 'Buy' to purchase it.</p>
+                    <div class="tutorial-step-dialog__footer">
+                         <button class="btn btn--primary" onclick="window.location.hash='step4-target'">Next &gt;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tutorial-step-container" id="step4">
+            <div class="tutorial-overlay">
+                <div class="tutorial-scrim"></div>
+                <div class="tutorial-step-dialog" role="alertdialog" style="top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <h4 class="tutorial-step-dialog__header">Tutorial Complete!</h4>
+                    <p class="tutorial-step-dialog__body">You've learned the basics of moving and buying property. You're ready to build your empire! What would you like to do next?</p>
+                    <div class="tutorial-step-dialog__footer" style="justify-content: center; gap: 16px;">
+                         <button class="btn btn--secondary" style="background-color: transparent; border-color: var(--color-primary-700); color: var(--color-primary-700);">Return to Main Menu</button>
+                         <button class="btn btn--primary">Start New Game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="screen-variations" style="display: none;">
+        <h2>Screen Variations</h2>
+        <div class="variation-group">
+            <h3>Variant Name: "Step-by-Step Guidance"</h3>
+            <p>
+                The tutorial is a linear sequence of guided steps. The user's interaction is restricted to a single highlighted element at each stage to ensure they follow the correct flow. This mockup demonstrates four key steps:
+            </p>
+            <ol>
+                <li><strong>Welcome & Roll Dice:</strong> Introduces the player and highlights the 'Roll Dice' button.</li>
+                <li><strong>Movement Explanation:</strong> A modal dialog explains the outcome of the dice roll and the concept of landing on a space.</li>
+                <li><strong>Buying Property:</strong> After landing on an unowned property, a modal appears, and the tutorial highlights the 'Buy' button, explaining its function.</li>
+                <li><strong>Tutorial Complete:</strong> A final modal appears, congratulating the user and offering navigation options to start a real game or return to the menu.</li>
+            </ol>
+            <p>
+                Further steps in a full implementation would cover collecting rent, passing GO, and managing properties. The interactive buttons at the top left of this mockup simulate progressing through these steps.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

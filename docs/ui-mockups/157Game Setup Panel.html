@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Setup Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---------------------------------- */
+    /* --- CSS Reset & Base Styles --- */
+    /* ---------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+
+    /* ------------------------------ */
+    /* --- Design System Tokens -- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      --color-error-500: #C0392B;
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-size-h3: 28px; --font-size-h4: 20px;
+      --font-size-body: 16px; --font-size-caption: 14px;
+      --font-weight-regular: 400; --font-weight-semibold: 600;
+      --line-height-heading: 1.4; --line-height-body: 1.6;
+
+      /* Spacing */
+      --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+      --spacing-xl: 32px;
+
+      /* Borders & Shadows */
+      --border-radius-sm: 4px; --border-radius-md: 8px; --border-radius-lg: 12px;
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+    
+    body {
+        font-family: var(--font-family-secondary);
+        background-color: var(--color-primary-900);
+        color: var(--color-neutral-900);
+        padding: var(--spacing-xl);
+    }
+
+    /* --------------------------------- */
+    /* --- ATOMIC COMPONENT STYLES --- */
+    /* --------------------------------- */
+    
+    /* --- Button --- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm);
+      min-height: 44px; padding: 12px 24px;
+      font-family: var(--font-family-secondary); font-size: var(--font-size-body); font-weight: var(--font-weight-semibold);
+      border: 1px solid transparent; border-radius: var(--border-radius-md);
+      cursor: pointer; text-decoration: none; text-align: center; white-space: nowrap;
+      transition: all 150ms ease-out;
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--color-primary-300); outline-offset: 2px;
+    }
+    .btn--primary { background-color: var(--color-primary-500); color: var(--color-neutral-white); }
+    .btn--primary:hover { background-color: var(--color-primary-600); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .btn--primary:active { background-color: var(--color-primary-700); box-shadow: var(--shadow-sm); transform: translateY(0); }
+    .btn--primary:disabled { background-color: var(--color-primary-200); color: var(--color-primary-50); cursor: not-allowed; }
+
+    /* --- Text Input & Form Group --- */
+    .form-group { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+    .text-label--caption { font-size: var(--font-size-caption); font-weight: var(--font-weight-regular); color: var(--color-neutral-500); line-height: var(--line-height-heading); }
+    .form-input {
+      width: 100%; max-width: 400px; padding: 12px 16px;
+      font-family: var(--font-family-secondary); font-size: var(--font-size-body);
+      background-color: var(--color-neutral-white); color: var(--color-neutral-900);
+      border: 1px solid var(--color-neutral-500); border-radius: var(--border-radius-md);
+      transition: all 150ms ease-out;
+    }
+    .form-input:focus { border: 2px solid var(--color-primary-500); padding: 11px 15px; outline: none; box-shadow: 0 0 0 3px var(--color-primary-50); }
+    .form-input--error { border: 2px solid var(--color-error-500); padding: 11px 15px; }
+    
+    /* --- Segmented Control --- */
+    .segmented-control {
+      display: inline-flex; border: 1px solid var(--color-primary-700); border-radius: var(--border-radius-md); overflow: hidden;
+    }
+    .segmented-control__label {
+      position: relative; cursor: pointer;
+    }
+    .segmented-control__input { 
+      position: absolute; opacity: 0; width: 0; height: 0;
+    }
+    .segmented-control__text {
+      display: block; padding: 8px 16px;
+      background-color: var(--color-neutral-white); color: var(--color-primary-700);
+      font-weight: var(--font-weight-semibold); transition: background-color 150ms ease;
+      border-right: 1px solid var(--color-primary-700);
+    }
+    .segmented-control__label:last-child .segmented-control__text { border-right: none; }
+    .segmented-control__label:hover .segmented-control__text { background-color: var(--color-primary-50); }
+    .segmented-control__input:checked + .segmented-control__text {
+      background-color: var(--color-primary-700); color: var(--color-neutral-white);
+    }
+    .segmented-control__input:focus-visible + .segmented-control__text {
+      outline: 2px solid var(--color-primary-300); outline-offset: -2px; z-index: 1;
+    }
+
+    /* --------------------------------- */
+    /* --- ORGANISM: GAME SETUP PANEL -- */
+    /* --------------------------------- */
+    
+    .game-setup {
+      background-color: var(--color-neutral-white);
+      padding: var(--spacing-xl);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xl);
+    }
+
+    .game-setup__header h2 {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h3);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary-900);
+      text-align: center;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .game-setup__section {
+      border-top: 1px solid var(--color-neutral-100);
+      padding-top: var(--spacing-xl);
+    }
+
+    .game-setup__section-title {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary-800);
+      margin-bottom: var(--spacing-md);
+    }
+
+    /* --- Token Selection --- */
+    .game-setup__token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-sm);
+    }
+
+    .game-setup__token-label {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      aspect-ratio: 1 / 1;
+      background-color: var(--color-neutral-50);
+      border-radius: var(--border-radius-md);
+      transition: all 150ms ease-out;
+      border: 2px solid transparent;
+    }
+
+    .game-setup__token-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .game-setup__token-img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+      filter: grayscale(1);
+      opacity: 0.7;
+      transition: all 150ms ease-out;
+    }
+
+    .game-setup__token-label:hover .game-setup__token-img {
+      filter: grayscale(0);
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .game-setup__token-input:focus-visible + .game-setup__token-label {
+      outline: 2px solid var(--color-primary-300);
+      outline-offset: 2px;
+    }
+
+    .game-setup__token-input:checked + .game-setup__token-label {
+      border-color: var(--color-primary-500);
+      background-color: var(--color-primary-50);
+    }
+
+    .game-setup__token-input:checked + .game-setup__token-label .game-setup__token-img {
+      filter: grayscale(0);
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    /* --- Opponent Configuration --- */
+    .game-setup__opponents-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .game-setup__opponent-config {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--color-neutral-50);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--border-radius-md);
+    }
+
+    .game-setup__opponent-label {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+    }
+
+    .game-setup__actions {
+      border-top: 1px solid var(--color-neutral-100);
+      padding-top: var(--spacing-xl);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* --- Responsive Adjustments --- */
+    @media (max-width: 768px) {
+      body {
+        padding: var(--spacing-md);
+      }
+      .game-setup {
+        padding: var(--spacing-lg);
+      }
+      .game-setup__opponent-config {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+      }
+      .game-setup__actions {
+        justify-content: center;
+      }
+      .game-setup__actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <form class="game-setup">
+    <header class="game-setup__header">
+      <h2>New Game</h2>
+    </header>
+
+    <section class="game-setup__section">
+      <h3 class="game-setup__section-title">Your Profile</h3>
+      <div class="form-group">
+        <label for="profileName" class="text-label--caption">Profile Name</label>
+        <input type="text" id="profileName" class="form-input" placeholder="Enter your name..." maxlength="16">
+      </div>
+
+      <div class="form-group">
+        <label class="text-label--caption">Choose Your Token</label>
+        <fieldset class="game-setup__token-grid">
+            <legend class="sr-only">Select a game token</legend>
+            
+            <div>
+              <input type="radio" name="player-token" value="thimble" id="token-thimble" class="game-setup__token-input" checked>
+              <label for="token-thimble" class="game-setup__token-label" title="Thimble">
+                <img src="https://i.imgur.com/Kydaz8C.png" alt="Thimble Token" class="game-setup__token-img">
+              </label>
+            </div>
+            
+            <div>
+              <input type="radio" name="player-token" value="wheelbarrow" id="token-wheelbarrow" class="game-setup__token-input">
+              <label for="token-wheelbarrow" class="game-setup__token-label" title="Wheelbarrow">
+                <img src="https://i.imgur.com/gFe2y1T.png" alt="Wheelbarrow Token" class="game-setup__token-img">
+              </label>
+            </div>
+            
+            <div>
+              <input type="radio" name="player-token" value="cat" id="token-cat" class="game-setup__token-input">
+              <label for="token-cat" class="game-setup__token-label" title="Cat">
+                <img src="https://i.imgur.com/V7a82pD.png" alt="Cat Token" class="game-setup__token-img">
+              </label>
+            </div>
+            
+            <div>
+              <input type="radio" name="player-token" value="car" id="token-car" class="game-setup__token-input">
+              <label for="token-car" class="game-setup__token-label" title="Racing Car">
+                <img src="https://i.imgur.com/p51g2eX.png" alt="Car Token" class="game-setup__token-img">
+              </label>
+            </div>
+
+            <div>
+              <input type="radio" name="player-token" value="dog" id="token-dog" class="game-setup__token-input">
+              <label for="token-dog" class="game-setup__token-label" title="Scottish Terrier">
+                <img src="https://i.imgur.com/6gL1gFA.png" alt="Dog Token" class="game-setup__token-img">
+              </label>
+            </div>
+            
+            <div>
+              <input type="radio" name="player-token" value="battleship" id="token-battleship" class="game-setup__token-input">
+              <label for="token-battleship" class="game-setup__token-label" title="Battleship">
+                <img src="https://i.imgur.com/d9jYjI9.png" alt="Battleship Token" class="game-setup__token-img">
+              </label>
+            </div>
+
+            <div>
+              <input type="radio" name="player-token" value="tophat" id="token-tophat" class="game-setup__token-input">
+              <label for="token-tophat" class="game-setup__token-label" title="Top Hat">
+                <img src="https://i.imgur.com/4tnsfT7.png" alt="Top Hat Token" class="game-setup__token-img">
+              </label>
+            </div>
+
+            <div>
+              <input type="radio" name="player-token" value="boot" id="token-boot" class="game-setup__token-input">
+              <label for="token-boot" class="game-setup__token-label" title="Boot">
+                <img src="https://i.imgur.com/TETuJpY.png" alt="Boot Token" class="game-setup__token-img">
+              </label>
+            </div>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="game-setup__section">
+      <h3 class="game-setup__section-title">Opponents</h3>
+      <div class="form-group">
+        <label class="text-label--caption">Number of Opponents</label>
+        <fieldset class="segmented-control">
+          <legend class="sr-only">Select number of AI opponents</legend>
+          <label class="segmented-control__label">
+            <input type="radio" name="ai-count" value="1" class="segmented-control__input">
+            <span class="segmented-control__text">1</span>
+          </label>
+          <label class="segmented-control__label">
+            <input type="radio" name="ai-count" value="2" class="segmented-control__input">
+            <span class="segmented-control__text">2</span>
+          </label>
+          <label class="segmented-control__label">
+            <input type="radio" name="ai-count" value="3" class="segmented-control__input" checked>
+            <span class="segmented-control__text">3</span>
+          </label>
+        </fieldset>
+      </div>
+
+      <div class="game-setup__opponents-list">
+        <div class="game-setup__opponent-config">
+          <span class="game-setup__opponent-label">AI Opponent 1</span>
+          <fieldset class="segmented-control">
+            <legend class="sr-only">Difficulty for AI Opponent 1</legend>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-1" value="easy" class="segmented-control__input">
+              <span class="segmented-control__text">Easy</span>
+            </label>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-1" value="medium" class="segmented-control__input" checked>
+              <span class="segmented-control__text">Medium</span>
+            </label>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-1" value="hard" class="segmented-control__input">
+              <span class="segmented-control__text">Hard</span>
+            </label>
+          </fieldset>
+        </div>
+        <div class="game-setup__opponent-config">
+          <span class="game-setup__opponent-label">AI Opponent 2</span>
+          <fieldset class="segmented-control">
+            <legend class="sr-only">Difficulty for AI Opponent 2</legend>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-2" value="easy" class="segmented-control__input">
+              <span class="segmented-control__text">Easy</span>
+            </label>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-2" value="medium" class="segmented-control__input" checked>
+              <span class="segmented-control__text">Medium</span>
+            </label>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-2" value="hard" class="segmented-control__input">
+              <span class="segmented-control__text">Hard</span>
+            </label>
+          </fieldset>
+        </div>
+        <div class="game-setup__opponent-config">
+          <span class="game-setup__opponent-label">AI Opponent 3</span>
+          <fieldset class="segmented-control">
+            <legend class="sr-only">Difficulty for AI Opponent 3</legend>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-3" value="easy" class="segmented-control__input">
+              <span class="segmented-control__text">Easy</span>
+            </label>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-3" value="medium" class="segmented-control__input" checked>
+              <span class="segmented-control__text">Medium</span>
+            </label>
+            <label class="segmented-control__label">
+              <input type="radio" name="difficulty-3" value="hard" class="segmented-control__input">
+              <span class="segmented-control__text">Hard</span>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+    </section>
+
+    <footer class="game-setup__actions">
+      <button type="submit" class="btn btn--primary">Start Game</button>
+    </footer>
+  </form>
+
+  <div style="margin-top: 40px;">
+      <h2 style="text-align: center; color: white; font-family: var(--font-family-primary);">Component Variations</h2>
+      <div style="color: #ddd; text-align: center; margin-bottom: 20px;">The number of AI configuration rows below would be dynamically shown based on the 'Number of Opponents' selection.</div>
+
+      <!-- Variant 1: 2-AI -->
+      <div style="margin-bottom: 20px;">
+          <h3 style="color: white; font-family: var(--font-family-secondary); text-align: center; margin-bottom: 10px;">Variant: 2 AI Opponents</h3>
+           <div class="game-setup__opponents-list" style="max-width: 700px; margin: 0 auto;">
+              <div class="game-setup__opponent-config">
+                <span class="game-setup__opponent-label">AI Opponent 1</span>
+                <fieldset class="segmented-control">
+                  <legend class="sr-only">Difficulty for AI Opponent 1</legend>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-1-v2" value="easy" class="segmented-control__input">
+                    <span class="segmented-control__text">Easy</span>
+                  </label>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-1-v2" value="medium" class="segmented-control__input" checked>
+                    <span class="segmented-control__text">Medium</span>
+                  </label>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-1-v2" value="hard" class="segmented-control__input">
+                    <span class="segmented-control__text">Hard</span>
+                  </label>
+                </fieldset>
+              </div>
+              <div class="game-setup__opponent-config">
+                <span class="game-setup__opponent-label">AI Opponent 2</span>
+                <fieldset class="segmented-control">
+                  <legend class="sr-only">Difficulty for AI Opponent 2</legend>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-2-v2" value="easy" class="segmented-control__input">
+                    <span class="segmented-control__text">Easy</span>
+                  </label>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-2-v2" value="medium" class="segmented-control__input" checked>
+                    <span class="segmented-control__text">Medium</span>
+                  </label>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-2-v2" value="hard" class="segmented-control__input">
+                    <span class="segmented-control__text">Hard</span>
+                  </label>
+                </fieldset>
+              </div>
+           </div>
+      </div>
+
+      <!-- Variant 2: 1-AI -->
+      <div>
+          <h3 style="color: white; font-family: var(--font-family-secondary); text-align: center; margin-bottom: 10px;">Variant: 1 AI Opponent</h3>
+           <div class="game-setup__opponents-list" style="max-width: 700px; margin: 0 auto;">
+              <div class="game-setup__opponent-config">
+                <span class="game-setup__opponent-label">AI Opponent 1</span>
+                <fieldset class="segmented-control">
+                  <legend class="sr-only">Difficulty for AI Opponent 1</legend>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-1-v1" value="easy" class="segmented-control__input">
+                    <span class="segmented-control__text">Easy</span>
+                  </label>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-1-v1" value="medium" class="segmented-control__input" checked>
+                    <span class="segmented-control__text">Medium</span>
+                  </label>
+                  <label class="segmented-control__label">
+                    <input type="radio" name="difficulty-1-v1" value="hard" class="segmented-control__input">
+                    <span class="segmented-control__text">Hard</span>
+                  </label>
+                </fieldset>
+              </div>
+           </div>
+      </div>
+  </div>
+
+</body>
+</html>

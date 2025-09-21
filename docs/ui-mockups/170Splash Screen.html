@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monopoly Tycoon - Splash Screen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Lora:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------ */
+    /* --- 1. Design System Tokens -- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      
+      --color-destructive-50: #FBE9EC; --color-destructive-500: #D7263D; --color-destructive-900: #5A0A15;
+
+      --color-success-500: #1E8449; --color-warning-500: #F39C12; --color-error-500: #C0392B; --color-info-500: #2980B9;
+
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17; --color-neutral-black: #000000;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-family-monospace: 'Roboto Mono', monospace;
+      
+      --font-size-h1: 48px; --font-size-h2: 36px; --font-size-h3: 28px; --font-size-h4: 20px;
+      --font-size-body: 16px; --font-size-caption: 14px;
+
+      --font-weight-regular: 400; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+      --line-height-tight: 1.2; --line-height-heading: 1.4; --line-height-body: 1.6;
+
+      /* Spacing */
+      --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px;
+      --spacing-xl: 32px; --spacing-2xl: 48px; --spacing-3xl: 64px;
+    }
+
+    /* ------------------------------ */
+    /* --- 2. CSS Reset & Base Styles -- */
+    /* ------------------------------ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-primary-900);
+      color: var(--color-neutral-white);
+      line-height: var(--line-height-body);
+      overflow: hidden;
+    }
+
+    /* ------------------------------ */
+    /* --- 3. Screen Implementation -- */
+    /* ------------------------------ */
+    .splash-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      position: relative;
+      background: radial-gradient(circle, var(--color-primary-800) 0%, var(--color-primary-900) 70%);
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .splash-screen__logo {
+      margin-bottom: var(--spacing-2xl);
+    }
+    
+    .splash-screen__logo .text-label--h1 {
+      font-family: var(--font-family-primary);
+      font-size: 64px; /* Larger for splash screen */
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-tight);
+      color: var(--color-neutral-white);
+      text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      letter-spacing: 2px;
+    }
+
+    .splash-screen__loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-lg);
+      position: absolute;
+      bottom: 10vh;
+    }
+
+    .splash-screen__spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 4px solid var(--color-primary-700);
+      border-top-color: var(--color-primary-300);
+      animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .splash-screen__loading-text {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-regular);
+      color: var(--color-neutral-100);
+      letter-spacing: 1px;
+    }
+    
+    .splash-screen__footer {
+      position: absolute;
+      bottom: var(--spacing-lg);
+      font-family: var(--font-family-monospace);
+      font-size: var(--font-size-caption);
+      color: var(--color-primary-700);
+      opacity: 0.8;
+    }
+    
+    /* Reusable Atomic Component Classes */
+    .text-label--h1 { font-family: var(--font-family-primary); font-size: var(--font-size-h1); font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); }
+    .text-label--body { font-size: var(--font-size-body); font-weight: var(--font-weight-regular); line-height: var(--line-height-body); }
+    .text-label--caption { font-size: var(--font-size-caption); font-weight: var(--font-weight-regular); color: var(--color-neutral-500); line-height: var(--line-height-heading); }
+
+    /* For variations section styling */
+    .screen-variations {
+        display: none; /* Hide in the actual view, for documentation only */
+        padding: 20px;
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    .variation-group h3 {
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+    .variation-group p {
+        font-size: 14px;
+        font-style: italic;
+        color: #555;
+    }
+
+  </style>
+</head>
+<body>
+
+  <main class="splash-screen" role="main" aria-label="Loading Monopoly Tycoon">
+    <div class="splash-screen__logo">
+      <h1 class="text-label--h1">Monopoly Tycoon</h1>
+    </div>
+
+    <div class="splash-screen__loader">
+      <div class="splash-screen__spinner" role="status" aria-label="Loading indicator"></div>
+      <p class="splash-screen__loading-text" aria-live="polite">Loading...</p>
+    </div>
+
+    <footer class="splash-screen__footer">
+      <p class="text-label--caption">&copy; 2024 Your Company. Based on the Hasbro MONOPOLY board game.</p>
+    </footer>
+  </main>
+  
+  <div class="screen-variations">
+    <h2>Screen Variations</h2>
+    <div class="variation-group">
+      <h3>Variant Name: "Loading State"</h3>
+      <p>The default and only state of the splash screen, displayed while the application initializes in the background. It transitions automatically to the main menu. The entire body of this HTML file demonstrates this state.</p>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade Interface Component</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ------------------------------ */
+    /* --- DESIGN SYSTEM TOKENS ----- */
+    /* ------------------------------ */
+    :root {
+      /* Color Palette */
+      --color-primary-50: #E6F0F6; --color-primary-100: #BEDAED; --color-primary-200: #94C3E3;
+      --color-primary-300: #6BAFDA; --color-primary-400: #429BD0; --color-primary-500: #1987C7;
+      --color-primary-600: #126DA3; --color-primary-700: #0C537F; --color-primary-800: #063A5B;
+      --color-primary-900: #032037;
+      
+      --color-destructive-500: #D7263D; --color-success-500: #1E8449; --color-error-500: #C0392B;
+
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F7F5F2; --color-neutral-100: #E8E5E1;
+      --color-neutral-500: #7D7871; --color-neutral-900: #1C1A17;
+
+      /* Typography */
+      --font-family-primary: 'Lora', serif; --font-family-secondary: 'Inter', sans-serif;
+      --font-size-h3: 28px; --font-size-h4: 20px; --font-size-body: 16px; --font-size-caption: 14px;
+      --font-weight-regular: 400; --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
+      
+      /* Spacing */
+      --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px; --spacing-xl: 32px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 8px; --border-radius-lg: 12px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    }
+
+    /* ------------------------------ */
+    /* --- BASE & LAYOUT STYLES ----- */
+    /* ------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family-secondary);
+      background-color: var(--color-primary-900);
+      color: var(--color-neutral-900);
+      padding: var(--spacing-xl);
+      background-image: linear-gradient(45deg, var(--color-primary-800) 25%, transparent 25%), linear-gradient(-45deg, var(--color-primary-800) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--color-primary-800) 75%), linear-gradient(-45deg, transparent 75%, var(--color-primary-800) 75%);
+      background-size: 20px 20px;
+    }
+    
+    .showcase-title {
+        text-align: center;
+        color: white;
+        font-family: var(--font-family-primary);
+        font-size: 3rem;
+        margin-bottom: var(--spacing-lg);
+    }
+    .variant-section {
+        margin-top: var(--spacing-xl);
+    }
+    .variant-section > h2 {
+        color: white;
+        font-family: var(--font-family-primary);
+        margin-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--color-primary-700);
+        padding-bottom: var(--spacing-sm);
+    }
+    
+    /* ------------------------------ */
+    /* --- ATOMIC DEPENDENCIES ------ */
+    /* ------------------------------ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm);
+      min-height: 44px; padding: 12px 24px;
+      font-family: var(--font-family-secondary); font-size: var(--font-size-body); font-weight: var(--font-weight-semibold);
+      border: 1px solid transparent; border-radius: var(--border-radius-md);
+      cursor: pointer; text-decoration: none;
+      transition: all 150ms ease-out;
+    }
+    .btn:focus-visible { outline: 2px solid var(--color-primary-300); outline-offset: 2px; }
+    .btn--primary { background-color: var(--color-primary-500); color: var(--color-neutral-white); }
+    .btn--primary:hover { background-color: var(--color-primary-600); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .btn--primary:active { background-color: var(--color-primary-700); box-shadow: var(--shadow-sm); transform: translateY(0); }
+    .btn--primary:disabled { background-color: var(--color-primary-200); color: var(--color-primary-50); cursor: not-allowed; box-shadow: none; transform: none; }
+    .btn--secondary { background-color: transparent; color: var(--color-primary-700); border-color: var(--color-neutral-100); }
+    .btn--secondary:hover { background-color: var(--color-primary-50); color: var(--color-primary-800); }
+    .btn--secondary:active { background-color: var(--color-primary-100); transform: translateY(1px); }
+    .btn--confirm { background-color: var(--color-success-500); color: var(--color-neutral-white); }
+    .btn--confirm:hover { background-color: #176839; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .btn--destructive { background-color: var(--color-destructive-500); color: var(--color-neutral-white); }
+    .btn--destructive:hover { background-color: #a51e2f; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    
+    .form-input {
+      width: 100%; padding: 10px var(--spacing-md);
+      font-family: var(--font-family-secondary); font-size: var(--font-size-body);
+      background-color: var(--color-neutral-white); color: var(--color-neutral-900);
+      border: 1px solid var(--color-neutral-500); border-radius: var(--border-radius-md);
+      transition: all 150ms ease-out;
+    }
+    .form-input:focus { border-color: var(--color-primary-500); outline: none; box-shadow: 0 0 0 3px var(--color-primary-50); }
+    .form-input--error { border-color: var(--color-error-500); }
+    .form-input--error:focus { box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.2); }
+
+    /* ------------------------------ */
+    /* --- TRADE INTERFACE ORGANISM --- */
+    /* ------------------------------ */
+    .trade-interface-scrim {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(6, 58, 91, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-xl);
+      animation: fadeIn 200ms ease-out forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .trade-interface {
+      width: 100%;
+      max-width: 900px;
+      background-color: var(--color-neutral-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-height: 90vh;
+      animation: scaleUp 250ms 100ms ease-out forwards;
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+    .trade-interface__header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--color-neutral-100);
+      background-color: var(--color-neutral-50);
+    }
+
+    .trade-interface__title {
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-h3);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary-800);
+      text-align: center;
+    }
+
+    .trade-interface__body {
+      flex-grow: 1;
+      overflow: hidden; /* for child scrolling */
+    }
+
+    .trade-interface__panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100%;
+    }
+
+    .trade-panel {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--color-neutral-100);
+      overflow: hidden;
+    }
+    .trade-panel:last-child {
+      border-right: none;
+    }
+
+    .trade-panel__header {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-neutral-100);
+    }
+
+    .trade-panel__player-name {
+      font-family: var(--font-family-secondary);
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+    }
+    .trade-panel__player-cash {
+      font-size: var(--font-size-caption);
+      color: var(--color-neutral-500);
+    }
+
+    .trade-panel__section {
+        padding: var(--spacing-md);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .trade-panel__section--offer {
+        background-color: var(--color-neutral-white);
+        min-height: 150px;
+        border-bottom: 1px solid var(--color-neutral-100);
+    }
+    .trade-panel__section--inventory {
+        background-color: var(--color-neutral-50);
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .trade-panel__section-title {
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-500);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .asset-item, .inventory-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-sm);
+      border-radius: var(--border-radius-md);
+      background-color: var(--color-neutral-white);
+      border: 1px solid var(--color-neutral-100);
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+    .inventory-item:hover {
+        border-color: var(--color-primary-500);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .asset-item__color-bar {
+      width: 6px;
+      height: 36px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .asset-item__content {
+      flex-grow: 1;
+    }
+    .asset-item__name {
+      font-weight: var(--font-weight-semibold);
+    }
+    .asset-item__mortgaged-indicator {
+      font-size: 12px;
+      color: var(--color-error-500);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .inventory-item--disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: var(--color-neutral-100);
+    }
+    .inventory-item--disabled:hover {
+        border-color: var(--color-neutral-100);
+        box-shadow: none;
+    }
+
+    .cash-input-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+    .cash-input-group__symbol {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-500);
+    }
+
+    .trade-interface__footer {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-top: 1px solid var(--color-neutral-100);
+      background-color: var(--color-neutral-50);
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    /* Variant-specific display logic */
+    .trade-interface--response-mode .trade-panel__section--inventory,
+    .trade-interface--response-mode .cash-input-group {
+        display: none;
+    }
+     .trade-interface--response-mode .asset-item {
+        cursor: default;
+    }
+    
+    .trade-interface--propose-mode .trade-interface__footer--response { display: none; }
+    .trade-interface--response-mode .trade-interface__footer--propose { display: none; }
+  </style>
+</head>
+<body>
+
+<h1 class="showcase-title">Trade Interface</h1>
+
+<div class="trade-interface-scrim" role="dialog" aria-modal="true" aria-labelledby="trade-title-1">
+  <div class="trade-interface trade-interface--propose-mode">
+    <header class="trade-interface__header">
+      <h2 class="trade-interface__title" id="trade-title-1">Propose Trade with AI-Bot-1</h2>
+    </header>
+    <div class="trade-interface__body">
+      <div class="trade-interface__panels">
+        <!-- YOUR PANEL -->
+        <div class="trade-panel">
+          <header class="trade-panel__header">
+            <div class="trade-panel__player-name">Your Offer</div>
+            <div class="trade-panel__player-cash">Your Cash: $1250</div>
+          </header>
+
+          <div class="trade-panel__section trade-panel__section--offer">
+            <h3 class="trade-panel__section-title">Items you will give</h3>
+            <!-- Dynamically added asset items go here -->
+            <div class="asset-item">
+              <div class="asset-item__color-bar" style="background-color: #A0E2FA;"></div>
+              <div class="asset-item__content">
+                <div class="asset-item__name">Connecticut Avenue</div>
+              </div>
+            </div>
+            <div class="asset-item">
+              <div class="asset-item__content">
+                <div class="asset-item__name">Cash: $100</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trade-panel__section trade-panel__section--inventory">
+            <h3 class="trade-panel__section-title">Your Available Assets</h3>
+            <div class="inventory-item">
+                <div class="asset-item__color-bar" style="background-color: #D93A96;"></div>
+                <div class="asset-item__content"><div class="asset-item__name">Virginia Avenue</div></div>
+            </div>
+            <div class="inventory-item inventory-item--disabled">
+                <div class="asset-item__color-bar" style="background-color: #F88200;"></div>
+                <div class="asset-item__content"><div class="asset-item__name">New York Avenue</div></div>
+                <div class="asset-item__mortgaged-indicator" title="Cannot trade properties with buildings">H</div>
+            </div>
+            <div class="cash-input-group">
+                <span class="cash-input-group__symbol">$</span>
+                <input type="number" class="form-input" placeholder="0" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- OPPONENT'S PANEL -->
+        <div class="trade-panel">
+          <header class="trade-panel__header">
+            <div class="trade-panel__player-name">AI-Bot-1's Offer</div>
+            <div class="trade-panel__player-cash">Their Cash: $800</div>
+          </header>
+          
+          <div class="trade-panel__section trade-panel__section--offer">
+            <h3 class="trade-panel__section-title">Items you will receive</h3>
+             <div class="asset-item">
+              <div class="asset-item__color-bar" style="background-color: #A0E2FA;"></div>
+              <div class="asset-item__content">
+                <div class="asset-item__name">Vermont Avenue</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trade-panel__section trade-panel__section--inventory">
+            <h3 class="trade-panel__section-title">Their Available Assets</h3>
+             <div class="inventory-item asset-item--mortgaged">
+                <div class="asset-item__color-bar" style="background-color: #486824;"></div>
+                <div class="asset-item__content">
+                    <div class="asset-item__name">Pennsylvania Avenue</div>
+                    <div class="asset-item__mortgaged-indicator">MORTGAGED</div>
+                </div>
+            </div>
+            <div class="inventory-item">
+                <div class="asset-item__color-bar" style="background-color: #FE0000;"></div>
+                <div class="asset-item__content"><div class="asset-item__name">Kentucky Avenue</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="trade-interface__footer trade-interface__footer--propose">
+      <button type="button" class="btn btn--secondary">Cancel</button>
+      <button type="button" class="btn btn--primary">Propose Trade</button>
+    </footer>
+    <footer class="trade-interface__footer trade-interface__footer--response">
+      <button type="button" class="btn btn--secondary">Propose Counter-Offer</button>
+      <button type="button" class="btn btn--destructive">Decline</button>
+      <button type="button" class="btn btn--confirm">Accept</button>
+    </footer>
+  </div>
+</div>
+
+<div class="variant-section">
+    <h2>Component Variants</h2>
+    <p style="color: white; max-width: 80ch;">The Trade Interface organism changes its available actions based on the context. Modifier classes like `.trade-interface--response-mode` are used to toggle the footer buttons and hide editing controls.</p>
+    
+    <!-- AI INITIATED RESPONSE VARIANT -->
+    <div class="trade-interface-scrim" style="position: static; margin-top: 1rem;">
+      <div class="trade-interface trade-interface--response-mode" style="animation: none; opacity: 1; transform: none; max-height: 500px;">
+        <header class="trade-interface__header">
+          <h2 class="trade-interface__title" id="trade-title-2">Trade Offer from AI-Bot-2</h2>
+        </header>
+        <div class="trade-interface__body">
+          <div class="trade-interface__panels">
+            <!-- YOUR PANEL -->
+            <div class="trade-panel">
+              <header class="trade-panel__header">
+                <div class="trade-panel__player-name">You Give</div>
+                <div class="trade-panel__player-cash">Your Cash: $1250</div>
+              </header>
+              <div class="trade-panel__section trade-panel__section--offer">
+                <h3 class="trade-panel__section-title">Items requested from you</h3>
+                <div class="asset-item">
+                  <div class="asset-item__color-bar" style="background-color: #D93A96;"></div>
+                  <div class="asset-item__content"><div class="asset-item__name">Virginia Avenue</div></div>
+                </div>
+              </div>
+            </div>
+            <!-- OPPONENT'S PANEL -->
+            <div class="trade-panel">
+              <header class="trade-panel__header">
+                <div class="trade-panel__player-name">You Receive</div>
+                <div class="trade-panel__player-cash">Their Cash: $950</div>
+              </header>
+              <div class="trade-panel__section trade-panel__section--offer">
+                <h3 class="trade-panel__section-title">Items offered to you</h3>
+                <div class="asset-item">
+                    <div class="asset-item__content">
+                        <div class="asset-item__name">Cash: $200</div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="trade-interface__footer trade-interface__footer--response" style="display: flex;">
+          <button type="button" class="btn btn--secondary">Propose Counter-Offer</button>
+          <button type="button" class="btn btn--destructive">Decline</button>
+          <button type="button" class="btn btn--confirm">Accept</button>
+        </footer>
+      </div>
+    </div>
+</div>
+
+</body>
+</html>
